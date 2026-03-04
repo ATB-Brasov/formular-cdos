@@ -1,0 +1,107 @@
+import lista from './lista_facultati_unitbv_2026.js';
+
+
+/**
+ * @template T
+ * @param {T} e - The element of a list
+ * @param {number} i - The index of the element
+ * @param {T[]} self The reference to the list
+ * @returns {boolean} If the element should be filtered out
+ */
+function uniq(e, i, self) {
+    return i === self.indexOf(e);
+}
+
+export default [
+    {
+        titlu: 'Date Academice',
+        descriere: 'Date academice, ce nu-i clar?',
+        cimpuri: [
+            {
+                tip: 'email',
+                nume: 'posta',
+                titlu: 'Poșta Instituțională',
+                obligatoriu: true,
+                valideaza: (/** @type {string} */ val) => {
+                    if (
+                        !val.endsWith('@student.unitbv.ro') &&
+                        !val.endsWith('@unitbv.ro')
+                    )
+                        return 'Folosește adresa instutițională!';
+                },
+            },
+            {
+                tip: 'selecție',
+                nume: 'facultatea',
+                titlu: 'Facultatea',
+                obligatoriu: true,
+                optiuni: () =>
+                    lista.facultati
+                        .map(function (o) {
+                            return o.fac;
+                        })
+                        .filter(uniq),
+            },
+            {
+                tip: 'selecție',
+                nume: 'ciclu',
+                titlu: 'Ciclu de Studii',
+                optiuni: (/** @type {Object.<string,string>} */ raspunsuri) =>
+                    lista.facultati
+                        .filter((o) => o.fac === raspunsuri['facultatea'])
+                        .map((o) => o.cic)
+                        .filter(uniq),
+            },
+            {
+                tip: 'selecție',
+                nume: 'forma',
+                titlu: 'Forma de Învățămînt',
+                optiuni: (/** @type {Object.<string,string>} */ raspunsuri) =>
+                    lista.facultati
+                        .filter(
+                            (o) =>
+                                o.fac === raspunsuri['facultatea'] &&
+                                o.cic === raspunsuri['ciclu'],
+                        )
+                        .map((o) => o.frm)
+                        .filter((e, i, self) => i === self.indexOf(e)),
+            },
+            {
+                tip: 'selecție',
+                nume: 'programul',
+                titlu: 'Programul de Învățămînt',
+                optiuni: (/** @type {Object.<string,string>} */ raspunsuri) =>
+                    lista.facultati
+                        .filter(
+                            (o) =>
+                                o.fac === raspunsuri['facultatea'] &&
+                                o.cic === raspunsuri['ciclu'] &&
+                                o.frm === raspunsuri['forma'],
+                        )
+                        .map((o) => o.prg)
+                        .filter(uniq),
+            },
+        ],
+    },
+    {
+        titlu: 'Fisa de Curs',
+        descriere: 'Ca la dnul Țierean',
+        cimpuri: [
+            {
+                tip: 'text',
+                nume: 'cunostinte',
+                titlu: 'descrieție ĉe e aia o fișă de curs',
+            },
+            {
+                tip: 'text',
+                nume: 'primire',
+                titlu: 'ați primit fișa?',
+                obligatoriu: true,
+                valideaza: (/** @type {string} */ val) => {
+                    if (val.toLowerCase() !== 'da')
+                        return 'răspunsul trebuie să fie `da`';
+                },
+            },
+        ],
+    },
+];

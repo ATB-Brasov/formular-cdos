@@ -1,198 +1,174 @@
 <script>
+    import { enhance } from '$app/forms';
+    import intrebari from './intrebari.js';
+    import Selectie from './Selectie.svelte';
 
-import { enhance } from '$app/forms';
-import lista from './lista_facultati_unitbv_2026.js';
-import Selectie from './Selectie.svelte';
+    /** @type {{ form: import('./$types').ActionData }} */
+    const { form } = $props();
 
-/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
-const { form } = $props()
+    let raspunsuri = $state(form ?? {});
 
-let posta = $derived(form?.posta ?? "")
-let facultatea = $state("")
-let ciclu = $state("")
-let forma = $state("")
-let specializare = $state("")
+    let pagina = $derived(form?.pag ?? 0);
+    const ULTIMA_PAGINA = intrebari.length - 1;
+    const pagina_activa = $derived(intrebari[pagina]);
+    const btn_urmator_activ = $derived(
+        pagina_activa.cimpuri
+            .map(
+                (c) =>
+                    c.obligatoriu &&
+                    (raspunsuri[c.nume] === undefined ||
+                        raspunsuri[c.nume] === ''),
+            )
+            .reduce((prev, curr) => {
+                return prev || curr;
+            }, false),
+    );
 
-const lista_facultati = lista.facultati
-.map(function(o) { return o.fac; })
-.filter(function(e, i, self) { return i === self.indexOf(e); });
-
-
-const lista_cicluri = $derived(
-    lista.facultati
-        .filter(o => o.fac === facultatea)
-        .map(o => o.cic)
-        .filter((e, i, self) => i === self.indexOf(e))
-);
-const lista_frm = $derived(
-    lista.facultati
-        .filter(o => o.fac === facultatea && o.cic === ciclu)
-        .map(o => o.frm)
-        .filter((e, i, self) => i === self.indexOf(e))
-);
-const specializări = $derived(
-    lista.facultati
-        .filter(o => o.fac === facultatea && o.cic === ciclu && o.frm === forma)
-        .map(o=>o.prg)
-)
-
-let pagina = $derived(form?.pag ?? 1)
-const ULITMA_PAGINA = 3;
-
-// FIXME: Verifică doar cîmpurile obligatorii!
-let pag_1_completat = $derived(posta && facultatea && ciclu && forma && specializare)
-
-const error = $state({
-    error: "",
-    msg: ""
-});
-
-function inloct(text) {
-    if (text === "") return "{}";
-    return text;
-}
-
+    function inloct(text) {
+        if (text === '') return '{}';
+        return text;
+    }
 </script>
 
-<form 
-    method=POST
-    use:enhance
-    class="w-[500px] m-auto mt-10 p-4 flex flex-col gap-4">
+<form
+    method="POST"
+    use:enhance={({}) => {
+        return async ({ result, update }) => {
+            console.dir(result);
+            if (!result.type === 'success') {
+                update({ reset: false });
+            } else {
+                update();
+            }
+        };
+    }}
+    class="m-auto mt-10 flex w-[500px] flex-col gap-4 p-4"
+>
+    <h1 class="text-xl font-bold">{pagina_activa.titlu}</h1>
 
-    {#if pagina === 1}
-
-        <label class="flex flex-col">
-            <span>test</span>
-            <input 
-                class="
-                form-input mt-1 px-2 py-1 rounded shadow-xs 
-                border-stone-300 dark:border-stone-500
-                bg-stone-50/10 dark:bg-stone-700 w-full
-                placeholder:text-stone-300
-                " 
-                type="text" name="test" bind:value={test_val['val']}
-            >
-        </label>
-
-        <div>
-            <label class="flex flex-col">
-                <span>e-poșta <span class="rounded-full leading-none px-0.5 text-xs font-bold bg-red-300/70 dark:bg-red-800/70 text-red-500">★</span></span>
-                <input 
-                    required={true}
-                    class="
-                    form-input mt-1 px-2 py-1 rounded shadow-xs 
-                    border-stone-300 dark:border-stone-500
-                    bg-stone-50/10 dark:bg-stone-700 w-full
-                    placeholder:text-stone-300
-                    " 
-                    placeholder="ion.stanciu@student.unitbv.ro"
-                    onblur={() => {
-                        if (!posta.endsWith("@unitbv.ro") && !posta.endsWith("@student.unitbv.ro")) {
-                            error.error = "POSTA"
-                            error.msg = "Introdu adresa instutițională!"
-                        } else {
-                            error.error = ""
-                            error.msg = ""
-
-                        }
-                    }}
-                    type="email" name="posta" bind:value={posta}
-                >
-            </label>
-
-            {#if error.error === "POSTA"}
-                <span class="text-red-600 dark:text-red-300">{error.msg}</span>
-            {/if}
-            {#if form?.error === "POSTA"}
-                <span class="text-red-600 dark:text-red-300">{form?.msg}</span>
-            {/if}
-
-        </div>
-
-        <Selectie 
-            name="facultatea"
-            intrebare="Facultatea" 
-            optiuni={lista_facultati} 
-            bind:value={facultatea}
-        />
-
-        {#if lista_cicluri.length !== 0}
-            <Selectie
-                name="ciclul"
-                intrebare="Ciclul de studii" 
-                optiuni={lista_cicluri} 
-                bind:value={ciclu}
-            />
-        {/if}
-
-        {#if lista_frm.length !== 0}
-            <Selectie
-                name="forma"
-                intrebare="Forma de învățămînt" 
-                optiuni={lista_frm} 
-                bind:value={forma}
-            />
-        {/if}
-
-        {#if specializări.length !== 0}
-            <Selectie
-                name="programul"
-                intrebare="Programul de studii" 
-                optiuni={specializări} 
-                bind:value={specializare}
-            />
-        {/if}
-
-    {:else if pagina === 2}
-
-        <div>Pagina 2, trebuește complectată</div>
-
-    {:else if pagina === ULITMA_PAGINA}
-
-        <div>Serios mă, complectează toate paĝinile, și după îți voi activa butonu!</div>
-
-    {/if}
-
-    <div>
-        Salut <span class="font-bold">{inloct(posta)}</span> din facultatea <span class="font-bold">{inloct(facultatea)}</span> specializaera <span class="font-bold">{inloct(specializare)}</span>
+    <div class="w-[100wv] rounded-xl border border-stone-200 bg-white p-3">
+        {pagina_activa.descriere}
     </div>
 
+    {#each intrebari as pag, i}
+        {#each pag.cimpuri as cimp}
+            <div class:hidden={i !== pagina}>
+                {#if cimp.tip === 'email'}
+                    <label class="flex flex-col">
+                        <span
+                            >{cimp.titlu}
 
-    <div class="w-[100wv] bg-white p-3 rounded-xl border border-stone-200">
+                            {#if cimp.obligatoriu}
+                                <span
+                                    class="rounded-full bg-red-300/70 px-0.5 text-xs leading-none font-bold text-red-500 dark:bg-red-800/70"
+                                    >★</span
+                                >
+                            {/if}
+                        </span>
+
+                        <input
+                            required={cimp.obligatoriu}
+                            class="
+                            mt-1 form-input w-full rounded border-stone-300 bg-white/90
+                            px-2 py-1
+                            shadow-xs placeholder:text-stone-300 dark:border-stone-500
+                            dark:bg-stone-700
+                            "
+                            type="email"
+                            name={cimp.nume}
+                            bind:value={raspunsuri[cimp.nume]}
+                        />
+                    </label>
+                {:else if cimp.tip === 'text'}
+                    <label class="flex flex-col">
+                        <span
+                            >{cimp.titlu}
+
+                            {#if cimp.obligatoriu}
+                                <span
+                                    class="rounded-full bg-red-300/70 px-0.5 text-xs leading-none font-bold text-red-500 dark:bg-red-800/70"
+                                    >★</span
+                                >
+                            {/if}
+                        </span>
+
+                        <input
+                            required={cimp.obligatoriu}
+                            class="
+                            mt-1 form-input w-full rounded border-stone-300 bg-stone-50/10
+                            px-2 py-1
+                            shadow-xs placeholder:text-stone-300 dark:border-stone-500
+                            dark:bg-stone-700
+                            "
+                            type="text"
+                            name={cimp.nume}
+                            bind:value={raspunsuri[cimp.nume]}
+                        />
+                    </label>
+                {:else if cimp.tip === 'selecție'}
+                    <Selectie
+                        name={cimp.nume}
+                        intrebare={cimp.titlu}
+                        obligatoriu={cimp.obligatoriu}
+                        optiuni={cimp.optiuni(raspunsuri)}
+                        bind:value={raspunsuri[cimp.nume]}
+                    />
+                {:else}
+                    <i class="text-italic text-red-600"
+                        >Tip cîmp `{cimp.tip}` necunoscut</i
+                    >
+                {/if}
+
+                {#if form?.error === cimp.nume}
+                    <div class="text-sm text-red-500">
+                        {form?.msg}
+                    </div>
+                {/if}
+            </div>
+        {/each}
+    {/each}
+
+    <div>
+        Salut <span class="font-bold">{inloct(raspunsuri['posta'])}</span> din
+        facultatea
+        <span class="font-bold">{inloct(raspunsuri['facultatea'])}</span>
+        specializaera <span class="font-bold">{inloct(raspunsuri['programul'])}</span>
+    </div>
+
+    <div class="w-[100wv] rounded-xl border border-stone-200 bg-white p-3">
         <div class="flex justify-center gap-4">
-            {#if pagina === 1}
-                <button 
-                    class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                    type="submit"
-                >Trimite</button>
-            {:else}
-                <button 
-                    class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                    type="button"
-                    onclick={() => pagina -= 1}
-                >Anterior</button>
-            {/if}
+            <button
+                class="
+                rounded-md border border-blue-600 bg-blue-500 px-2
+                py-1 text-white shadow-xs shadow-blue-600/90
+                disabled:border-stone-200 disabled:bg-stone-100 disabled:text-stone-100 disabled:shadow-stone-200/40
+                "
+                type="button"
+                disabled={pagina === 0}
+                onclick={() => (pagina -= 1)}>Anterior</button
+            >
 
-
-            {#if pagina === ULITMA_PAGINA}
-                <button 
-                    class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                    type="submit"
-                >Trimite</button>
+            {#if pagina === ULTIMA_PAGINA}
+                <button
+                    class="rounded-md border border-blue-600 bg-blue-500 px-2 py-1 text-white shadow-xs shadow-blue-600/90"
+                    type="submit">Trimite</button
+                >
             {:else}
                 <button
-                    class="shadow-xs py-1 px-2 border rounded-md 
-                    bg-blue-500 border-blue-600 shadow-blue-600/90 text-white 
-                    disabled:bg-stone-300 disabled:border-stone-400 disabled:shadow-stone-400/40 disabled:text-stone-400 
-                    " 
+                    class="rounded-md border border-blue-600 bg-blue-500 px-2
+                    py-1 text-white shadow-xs shadow-blue-600/90
+                    disabled:border-stone-200 disabled:bg-stone-100 disabled:text-stone-400 disabled:shadow-stone-200/40
+                    "
                     type="button"
-                    disabled={!pag_1_completat}
-                    onclick={() => pagina += 1}
+                    disabled={false && btn_urmator_activ}
+                    onclick={function () {
+                        let tmp = pagina + 1;
+                        if (tmp <= ULTIMA_PAGINA) pagina = tmp;
+                    }}
                 >
                     Următor
                 </button>
             {/if}
         </div>
     </div>
-
 </form>

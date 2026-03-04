@@ -1,5 +1,5 @@
 <script>
-    let { name, cerut=true, intrebare, optiuni, value = $bindable() } = $props()
+    let { name, obligatoriu=false, intrebare, optiuni, value = $bindable() } = $props()
 </script>
 
 
@@ -13,7 +13,7 @@
             border-stone-300 dark:border-stone-500
             dark:bg-stone-700 min-w-full w-full max-w-full
             "
-            required={cerut}
+            required={obligatoriu}
             name={name}
             bind:value={value}
         >

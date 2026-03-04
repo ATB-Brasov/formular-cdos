@@ -10,7 +10,7 @@ export const actions = {
         const posta = data.get("posta");
 
         if (!posta) {
-            return { error: "POSTA", msg: "Introdu adresa poștei electronice!", posta }
+            return { error: "POSTA", msg: "Introdu adresa poștei electronice!", pag: 1, posta }
         }
         if (!posta.endsWith("@student.unitbv.ro") && !posta.endsWith("@unitbv.ro")) {
             return { error: "POSTA", msg: "Folosește adresa instituțională!", posta }

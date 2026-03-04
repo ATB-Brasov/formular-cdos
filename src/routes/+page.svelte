@@ -12,7 +12,6 @@ let facultatea = $state("")
 let ciclu = $state("")
 let forma = $state("")
 let specializare = $state("")
-let test_val = $state("")
 
 const lista_facultati = lista.facultati
 .map(function(o) { return o.fac; })
@@ -37,12 +36,21 @@ const specializări = $derived(
         .map(o=>o.prg)
 )
 
-let pagina = $state(1)
+let pagina = $derived(form?.pag ?? 1)
+const ULITMA_PAGINA = 3;
+
+// FIXME: Verifică doar cîmpurile obligatorii!
+let pag_1_completat = $derived(posta && facultatea && ciclu && forma && specializare)
 
 const error = $state({
     error: "",
     msg: ""
 });
+
+function inloct(text) {
+    if (text === "") return "{}";
+    return text;
+}
 
 </script>
 
@@ -52,6 +60,19 @@ const error = $state({
     class="w-[500px] m-auto mt-10 p-4 flex flex-col gap-4">
 
     {#if pagina === 1}
+
+        <label class="flex flex-col">
+            <span>test</span>
+            <input 
+                class="
+                form-input mt-1 px-2 py-1 rounded shadow-xs 
+                border-stone-300 dark:border-stone-500
+                bg-stone-50/10 dark:bg-stone-700 w-full
+                placeholder:text-stone-300
+                " 
+                type="text" name="test" bind:value={test_val['val']}
+            >
+        </label>
 
         <div>
             <label class="flex flex-col">
@@ -67,7 +88,6 @@ const error = $state({
                     placeholder="ion.stanciu@student.unitbv.ro"
                     onblur={() => {
                         if (!posta.endsWith("@unitbv.ro") && !posta.endsWith("@student.unitbv.ro")) {
-                            console.log("Poșta greșită!")
                             error.error = "POSTA"
                             error.msg = "Introdu adresa instutițională!"
                         } else {
@@ -79,12 +99,14 @@ const error = $state({
                     type="email" name="posta" bind:value={posta}
                 >
             </label>
+
             {#if error.error === "POSTA"}
                 <span class="text-red-600 dark:text-red-300">{error.msg}</span>
             {/if}
             {#if form?.error === "POSTA"}
                 <span class="text-red-600 dark:text-red-300">{form?.msg}</span>
             {/if}
+
         </div>
 
         <Selectie 
@@ -121,55 +143,56 @@ const error = $state({
             />
         {/if}
 
-        <div>
-            Salut <span class="font-bold">{posta ?? "{}"}</span> din facultatea <span class="font-bold">{facultatea ?? "{}"}</span> specializaera <span class="font-bold">{specializare ?? "{}"}</span>
-        </div>
-
-        <div class="flex justify-center gap-4">
-            <button 
-                class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                type="submit"
-            >Trimite</button>
-            <button
-                class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                type="button"
-                onclick={() => pagina += 1}
-            >
-                Următor
-            </button>
-        </div>
-
     {:else if pagina === 2}
 
         <div>Pagina 2, trebuește complectată</div>
 
-        <div class="flex justify-center gap-4">
-            <button 
-                class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                type="button"
-                onclick={() => pagina -= 1}
-            >Anterior</button>
-            <button 
-                class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                type="button"
-                onclick={() => pagina += 1}
-            >Următor</button>
-        </div>
-
-    {:else}
+    {:else if pagina === ULITMA_PAGINA}
 
         <div>Serios mă, complectează toate paĝinile, și după îți voi activa butonu!</div>
 
-        <div class="flex justify-center gap-4">
-            <button 
-                class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                type="button"
-                onclick={() => pagina -= 1}
-            >Anterior</button>
-            <button 
-                class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
-                type="submit"
-            >Trimite</button>
-        </div>
     {/if}
+
+    <div>
+        Salut <span class="font-bold">{inloct(posta)}</span> din facultatea <span class="font-bold">{inloct(facultatea)}</span> specializaera <span class="font-bold">{inloct(specializare)}</span>
+    </div>
+
+
+    <div class="w-[100wv] bg-white p-3 rounded-xl border border-stone-200">
+        <div class="flex justify-center gap-4">
+            {#if pagina === 1}
+                <button 
+                    class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
+                    type="submit"
+                >Trimite</button>
+            {:else}
+                <button 
+                    class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
+                    type="button"
+                    onclick={() => pagina -= 1}
+                >Anterior</button>
+            {/if}
+
+
+            {#if pagina === ULITMA_PAGINA}
+                <button 
+                    class="bg-blue-500 border border-blue-600 shadow-xs shadow-blue-600/90 py-1 px-2 rounded-md text-white" 
+                    type="submit"
+                >Trimite</button>
+            {:else}
+                <button
+                    class="shadow-xs py-1 px-2 border rounded-md 
+                    bg-blue-500 border-blue-600 shadow-blue-600/90 text-white 
+                    disabled:bg-stone-300 disabled:border-stone-400 disabled:shadow-stone-400/40 disabled:text-stone-400 
+                    " 
+                    type="button"
+                    disabled={!pag_1_completat}
+                    onclick={() => pagina += 1}
+                >
+                    Următor
+                </button>
+            {/if}
+        </div>
+    </div>
+
 </form>

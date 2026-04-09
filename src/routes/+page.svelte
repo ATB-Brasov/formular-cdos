@@ -1,7 +1,10 @@
 <script>
+    /** @import {Cimp} from "@content/cestionare/intrebari.js" */
+
     import { enhance } from '$app/forms';
-    import intrebari from './intrebari.js';
-    import Selectie from './Selectie.svelte';
+    import intrebari from '@content/cestionare/intrebari.js';
+    import Selectie from '@components/Selectie.svelte';
+    import CimpText from '@components/CimpText.svelte';
 
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
@@ -48,8 +51,7 @@
         return key in obj ? obj[key] : defaultValue;
     }
 
-    /** @param {import('./intrebari.js').Cimp} cimp */
-    function aplica_validare(cimp) {
+    function aplica_validare(/**@type{Cimp}*/ cimp) {
         delete eroare[cimp.nume]
 
         const rasp = raspunsuri[cimp.nume];
@@ -98,63 +100,19 @@
             {@const err = get(form?.erori, cimp.nume)}
 
             <div class:hidden={i !== pagina}>
-                {#if cimp.tip === 'email'}
-                    <label class="flex flex-col">
-                        <span
-                        >{cimp.titlu}
-
-                            {#if cimp.obligatoriu}
-                                <span
-                                    class="rounded-full bg-red-300/70 px-0.5 text-xs leading-none font-bold text-red-500 dark:bg-red-800/70"
-                                >★</span
-                                >
-                            {/if}
-                        </span>
-
-                        <input
-                            required={cimp.obligatoriu}
-                            class="
-                            mt-1 form-input w-full rounded border-stone-300 bg-white/90
-                            px-2 py-1
-                            shadow-xs placeholder:text-stone-300 dark:border-stone-500
-                            dark:bg-stone-700
-                            "
-                            type="email"
-                            onblur={() => aplica_validare(cimp)}
-                            name={cimp.nume}
-                            bind:value={raspunsuri[cimp.nume]}
-                        />
-                    </label>
-                {:else if cimp.tip === 'text'}
-                    <label class="flex flex-col">
-                        <span
-                            >{cimp.titlu}
-
-                            {#if cimp.obligatoriu}
-                                <span
-                                    class="rounded-full bg-red-300/70 px-0.5 text-xs leading-none font-bold text-red-500 dark:bg-red-800/70"
-                                    >★</span
-                                >
-                            {/if}
-                        </span>
-
-                        <input
-                            required={cimp.obligatoriu}
-                            class="
-                            mt-1 form-input w-full rounded border-stone-300 bg-stone-50/10
-                            px-2 py-1
-                            shadow-xs placeholder:text-stone-300 dark:border-stone-500
-                            dark:bg-stone-700
-                            "
-                            type="text"
-                            name={cimp.nume}
-                            bind:value={raspunsuri[cimp.nume]}
-                        />
-                    </label>
+                {#if cimp.tip === "email" || cimp.tip === "text"}
+                    <CimpText
+                        tip={cimp.tip}
+                        intrebare={cimp.titlu}
+                        nume={cimp.nume}
+                        obligatoriu={cimp.obligatoriu}
+                        onblur={() => aplica_validare(cimp)}
+                        bind:value={raspunsuri[cimp.nume]}
+                    />
                 {:else if cimp.tip === 'selecție'}
                     {#if cimp.optiuni !== undefined}
                         <Selectie
-                            name={cimp.nume}
+                            nume={cimp.nume}
                             intrebare={cimp.titlu}
                             obligatoriu={cimp.obligatoriu}
                             onblur={() => aplica_validare(cimp)}

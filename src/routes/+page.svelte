@@ -3,11 +3,22 @@
     import intrebari from './intrebari.js';
     import Selectie from './Selectie.svelte';
 
-    /** @type {{ form: import('./$types').ActionData }} */
-    let { form } = $props();
+    /** @type {import('./$types').PageProps} */
+    let { data, form } = $props();
 
-    let eroare = $state({})
-    let raspunsuri = $state(form ?? {});
+    /**
+     * @template T
+     * @typedef {{[key:string]: T}} SDict
+     */
+
+    /**
+     * @typedef {Object} Eroare
+     * @property {string} msg
+     * @property {number} pag
+     */
+
+    /** @type {SDict<Eroare>} */ let eroare = $state({})
+    /** @type {SDict<string>} */ let raspunsuri = $state(form ?? {});
 
     let pagina = $derived(form?.pag ?? 0);
     const ULTIMA_PAGINA = intrebari.length - 1;
@@ -19,20 +30,30 @@
             .reduce((p,c)=>p||c, false))
         && Object.keys(eroare).length === 0
     );
-    function inloct(text) {
+
+    function inloct(/**@type{string}*/ text) {
         if (text === '') return '{}';
         return text;
     }
 
+    /**
+     * @template T
+     * @param {SDict<T>|undefined} obj
+     * @param {string} key 
+     * @param {T} [defaultValue=undefined]
+     * @returns {T|undefined}
+     */
     function get(obj, key, defaultValue) {
         if (obj === undefined) return
         return key in obj ? obj[key] : defaultValue;
     }
 
+    /** @param {import('./intrebari.js').Cimp} cimp */
     function aplica_validare(cimp) {
         delete eroare[cimp.nume]
 
-        if ((raspunsuri[cimp.nume] === undefined || raspunsuri[cimp.nume] === "") && cimp.obligatoriu) {
+        const rasp = raspunsuri[cimp.nume];
+        if ((rasp === undefined || rasp === "") && cimp.obligatoriu) {
             eroare[cimp.nume] = {
                 msg: 'Cîmpul este obligatoriu',
                 pag: pagina,
@@ -41,7 +62,7 @@
         }
 
         if (cimp.valideaza !== undefined) {
-            const err = cimp.valideaza(raspunsuri[cimp.nume].toString());
+            const err = cimp.valideaza(rasp.toString());
             if (err !== undefined) {
                 eroare[cimp.nume] = {
                     msg: err,
@@ -57,8 +78,7 @@
     method="POST"
     use:enhance={({}) => {
         return async ({ result, update }) => {
-            console.dir(result);
-            if (!result.type === 'success') {
+            if (result.type !== 'success') {
                 update({ reset: false });
             } else {
                 update();
@@ -75,6 +95,8 @@
 
     {#each intrebari as pag, i}
         {#each pag.cimpuri as cimp}
+            {@const err = get(form?.erori, cimp.nume)}
+
             <div class:hidden={i !== pagina}>
                 {#if cimp.tip === 'email'}
                     <label class="flex flex-col">
@@ -130,14 +152,20 @@
                         />
                     </label>
                 {:else if cimp.tip === 'selecție'}
-                    <Selectie
-                        name={cimp.nume}
-                        intrebare={cimp.titlu}
-                        obligatoriu={cimp.obligatoriu}
-                        onblur={() => aplica_validare(cimp)}
-                        optiuni={cimp.optiuni(raspunsuri)}
-                        bind:value={raspunsuri[cimp.nume]}
-                    />
+                    {#if cimp.optiuni !== undefined}
+                        <Selectie
+                            name={cimp.nume}
+                            intrebare={cimp.titlu}
+                            obligatoriu={cimp.obligatoriu}
+                            onblur={() => aplica_validare(cimp)}
+                            optiuni={cimp.optiuni(raspunsuri)}
+                            bind:value={raspunsuri[cimp.nume]}
+                        />
+                    {:else}
+                        <i class="text-italic text-red-600"
+                            >Nu au fost definite opțiuni pentru selecția {cimp.nume}</i
+                        >
+                    {/if}
                 {:else}
                     <i class="text-italic text-red-600"
                         >Tip cîmp `{cimp.tip}` necunoscut</i
@@ -149,9 +177,10 @@
                         {eroare[cimp.nume].msg}
                     </div>
                 {/if}
-                {#if get(form?.erori, cimp.nume) !== undefined}
+
+                {#if err !== undefined}
                     <div class="text-sm text-red-500">
-                        {form?.erori[cimp.nume].msg}
+                        {err.msg}
                     </div>
                 {/if}
             </div>

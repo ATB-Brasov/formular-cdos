@@ -3,6 +3,9 @@
 with pkgs; mkShell {
   buildInputs = [
     svelte-language-server
+    tailwindcss-language-server
+    typescript-language-server
+
     deno
     nodejs
     # nodejs_22

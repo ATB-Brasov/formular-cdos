@@ -1,5 +1,6 @@
 {
-    "unstable": ["fmt-component"],
+    "version": "0.0.1",
+    "unstable": ["fmt-component", "kv"],
     "fmt": {
         "useTabs": false,
         "lineWidth": 80,
@@ -7,5 +8,29 @@
         "semiColons": true,
         "singleQuote": false,
         "proseWrap": "preserve"
-    }
+    },
+    "tasks": {
+        "dev": "deno run -A --node-modules-dir=auto npm:vite dev",
+        "build": "deno run -A --node-modules-dir=auto npm:vite build",
+        "preview": "deno run -A --node-modules-dir=auto npm:vite preview",
+        "prepare": "deno run -A --node-modules-dir=auto npm:svelte-kit sync || echo ''",
+        "check": "deno run -A --node-modules-dir=auto npm:svelte-kit sync && deno run -A --node-modules-dir=auto npm:svelte-check --tsconfig ./jsconfig.json",
+        "check:watch": "deno run -A --node-modules-dir=auto npm:svelte-kit sync && deno run -A --node-modules-dir=auto npm:svelte-check --tsconfig ./jsconfig.json --watch"
+    },
+    "imports": {
+        "@deno/svelte-adapter": "npm:@deno/svelte-adapter@^0.1.1",
+        "@sveltejs/adapter-auto": "npm:@sveltejs/adapter-auto@^7.0.1",
+        "@sveltejs/kit": "npm:@sveltejs/kit@^2.50.2",
+        "@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^6.2.4",
+        "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.18",
+        "@types/deno": "npm:@types/deno@^2.5.0",
+        "svelte": "npm:svelte@^5.51.0",
+        "svelte-check": "npm:svelte-check@^4.3.6",
+        "tailwindcss": "npm:tailwindcss@^4.2.2",
+        "typescript": "npm:typescript@^6.0.2",
+        "vite": "npm:vite@^7.3.1",
+        "$lib": "./src/lib",
+        "$lib/*": "./src/lib/*"
+    },
+    "nodeModulesDir": "auto"
 }

@@ -15,7 +15,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-bun x sv create --template minimal --types jsdoc --add tailwindcss="plugins:forms" --install bun formular-atb
+deno run npm:sv@0.15.1 create --template minimal --types jsdoc --add tailwindcss="plugins:none" --install deno ATB_Formulare
 ```
 
 ## Developing

@@ -1,12 +1,18 @@
 <script>
-    let { name, obligatoriu=false, intrebare, optiuni, value = $bindable() } = $props()
+    let { name, obligatoriu=false, onblur, intrebare, optiuni, value = $bindable() } = $props()
 </script>
-
-
 
 <div>
     <label class="flex flex-col">
-        <span class="mb-1">{intrebare}</span>
+        <span class="mb-1">{intrebare}
+            {#if obligatoriu}
+                <span
+                    class="rounded-full bg-red-300/70 px-0.5 text-xs leading-none font-bold text-red-500 dark:bg-red-800/70"
+                >★</span
+                >
+            {/if}
+        </span>
+
         <select
             class="
             form-input px-2 py-1 rounded shadow-xs 
@@ -14,6 +20,7 @@
             dark:bg-stone-700 min-w-full w-full max-w-full
             "
             required={obligatoriu}
+            onblur={onblur}
             name={name}
             bind:value={value}
         >

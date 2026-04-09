@@ -4,29 +4,52 @@
     import Selectie from './Selectie.svelte';
 
     /** @type {{ form: import('./$types').ActionData }} */
-    const { form } = $props();
+    let { form } = $props();
 
+    let eroare = $state({})
     let raspunsuri = $state(form ?? {});
 
     let pagina = $derived(form?.pag ?? 0);
     const ULTIMA_PAGINA = intrebari.length - 1;
     const pagina_activa = $derived(intrebari[pagina]);
     const btn_urmator_activ = $derived(
-        pagina_activa.cimpuri
-            .map(
-                (c) =>
-                    c.obligatoriu &&
-                    (raspunsuri[c.nume] === undefined ||
-                        raspunsuri[c.nume] === ''),
-            )
-            .reduce((prev, curr) => {
-                return prev || curr;
-            }, false),
+        (!pagina_activa
+            .cimpuri
+            .map(c => raspunsuri[c.nume] === "" && c.obligatoriu)
+            .reduce((p,c)=>p||c, false))
+        && Object.keys(eroare).length === 0
     );
-
     function inloct(text) {
         if (text === '') return '{}';
         return text;
+    }
+
+    function get(obj, key, defaultValue) {
+        if (obj === undefined) return
+        return key in obj ? obj[key] : defaultValue;
+    }
+
+    function aplica_validare(cimp) {
+        delete eroare[cimp.nume]
+
+        if ((raspunsuri[cimp.nume] === undefined || raspunsuri[cimp.nume] === "") && cimp.obligatoriu) {
+            eroare[cimp.nume] = {
+                msg: 'Cîmpul este obligatoriu',
+                pag: pagina,
+            }
+            return
+        }
+
+        if (cimp.valideaza !== undefined) {
+            const err = cimp.valideaza(raspunsuri[cimp.nume].toString());
+            if (err !== undefined) {
+                eroare[cimp.nume] = {
+                    msg: err,
+                    pag: pagina,
+                }
+                return
+            }
+        }
     }
 </script>
 
@@ -56,12 +79,12 @@
                 {#if cimp.tip === 'email'}
                     <label class="flex flex-col">
                         <span
-                            >{cimp.titlu}
+                        >{cimp.titlu}
 
                             {#if cimp.obligatoriu}
                                 <span
                                     class="rounded-full bg-red-300/70 px-0.5 text-xs leading-none font-bold text-red-500 dark:bg-red-800/70"
-                                    >★</span
+                                >★</span
                                 >
                             {/if}
                         </span>
@@ -75,6 +98,7 @@
                             dark:bg-stone-700
                             "
                             type="email"
+                            onblur={() => aplica_validare(cimp)}
                             name={cimp.nume}
                             bind:value={raspunsuri[cimp.nume]}
                         />
@@ -110,6 +134,7 @@
                         name={cimp.nume}
                         intrebare={cimp.titlu}
                         obligatoriu={cimp.obligatoriu}
+                        onblur={() => aplica_validare(cimp)}
                         optiuni={cimp.optiuni(raspunsuri)}
                         bind:value={raspunsuri[cimp.nume]}
                     />
@@ -119,9 +144,14 @@
                     >
                 {/if}
 
-                {#if form?.error === cimp.nume}
+                {#if eroare[cimp.nume] !== undefined}
                     <div class="text-sm text-red-500">
-                        {form?.msg}
+                        {eroare[cimp.nume].msg}
+                    </div>
+                {/if}
+                {#if get(form?.erori, cimp.nume) !== undefined}
+                    <div class="text-sm text-red-500">
+                        {form?.erori[cimp.nume].msg}
                     </div>
                 {/if}
             </div>
@@ -151,6 +181,7 @@
             {#if pagina === ULTIMA_PAGINA}
                 <button
                     class="rounded-md border border-blue-600 bg-blue-500 px-2 py-1 text-white shadow-xs shadow-blue-600/90"
+                    disabled={!btn_urmator_activ}
                     type="submit">Trimite</button
                 >
             {:else}
@@ -160,7 +191,7 @@
                     disabled:border-stone-200 disabled:bg-stone-100 disabled:text-stone-400 disabled:shadow-stone-200/40
                     "
                     type="button"
-                    disabled={false && btn_urmator_activ}
+                    disabled={!btn_urmator_activ}
                     onclick={function () {
                         let tmp = pagina + 1;
                         if (tmp <= ULTIMA_PAGINA) pagina = tmp;

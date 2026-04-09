@@ -1,4 +1,4 @@
-import lista from './lista_facultati_unitbv_2026.js';
+import lista from "./lista_facultati_unitbv_2026.js";
 
 /**
  * @template T
@@ -58,64 +58,51 @@ function uniq(e, i, self) {
 /**@type{Pagina[]}*/
 export default [
     {
-        titlu: 'Date Academice',
-        descriere: 'Date academice, ce nu-i clar?',
+        titlu: "Date Academice",
+        descriere: "Date academice, ce nu-i clar?",
         cimpuri: [
             {
-                tip: 'email',
-                nume: 'posta',
-                titlu: 'Poșta Instituțională',
-                obligatoriu: true,
-                valideaza: (val) => {
-                    if (
-                        !val.endsWith('@student.unitbv.ro') &&
-                        !val.endsWith('@unitbv.ro')
-                    )
-                        return 'Folosește adresa instutițională!';
-                },
-            },
-            {
-                tip: 'selecție',
-                nume: 'facultatea',
-                titlu: 'Facultatea',
+                tip: "selecție",
+                nume: "facultatea",
+                titlu: "Facultatea",
                 obligatoriu: true,
                 optiuni: () => lista.facultati.map((o) => o.fac).filter(uniq),
             },
             {
-                tip: 'selecție',
-                nume: 'ciclu',
-                titlu: 'Ciclu de Studii',
+                tip: "selecție",
+                nume: "ciclu",
+                titlu: "Ciclu de Studii",
                 optiuni: (rspi) =>
                     lista.facultati
-                        .filter((o) => o.fac === rspi['facultatea'])
+                        .filter((o) => o.fac === rspi["facultatea"])
                         .map((o) => o.cic)
                         .filter(uniq),
             },
             {
-                tip: 'selecție',
-                nume: 'forma',
-                titlu: 'Forma de Învățămînt',
+                tip: "selecție",
+                nume: "forma",
+                titlu: "Forma de Învățămînt",
                 optiuni: (rspi) =>
                     lista.facultati
                         .filter(
                             (o) =>
-                                o.fac === rspi['facultatea'] &&
-                                o.cic === rspi['ciclu'],
+                                o.fac === rspi["facultatea"] &&
+                                o.cic === rspi["ciclu"],
                         )
                         .map((o) => o.frm)
                         .filter((e, i, self) => i === self.indexOf(e)),
             },
             {
-                tip: 'selecție',
-                nume: 'programul',
-                titlu: 'Programul de Învățămînt',
+                tip: "selecție",
+                nume: "programul",
+                titlu: "Programul de Învățămînt",
                 optiuni: (rspi) =>
                     lista.facultati
                         .filter(
                             (o) =>
-                                o.fac === rspi['facultatea'] &&
-                                o.cic === rspi['ciclu'] &&
-                                o.frm === rspi['forma'],
+                                o.fac === rspi["facultatea"] &&
+                                o.cic === rspi["ciclu"] &&
+                                o.frm === rspi["forma"],
                         )
                         .map((o) => o.prg)
                         .filter(uniq),
@@ -123,22 +110,23 @@ export default [
         ],
     },
     {
-        titlu: 'Fisa de Curs',
-        descriere: 'Ca la dnul Țierean',
+        titlu: "Fisa de Curs",
+        descriere: "Ca la dnul Țierean",
         cimpuri: [
             {
-                tip: 'text',
-                nume: 'cunostinte',
-                titlu: 'descrieție ĉe e aia o fișă de curs',
+                tip: "text",
+                nume: "cunostinte",
+                titlu: "descrieție ĉe e aia o fișă de curs",
             },
             {
-                tip: 'text',
-                nume: 'primire',
-                titlu: 'ați primit fișa?',
+                tip: "text",
+                nume: "primire",
+                titlu: "ați primit fișa?",
                 obligatoriu: true,
                 valideaza: (/** @type {string} */ val) => {
-                    if (val.toLowerCase() !== 'da')
-                        return 'răspunsul trebuie să fie `da`';
+                    if (val.toLowerCase() !== "da") {
+                        return "răspunsul trebuie să fie `da`";
+                    }
                 },
             },
         ],

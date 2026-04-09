@@ -1,7 +1,7 @@
 /** @type {import("prettier").Config} */
 export default {
     semi: true,
-    trailingComma: 'all',
+    trailingComma: "all",
     bracketSpacing: true,
     bracketSameLine: false,
     singleQuote: true,
@@ -11,12 +11,11 @@ export default {
     plugins: ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
     overrides: [
         {
-            files: '*.svelte',
+            files: "*.svelte",
             options: {
-                parser: 'svelte',
+                parser: "svelte",
             },
         },
     ],
-    tailwindStylesheet: "./src/routes/layout.css"
+    tailwindStylesheet: "./src/routes/layout.css",
 };
-

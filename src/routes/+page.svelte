@@ -21,7 +21,7 @@
      */
 
     /** @type {SDict<Eroare>} */ let eroare = $state({});
-    /** @type {SDict<string>} */ let raspunsuri = $state(form ?? {});
+    /** @type {SDict<string>} */ let raspunsuri = $state(form ?? {}); // TODO: Fix warning
 
     let pagina = $derived(form?.pag ?? 0);
     const ULTIMA_PAGINA = intrebari.length - 1;

@@ -1,15 +1,11 @@
-import { fail } from "@sveltejs/kit";
-import intrebari from "@content/cestionare/intrebari.js";
 import { getListOfAnswers } from "$lib/server/session.js";
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ }) {
-    let answers = await getListOfAnswers();
-    const l = []
-    for await (const entry of answers) {
-        l.push(entry)
+    let iterator = await getListOfAnswers();
+    const answers = []
+    for await (const entry of iterator) {
+        answers.push(entry)
     }
-    return { answers: l };
+    return { answers };
 }
-
-

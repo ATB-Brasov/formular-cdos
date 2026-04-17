@@ -1,5 +1,6 @@
 import { fail } from "@sveltejs/kit";
 import { dev } from "$app/environment";
+import { verifyPoW } from '$lib/server/pow.js';
 
 import intrebari from "@content/cestionare/intrebari.js";
 import {
@@ -7,6 +8,7 @@ import {
     deleteSession,
     getAnsweredEmail,
     getSession,
+    hashEmail,
     saveAnswers,
     updateSessionEmail,
 } from "$lib/server/session.js";
@@ -23,7 +25,7 @@ async function newSession(cookies) {
         httpOnly: true,
         secure: !dev,
         sameSite: "lax",
-        maxAge: 60 * 60 * 24, // 1 day
+        maxAge: 60 * 60, // 1 hour
     });
     return sessionid;
 }
@@ -37,6 +39,7 @@ export async function load({ cookies }) {
         sessionid = await newSession(cookies);
     }
     let session = await getSession(sessionid);
+    console.dir(session)
     return { session };
 }
 
@@ -51,6 +54,7 @@ export const actions = {
     posta: async ({ request, cookies }) => {
         const data = await request.formData();
         let email = data.get("posta");
+        const nonce = data.get('nonce');
         if (email == null) {
             return fail(400, {
                 erori: { email: { msg: "Cîmpul este obligatoriu", pag: 0 } },
@@ -59,6 +63,14 @@ export const actions = {
         }
         email = email.toString();
         console.log("data.email: ", email);
+
+        if (!verifyPoW(email, nonce)) {
+            return fail(400, {
+                    erori: { email: { msg: "Invalid Proof of Work. Nice try, bot!", pag: 0 } },
+                    pag: 0,
+                }
+            );
+        }
 
         const answered_email = await getAnsweredEmail(email);
         console.log("getAnsweredEmail => ", answered_email);
@@ -137,12 +149,10 @@ export const actions = {
             return fail(400, { msg: "Poșta electronică a sesiunii nu a fost setată" });
         }
 
-        console.log(session, JSON.stringify(raspunsuri));
-
         await saveAnswers(
             session.email,
             session.answerId,
-            JSON.stringify(raspunsuri),
+            raspunsuri,
         );
         await deleteSession(sessionId);
         cookies.delete("sessionid", { path: "/" });

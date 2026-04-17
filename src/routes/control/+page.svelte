@@ -10,7 +10,7 @@ Data answers:
             {@const answer = kdata.value.answers}
             {@const submitedAt = kdata.value.submittedAt}
             {#if answer != null}
-                {@const data = JSON.parse(answer)}
+                {@const data = answer}
                 <div class="flex flex-row gap-6">
                         <div>{ new Date(submitedAt).toLocaleString("ro") }</div>
                     {#each data as item}

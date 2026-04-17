@@ -1,3 +1,4 @@
+// Assisted-By: Gemini 3 Flash
 /** @typedef {Deno.Kv} Kv */
 
 /** @type {Kv | null} */
@@ -29,7 +30,17 @@ async function initKv() {
 
     isInitializing = true;
     try {
-        kvInstance = await Deno.openKv();
+
+        // If DENO_REGION is not set, we are running locally
+        const isLocal = !Deno.env.get("DENO_REGION");
+
+        if (isLocal) {
+            console.info("Connecting to local Deno KV (local.db)");
+            kvInstance = await Deno.openKv("./local.db");
+        } else {
+            // Connects to the managed Deno KV service in the cloud
+            kvInstance = await Deno.openKv();
+        }
         return kvInstance;
     } catch (error) {
         console.error("Failed to initialize Deno KV:", error);

@@ -1,3 +1,5 @@
+import argon2 from "argon2";
+
 import { getKv } from "./kv.js";
 
 const SESSION_PREFIX = ["sessions"];
@@ -15,7 +17,7 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
 
  /**
   * @typedef {Object} EmailData
-  * @property {string} email
+  * @property {boolean} answered
   */
 
  /**
@@ -92,7 +94,6 @@ export async function updateSessionEmail(sessionId, email) {
     const result = await kv.get([...SESSION_PREFIX, sessionId]);
 
     if (result.value) {
-        // Update last activity
         const updated = {
             ...result.value,
             lastActivity: Date.now(),
@@ -124,8 +125,10 @@ export async function deleteSession(sessionId) {
  */
 export async function getAnsweredEmail(email) {
     const kv = await getKv();
+
+    const hashed_email = await hashEmail(email)
     /** @type {Deno.KvEntryMaybe<EmailData>} */
-    const result = await kv.get([...EMAILS_PREFIX, email]);
+    const result = await kv.get([...EMAILS_PREFIX, hashed_email]);
     return result.value || null;
 }
 
@@ -152,17 +155,38 @@ export async function getPreviousAnswers(answerId) {
  * Salvează răspunsurile la cestionar
  * @param {string} email
  * @param {string} answerId
- * @param {string} answers
+ * @param {string[][]} answers
  * @returns {Promise<void>}
  */
 export async function saveAnswers(email, answerId, answers) {
     const kv = await getKv();
-    await kv.set([...EMAILS_PREFIX, email], {
-        email,
-    });
+
+    const hashed_email = await hashEmail(email)
+    await kv.set([...EMAILS_PREFIX, hashed_email], {answered: true});
     await kv.set([...ANSWERS_PREFIX, answerId], {
         answerId,
         answers,
         submittedAt: Date.now(),
     });
+}
+
+export async function hashEmail(/**@type{string}*/ email) {
+    const hash_secret = Deno.env.get("HASH_SECRET");
+    if (hash_secret == null) {
+        throw new Error("The `HASH_SECRET` environment variable was not defined!")
+    }
+    const hash_salt = Deno.env.get("HASH_SALT");
+    if (hash_salt == null) {
+        throw new Error("The `HASH_SALT` environment variable was not defined!")
+    }
+    const rawHash = await argon2.hash(email, {
+        type: argon2.argon2id,
+        salt: Buffer.from(hash_salt),
+        secret: Buffer.from(hash_secret),
+        memoryCost: 65536,
+        timeCost: 3,
+        raw: true,
+    });
+    const hash = Buffer.from(rawHash).toString('hex');
+    return hash;
 }

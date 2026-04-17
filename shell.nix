@@ -9,9 +9,14 @@ with pkgs; mkShell {
     deno
     nodejs
     # nodejs_22
+
+    stdenv.cc.cc.lib # Provides libstdc++.so.6
+    gcc
+    gnumake
   ];
 
   shellHook = ''
+    export LD_LIBRARY_PATH="${stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
     export PATH="$PWD/node_modules/.bin/:$PATH"
   '';
 }

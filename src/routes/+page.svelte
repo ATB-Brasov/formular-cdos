@@ -2,6 +2,7 @@
     /** @import {Cimp} from "@content/cestionare/intrebari.js" */
 
     import { enhance } from "$app/forms";
+    import { solvePoW } from '$lib/miner.js';
     import intrebari from "@content/cestionare/intrebari.js";
     import Selectie from "@components/Selectie.svelte";
     import CimpText from "@components/CimpText.svelte";
@@ -83,27 +84,47 @@
         return posta.endsWith("@student.unitbv.ro") ||
             posta.endsWith("@unitbv.ro");
     }
+
+
+    let isMining = $state(false);
+    let nonce = $state("");
 </script>
 
 {#if !data.session || !data.session.email}
 
     <form
         method="POST"
-        use:enhance
+        use:enhance={async ({ formData, cancel }) => {
+            // Assisted-By: Gemini 3 Flash
+            isMining = true;
+
+            try {
+                const solvedNonce = await solvePoW(email, 4);
+                nonce = solvedNonce.toString();
+                formData.append('nonce', nonce);
+            } catch (err) {
+                cancel();
+            } finally {
+                isMining = false;
+            }
+            console.log("Solved PoW with nonce:", nonce)
+
+            return async ({ update }) => {
+                await update();
+            };
+        }}
         action="?/posta"
         class="m-auto mt-10 flex w-[500px] flex-col gap-4 p-4"
     >
-        Nu există sesiune activă
-
-        <h1 class="text-xl font-bold">{pagina_activa.titlu}</h1>
+        <h1>Formular CDOS</h1>
 
         <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
-Avem nevoie de poșta electronică pentru a verifica statutul de student al unitbv și a preveni completări repetate. Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu răspunsurile date.
+            Avem nevoie de poșta electronică pentru a verifica statutul de student al unitbv și a preveni completări repetate. Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu răspunsurile date. (TODO: GDPR)
         </div>
 
         <CimpText
             tip={'email'}
-            intrebare={'Adresa poștei electronice'}
+            intrebare={'Adresa poștei instituționale'}
             nume={'posta'}
             obligatoriu={true}
             onblur={() => este_posta_valida(email)}
@@ -143,8 +164,9 @@ Avem nevoie de poșta electronică pentru a verifica statutul de student al unit
                 <button
                     class="rounded-md border border-blue-600 bg-blue-500 px-2 py-1 text-white shadow-xs shadow-blue-600/90"
                     type="submit"
+                    disabled={isMining}
                 >
-                    Începe
+                    {isMining ? "Se trimite..." : "Începe"}
                 </button>
             </div>
         </div>
@@ -165,8 +187,6 @@ Avem nevoie de poșta electronică pentru a verifica statutul de student al unit
         action="?/salveaza"
         class="m-auto mt-10 flex w-[500px] flex-col gap-4 p-4"
     >
-        Sesiunea: {data.session.email} {data.session.lastActivity}
-
         <h1 class="text-xl font-bold">{pagina_activa.titlu}</h1>
 
         <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">

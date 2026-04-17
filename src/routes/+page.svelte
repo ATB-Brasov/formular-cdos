@@ -2,7 +2,7 @@
     /** @import {Cimp} from "@content/cestionare/intrebari.js" */
 
     import { enhance } from "$app/forms";
-    import { solvePoW } from '$lib/miner.js';
+    import { solvePoW } from "$lib/miner.js";
     import intrebari from "@content/cestionare/intrebari.js";
     import Selectie from "@components/Selectie.svelte";
     import CimpText from "@components/CimpText.svelte";
@@ -76,22 +76,20 @@
         }
     }
 
-    let email = $state("")
+    let email = $state("");
 
-    let eroare_posta = $derived(!este_posta_valida(email))
+    let eroare_posta = $derived(!este_posta_valida(email));
 
-    function este_posta_valida(/**@type{string}*/posta)  {
+    function este_posta_valida(/**@type{string}*/ posta) {
         return posta.endsWith("@student.unitbv.ro") ||
             posta.endsWith("@unitbv.ro");
     }
-
 
     let isMining = $state(false);
     let nonce = $state("");
 </script>
 
 {#if !data.session || !data.session.email}
-
     <form
         method="POST"
         use:enhance={async ({ formData, cancel }) => {
@@ -101,13 +99,13 @@
             try {
                 const solvedNonce = await solvePoW(email, 4);
                 nonce = solvedNonce.toString();
-                formData.append('nonce', nonce);
+                formData.append("nonce", nonce);
             } catch (err) {
                 cancel();
             } finally {
                 isMining = false;
             }
-            console.log("Solved PoW with nonce:", nonce)
+            console.log("Solved PoW with nonce:", nonce);
 
             return async ({ update }) => {
                 await update();
@@ -119,13 +117,16 @@
         <h1>Formular CDOS</h1>
 
         <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
-            Avem nevoie de poșta electronică pentru a verifica statutul de student al unitbv și a preveni completări repetate. Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu răspunsurile date. (TODO: GDPR)
+            Avem nevoie de poșta electronică pentru a verifica statutul de
+            student al unitbv și a preveni completări repetate. Adresele vor fi
+            păstrate în formă criptată și <b class="font-bold">nu vor fi</b>
+            asociate cu răspunsurile date. (TODO: GDPR)
         </div>
 
         <CimpText
-            tip={'email'}
-            intrebare={'Adresa poștei instituționale'}
-            nume={'posta'}
+            tip={"email"}
+            intrebare={"Adresa poștei instituționale"}
+            nume={"posta"}
             obligatoriu={true}
             onblur={() => este_posta_valida(email)}
             bind:value={email}
@@ -139,7 +140,7 @@
             <span class="text-red-500">Folosește adresa instutițională!</span>
         {/if}
 
-        {#if form?.erori != null }
+        {#if form?.erori != null}
             <span class="text-red-500">{form?.erori?.posta?.msg}</span>
         {/if}
 
@@ -151,9 +152,9 @@
             <div class="flex justify-center gap-4">
                 <button
                     class="
-                    rounded-md border border-blue-600 bg-blue-500 px-2
-                    py-1 text-white shadow-xs shadow-blue-600/90
-                    disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-100 disabled:shadow-olive-200/40
+                        rounded-md border border-blue-600 bg-blue-500 px-2
+                        py-1 text-white shadow-xs shadow-blue-600/90
+                        disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-100 disabled:shadow-olive-200/40
                     "
                     type="button"
                     disabled={true}
@@ -171,7 +172,6 @@
             </div>
         </div>
     </form>
-
 {:else}
     <form
         method="POST"
@@ -218,8 +218,8 @@
                                 bind:value={raspunsuri[cimp.nume]}
                             />
                         {:else}
-                            <i class="text-italic text-red-600">Nu au fost definite
-                                opțiuni pentru selecția {cimp.nume}</i>
+                            <i class="text-italic text-red-600">Nu au fost
+                                definite opțiuni pentru selecția {cimp.nume}</i>
                         {/if}
                     {:else}
                         <i class="text-italic text-red-600"
@@ -242,21 +242,21 @@
         {/each}
 
         <div>
-            Salut <span class="font-bold">{inloct(raspunsuri["posta"])}</span> din
-            facultatea
+            Salut <span class="font-bold">{inloct(raspunsuri["posta"])}</span>
+            din facultatea
             <span class="font-bold">{inloct(raspunsuri["facultatea"])}</span>
             specializaera <span class="font-bold">{
                 inloct(raspunsuri["programul"])
-                }</span>
+            }</span>
         </div>
 
         <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
             <div class="flex justify-center gap-4">
                 <button
                     class="
-                    rounded-md border border-blue-600 bg-blue-500 px-2
-                    py-1 text-white shadow-xs shadow-blue-600/90
-                    disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-100 disabled:shadow-olive-200/40
+                        rounded-md border border-blue-600 bg-blue-500 px-2
+                        py-1 text-white shadow-xs shadow-blue-600/90
+                        disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-100 disabled:shadow-olive-200/40
                     "
                     type="button"
                     disabled={pagina === 0}
@@ -288,9 +288,9 @@
                 {:else}
                     <button
                         class="
-                        rounded-md border border-blue-600 bg-blue-500 px-2
-                        py-1 text-white shadow-xs shadow-blue-600/90
-                        disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-400 disabled:shadow-olive-200/40
+                            rounded-md border border-blue-600 bg-blue-500 px-2
+                            py-1 text-white shadow-xs shadow-blue-600/90
+                            disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-400 disabled:shadow-olive-200/40
                         "
                         type="button"
                         disabled={!btn_urmator_activ}
@@ -305,5 +305,4 @@
             </div>
         </div>
     </form>
-
 {/if}

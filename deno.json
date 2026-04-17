@@ -10,17 +10,18 @@
         "proseWrap": "preserve"
     },
     "tasks": {
-        "dev": "deno run -A --env-file --node-modules-dir=auto npm:vite dev",
-        "build": "deno run -A --node-modules-dir=auto npm:vite build",
-        "preview": "deno run -A --node-modules-dir=auto npm:vite preview",
-        "prepare": "deno run -A --node-modules-dir=auto npm:svelte-kit sync || echo ''",
-        "check": "deno run -A --node-modules-dir=auto npm:svelte-kit sync && deno run -A --node-modules-dir=auto npm:svelte-check --tsconfig ./jsconfig.json",
-        "check:watch": "deno run -A --node-modules-dir=auto npm:svelte-kit sync && deno run -A --node-modules-dir=auto npm:svelte-check --tsconfig ./jsconfig.json --watch"
+        "dev": "deno run -A --env-file npm:vite dev",
+        "build": "deno run -A npm:vite build",
+        "preview": "deno run -A npm:vite preview",
+        "prepare": "deno run -A npm:svelte-kit sync || echo ''",
+        "check": "deno run -A npm:svelte-kit sync && deno run -A npm:svelte-check --tsconfig ./jsconfig.json",
+        "check:watch": "deno run -A npm:svelte-kit sync && deno run -A npm:svelte-check --tsconfig ./jsconfig.json --watch"
     },
     "imports": {
         "$lib": "./src/lib",
         "$lib/*": "./src/lib/*",
         "@/": "./src/"
     },
-    "nodeModulesDir": "auto"
+    "nodeModulesDir": "auto",
+    "allowScripts": ["npm:argon2@0.44.0", "npm:esbuild@0.27.7"]
 }

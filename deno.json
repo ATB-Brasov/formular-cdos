@@ -23,5 +23,15 @@
         "@/": "./src/"
     },
     "nodeModulesDir": "auto",
-    "allowScripts": ["npm:argon2@0.44.0", "npm:esbuild@0.27.7", "npm:svelte-kit@1.2.0"]
+    "allowScripts": ["npm:argon2@0.44.0", "npm:esbuild@0.27.7", "npm:svelte-kit@1.2.0"],
+    "deploy": {
+        "org": "yehoslav",
+        "app": "cdos"
+    }
 }
+
+
+
+
+
+

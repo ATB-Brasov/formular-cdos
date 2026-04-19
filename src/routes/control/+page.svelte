@@ -6,8 +6,6 @@
 </script>
 
 {#if dev}
-    Disponibil doar pentru Dezvoltare
-{:else}
     Data answers: 
     {#if data.answers != null}
         <div class="flex flex-col">
@@ -28,4 +26,6 @@
     {:else}
         nulll
     {/if}
+{:else}
+    Disponibil doar pentru Dezvoltare
 {/if}

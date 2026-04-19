@@ -1,7 +1,9 @@
 <script>
-    /** @import {Cimp} from "@content/cestionare/types.js" */
+    /** @import { Cimp } from "@content/cestionare/types.js" */
+    /** @import { SDict } from "$lib/common_types.js" */
 
     import { enhance } from "$app/forms";
+
     import { solvePoW } from "$lib/miner.js";
     import * as ds from "$lib/ds_helpers.js";
 
@@ -13,8 +15,6 @@
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
 
-    /** @import { SDict } from "$lib/common_types.js" */
-
     /**
      * @typedef {Object} Eroare
      * @property {string} msg
@@ -24,7 +24,7 @@
     /** @type {SDict<Eroare>} */ let eroare = $state({});
     /** @type {SDict<string>} */ let raspunsuri = $state(form ?? {}); // TODO: Fix warning
 
-    let intrebari = sondaj_cdos.pagini
+    let intrebari = sondaj_cdos.pagini;
 
     let pagina = $derived(form?.pag ?? 0);
     const ULTIMA_PAGINA = intrebari.length - 1;
@@ -103,18 +103,16 @@
         action="?/posta"
         class="m-auto mt-10 flex w-[500px] flex-col gap-4 p-4"
     >
-        <h1>Formular CDOS</h1>
+        <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
 
         <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
-            Avem nevoie de poșta electronică pentru a verifica statutul de
-            student al unitbv și a preveni completări repetate. Adresele vor fi
-            păstrate în formă criptată și <b class="font-bold">nu vor fi</b>
-            asociate cu răspunsurile date. (TODO: GDPR)
+            {sondaj_cdos.descriere}
         </div>
 
         <CimpText
             tip={"email"}
             intrebare={"Adresa poștei instituționale"}
+            desc={`Avem nevoie de poșta electronică pentru a verifica statutul de student al unitbv și a preveni completări repetate. Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu răspunsurile date. (TODO: GDPR)`}
             nume={"posta"}
             obligatoriu={true}
             bind:value={email}
@@ -152,11 +150,12 @@
                     type="submit"
                     disabled={isMining || eroare_posta != null}
                 >
-                    {isMining ? "Se trimite..." : "Începe"}
+                    {isMining ? "Începere..." : "Începe"}
                 </button>
             </div>
         </div>
     </form>
+
 {:else}
     <form
         method="POST"
@@ -172,7 +171,8 @@
         action="?/salveaza"
         class="m-auto mt-10 flex w-[500px] flex-col gap-4 p-4"
     >
-        <h1 class="text-xl font-bold">{pagina_activa.titlu}</h1>
+        <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
+        <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>
 
         <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
             {pagina_activa.descriere}
@@ -246,48 +246,32 @@
                     "
                     type="button"
                     disabled={pagina === 0}
-                    onclick={() => (pagina -= 1)}
+                    onclick={() => Math.max(0, pagina -= 1)}
                 >
                     Anterior
                 </button>
 
-                {#if pagina === 0}
+                {@render button()}
+                {#snippet button()}
+                    {@const ultima = pagina === ULTIMA_PAGINA}
                     <button
-                        class="rounded-md border border-blue-600 bg-blue-500 px-2 py-1 text-white shadow-xs shadow-blue-600/90"
-                        type="submit"
-                        disabled={!btn_urmator_activ}
-                        onclick={async () => {
-                            let tmp = pagina + 1;
-                            if (tmp <= ULTIMA_PAGINA) pagina = tmp;
-                        }}
-                    >
-                        Următorul
-                    </button>
-                {:else if pagina === ULTIMA_PAGINA}
-                    <button
-                        class="rounded-md border border-blue-600 bg-blue-500 px-2 py-1 text-white shadow-xs shadow-blue-600/90"
-                        disabled={!btn_urmator_activ}
-                        type="submit"
-                    >
-                        Trimite
-                    </button>
-                {:else}
-                    <button
+                        type={ultima ? "submit" : "button"}
                         class="
-                            rounded-md border border-blue-600 bg-blue-500 px-2
-                            py-1 text-white shadow-xs shadow-blue-600/90
-                            disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-400 disabled:shadow-olive-200/40
+                            px-2 py-1 text-white bg-blue-500
+                            rounded-md border border-blue-600
+                            shadow-xs shadow-blue-600/90
+                            disabled:bg-olive-100 disabled:text-olive-400
+                            disabled:border-olive-200 disabled:shadow-olive-200/40
                         "
-                        type="button"
                         disabled={!btn_urmator_activ}
-                        onclick={() => {
+                        onclick={ultima ? null : () => {
                             let tmp = pagina + 1;
                             if (tmp <= ULTIMA_PAGINA) pagina = tmp;
                         }}
                     >
-                        Următor
+                        {ultima ? "Trimite" : "Următor"}
                     </button>
-                {/if}
+                {/snippet}
             </div>
         </div>
     </form>

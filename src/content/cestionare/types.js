@@ -27,6 +27,7 @@
  * @property {TipCimp} tip
  * @property {string} nume
  * @property {string} titlu
+ * @property {string} [desc]
  * @property {boolean} [obligatoriu]
  * @property {Validator} [valideaza]
  * @property {DaOptiuniSelectie} [optiuni]

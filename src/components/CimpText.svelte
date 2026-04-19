@@ -5,6 +5,7 @@
      * @typedef {Object} Props
      * @property {'text'|'email'} tip
      * @property {string} nume
+     * @property {string | null} [desc=null]
      * @property {string} intrebare
      * @property {string} value
      * @property {boolean} [obligatoriu=false]
@@ -15,6 +16,7 @@
     let {
         tip,
         nume,
+        desc = null,
         obligatoriu = false,
         onblur,
         intrebare,
@@ -23,13 +25,22 @@
 </script>
 
 <label class="flex flex-col">
-    <span class="mb-1">{intrebare}
+    <span class="mb-1 font-bold">{intrebare}
         {#if obligatoriu}
             <span
                 class="px-0.5 text-lg leading-none font-bold text-red-500"
             >*</span>
         {/if}
     </span>
+
+    {#if desc != null}
+        <details>
+            <summary>Vezi mai multe detalii&hellip;</summary>
+            <span>
+                {desc}
+            </span>
+        </details>
+    {/if}
 
     <input
         required={obligatoriu}

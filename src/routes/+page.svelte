@@ -193,6 +193,7 @@
                             tip={cimp.tip}
                             intrebare={cimp.titlu}
                             nume={cimp.nume}
+                            desc={cimp.desc}
                             obligatoriu={cimp.obligatoriu}
                             onblur={() => aplica_validare(cimp)}
                             bind:value={raspunsuri[cimp.nume]}

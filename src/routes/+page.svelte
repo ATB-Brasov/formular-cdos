@@ -68,18 +68,17 @@
 
     let email = $state("");
 
-    let eroare_posta = $derived(!este_posta_valida(email));
-
-    function este_posta_valida(/**@type{string}*/ posta) {
-        return posta.endsWith("@student.unitbv.ro") ||
-            posta.endsWith("@unitbv.ro");
-    }
+    let eroare_posta = $derived(
+        sondaj_cdos.validare_posta != null
+            ? sondaj_cdos.validare_posta(email)
+            : null,
+    );
 
     let isMining = $state(false);
     let nonce = $state("");
 </script>
 
-{#if !data.session || !data.session.email}
+{#if !data.session?.email}
     <form
         method="POST"
         use:enhance={async ({ formData, cancel }) => {
@@ -92,13 +91,13 @@
                 formData.append("nonce", nonce);
             } catch (err) {
                 cancel();
-            } finally {
                 isMining = false;
             }
             console.log("Solved PoW with nonce:", nonce);
 
             return async ({ update }) => {
                 await update();
+                isMining = false;
             };
         }}
         action="?/posta"
@@ -118,25 +117,18 @@
             intrebare={"Adresa poștei instituționale"}
             nume={"posta"}
             obligatoriu={true}
-            onblur={() => este_posta_valida(email)}
             bind:value={email}
         />
 
-        <div>
-            Eroare posta: {eroare_posta}
-        </div>
-
         {#if eroare_posta}
-            <span class="text-red-500">Folosește adresa instutițională!</span>
+            <span class="text-red-500">{eroare_posta}</span>
         {/if}
 
         {#if form?.erori != null}
             <span class="text-red-500">{form?.erori?.posta?.msg}</span>
         {/if}
 
-        <div>
-            Salut <span class="font-bold">{inloct(raspunsuri["posta"])}</span>
-        </div>
+        <div>GDPR</div>
 
         <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
             <div class="flex justify-center gap-4">
@@ -153,9 +145,12 @@
                 </button>
 
                 <button
-                    class="rounded-md border border-blue-600 bg-blue-500 px-2 py-1 text-white shadow-xs shadow-blue-600/90"
+                    class="
+                        rounded-md border border-blue-600 bg-blue-500 px-2 py-1 text-white shadow-xs shadow-blue-600/90
+                        disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-400 disabled:shadow-olive-200/40
+                    "
                     type="submit"
-                    disabled={isMining}
+                    disabled={isMining || eroare_posta != null}
                 >
                     {isMining ? "Se trimite..." : "Începe"}
                 </button>

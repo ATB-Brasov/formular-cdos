@@ -56,17 +56,23 @@ export const actions = {
         const nonce = data.get('nonce');
         if (email == null) {
             return fail(400, {
-                erori: { email: { msg: "Cîmpul este obligatoriu", pag: 0 } },
-                pag: 0,
+                erori: { email: { msg: "Cîmpul este obligatoriu" } },
             });
         }
         email = email.toString();
+
+        const msg_validare = sondaj_cdos.validare_posta(email)
+        if (msg_validare != null) {
+            return fail(400, {
+                erori: { email: { msg: msg_validare } },
+            });
+        }
+
         console.log("data.email: ", email);
 
         if (!verifyPoW(email, nonce)) {
             return fail(400, {
-                    erori: { email: { msg: "Invalid Proof of Work. Nice try, bot!", pag: 0 } },
-                    pag: 0,
+                    erori: { email: { msg: "Invalid Proof of Work. Nice try, bot!" } },
                 }
             );
         }
@@ -93,7 +99,26 @@ export const actions = {
         }
         return { success: true };
     },
+
     salveaza: async ({ request, cookies }) => {
+        const sessionId = cookies.get("sessionid");
+        if (sessionId == null) {
+            return fail(400, { msg: "Nici o sesiune nu a fost setată" });
+        }
+        const session = await getSession(sessionId);
+        if (session == null) {
+            return fail(400, { msg: "Sesiune nevalidă" });
+        }
+        if (session.email == null) {
+            return fail(400, { msg: "Poșta electronică a sesiunii nu a fost setată" });
+        }
+        const msg_validare = sondaj_cdos.validare_posta(session.email)
+        if (msg_validare != null) {
+            return fail(400, {
+                erori: { email: { msg: msg_validare } },
+            });
+        }
+
         const data = await request.formData();
         /** @type { {[nume: string]: EroareValidare} } */
         const erori = {}; // Poate un Map?
@@ -136,18 +161,6 @@ export const actions = {
 
         if (Object.keys(erori).length > 0) {
             return fail(400, { erori: erori, pag: min_err_pag });
-        }
-
-        const sessionId = cookies.get("sessionid");
-        if (sessionId == null) {
-            return fail(400, { msg: "Nici o sesiune nu a fost setată" });
-        }
-        const session = await getSession(sessionId);
-        if (session == null) {
-            return fail(400, { msg: "Sesiune nevalidă" });
-        }
-        if (session.email == null) {
-            return fail(400, { msg: "Poșta electronică a sesiunii nu a fost setată" });
         }
 
         await saveAnswers(

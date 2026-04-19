@@ -45,6 +45,7 @@
  * @property {string} id
  * @property {string} titlu
  * @property {string} [descriere]
+ * @property {Validator} [validare_posta]
  * @property {Pagina[]} pagini
  */
 

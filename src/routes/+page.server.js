@@ -1,4 +1,4 @@
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { verifyPoW } from '$lib/server/pow.js';
 
@@ -174,6 +174,7 @@ export const actions = {
 
         // TODO: arată respondentului id-ul la răspuns ca să-l poată edita
 
-        return { success: true };
+        // return { success: true };
+        redirect(303, "/succes");
     },
 };

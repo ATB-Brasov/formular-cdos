@@ -11,6 +11,7 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
  * @typedef {Object} SessionData
  * @property {string|null} email
  * @property {string} answerId
+ * @property {string} formId
  * @property {number} createdAt
  * @property {number} lastActivity
  */
@@ -23,16 +24,17 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
  /**
   * @typedef {Object} AnswersData
   * @property {string} answerId
-  * @property {string} answers
+  * @property {Map<string,string>} answers
   * @property {number} submittedAt
   */
 
 /**
  * Create a new session for an email
+ * @param {string} formId - User email
  * @param {string|null} email - User email
  * @returns {Promise<string>} Session ID
  */
-export async function createSession(email) {
+export async function createSession(formId, email=null) {
     const kv = await getKv();
     const sessionId = crypto.randomUUID();
     const answerId = crypto.randomUUID();
@@ -42,6 +44,7 @@ export async function createSession(email) {
     const sessionData = {
         email,
         answerId,
+        formId,
         createdAt: now,
         lastActivity: now,
     };
@@ -83,7 +86,7 @@ export async function updateSessionEmail(sessionId, email) {
 
 /**
  * Get session data by session ID
- * @param {string|undefined} sessionId
+ * @param {string|undefined} sessionId The session id from Cookies, could be undefined to allow passing directly from cookies.get
  * @returns {Promise<SessionData|null>}
  */
  export async function getSession(sessionId) {
@@ -120,50 +123,56 @@ export async function deleteSession(sessionId) {
 
 /**
  * Extrge adresa poștei electronice din lista adreselor salvate
+ * @param {string} formId
  * @param {string} email
  * @returns {Promise<EmailData|null>}
  */
-export async function getAnsweredEmail(email) {
+export async function getAnsweredEmail(formId, email) {
     const kv = await getKv();
 
     const hashed_email = await hashEmail(email)
     /** @type {Deno.KvEntryMaybe<EmailData>} */
-    const result = await kv.get([...EMAILS_PREFIX, hashed_email]);
+    const result = await kv.get([...EMAILS_PREFIX, formId, hashed_email]);
     return result.value || null;
 }
 
-/** @returns {Promise<Deno.KvListIterator<AnswersData>>} */
-export async function getListOfAnswers() {
+/**
+ * @param {string} formId
+ * @returns {Promise<Deno.KvListIterator<AnswersData>>} 
+ */
+export async function getListOfAnswers(formId) {
     const kv = await getKv();
     /** @type {Deno.KvListIterator<AnswersData>} */
-    const result = kv.list({ prefix: ANSWERS_PREFIX }, {limit: 10});
+    const result = kv.list({ prefix: [...ANSWERS_PREFIX, formId] }, {limit: 10});
     return result;
 }
 
 /**
  * Extrage răspunsuri pe baza identificatorului de raspuns
+ * @param {string} formId
  * @param {string} answerId
- * @returns {Promise<Object|null>}
+ * @returns {Promise<Map<string,string>|null>}
  */
-export async function getPreviousAnswers(answerId) {
+export async function getPreviousAnswers(formId, answerId) {
     const kv = await getKv();
-    const result = await kv.get([...ANSWERS_PREFIX, answerId]);
+    const result = await kv.get([...ANSWERS_PREFIX, formId, answerId]);
     return result.value || null;
 }
 
 /**
  * Salvează răspunsurile la cestionar
  * @param {string} email
+ * @param {string} formId
  * @param {string} answerId
- * @param {string[][]} answers
+ * @param {Map<string,string>} answers
  * @returns {Promise<void>}
  */
-export async function saveAnswers(email, answerId, answers) {
+export async function saveAnswers(email, formId, answerId, answers) {
     const kv = await getKv();
 
     const hashed_email = await hashEmail(email)
-    await kv.set([...EMAILS_PREFIX, hashed_email], {answered: true});
-    await kv.set([...ANSWERS_PREFIX, answerId], {
+    await kv.set([...EMAILS_PREFIX, formId, hashed_email], {answered: true});
+    await kv.set([...ANSWERS_PREFIX, formId, answerId], {
         answerId,
         answers,
         submittedAt: Date.now(),

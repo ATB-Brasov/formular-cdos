@@ -1,19 +1,19 @@
 <script>
-    /** @import {Cimp} from "@content/cestionare/intrebari.js" */
+    /** @import {Cimp} from "@content/cestionare/types.js" */
 
     import { enhance } from "$app/forms";
     import { solvePoW } from "$lib/miner.js";
-    import intrebari from "@content/cestionare/intrebari.js";
+    import * as ds from "$lib/ds_helpers.js";
+
     import Selectie from "@components/Selectie.svelte";
     import CimpText from "@components/CimpText.svelte";
+
+    import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js"; // TODO: Încărcare dinamică
 
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
 
-    /**
-     * @template T
-     * @typedef {{[key:string]: T}} SDict
-     */
+    /** @import { SDict } from "$lib/common_types.js" */
 
     /**
      * @typedef {Object} Eroare
@@ -23,6 +23,8 @@
 
     /** @type {SDict<Eroare>} */ let eroare = $state({});
     /** @type {SDict<string>} */ let raspunsuri = $state(form ?? {}); // TODO: Fix warning
+
+    let intrebari = sondaj_cdos.pagini
 
     let pagina = $derived(form?.pag ?? 0);
     const ULTIMA_PAGINA = intrebari.length - 1;
@@ -38,18 +40,6 @@
     function inloct(/**@type{string}*/ text) {
         if (text === "") return "{}";
         return text;
-    }
-
-    /**
-     * @template T
-     * @param {SDict<T>|undefined} obj
-     * @param {string} key
-     * @param {T} [defaultValue=undefined]
-     * @returns {T|undefined}
-     */
-    function get(obj, key, defaultValue) {
-        if (obj === undefined) return;
-        return key in obj ? obj[key] : defaultValue;
     }
 
     function aplica_validare(/**@type{Cimp}*/ cimp) {
@@ -195,7 +185,7 @@
 
         {#each intrebari as pag, i}
             {#each pag.cimpuri as cimp}
-                {@const err = get(form?.erori, cimp.nume)}
+                {@const err = ds.get(form?.erori, cimp.nume)}
 
                 <div class:hidden={i !== pagina}>
                     {#if cimp.tip === "email" || cimp.tip === "text"}
@@ -226,13 +216,13 @@
                         >Tip cîmp `{cimp.tip}` necunoscut</i>
                     {/if}
 
-                    {#if eroare[cimp.nume] !== undefined}
+                    {#if eroare[cimp.nume] != null}
                         <div class="text-sm text-red-500">
                             {eroare[cimp.nume].msg}
                         </div>
                     {/if}
 
-                    {#if err !== undefined}
+                    {#if err != null}
                         <div class="text-sm text-red-500">
                             {err.msg}
                         </div>

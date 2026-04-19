@@ -2,15 +2,14 @@ import { fail } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { verifyPoW } from '$lib/server/pow.js';
 
-import intrebari from "@content/cestionare/intrebari.js";
+import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js";
 import {
+    getSession,
     createSession,
     deleteSession,
-    getAnsweredEmail,
-    getSession,
-    hashEmail,
-    saveAnswers,
     updateSessionEmail,
+    getAnsweredEmail,
+    saveAnswers,
 } from "$lib/server/session.js";
 
 /**
@@ -18,7 +17,7 @@ import {
  * @returns {Promise<string>}
  */
 async function newSession(cookies) {
-    const sessionid = await createSession(null);
+    const sessionid = await createSession(sondaj_cdos.id);
     console.log(`Sesiune nouă cu id: ${sessionid}`);
     cookies.set("sessionid", sessionid, {
         path: "/",
@@ -72,7 +71,7 @@ export const actions = {
             );
         }
 
-        const answered_email = await getAnsweredEmail(email);
+        const answered_email = await getAnsweredEmail(sondaj_cdos.id, email);
         console.log("getAnsweredEmail => ", answered_email);
         if (answered_email != null) {
             return fail(400, {
@@ -101,9 +100,10 @@ export const actions = {
 
         const raspunsuri = [];
 
-        let min_err_pag = intrebari.length;
-        for (let pag_nr = 0; pag_nr < intrebari.length; ++pag_nr) {
-            const pag = intrebari[pag_nr];
+        const pagini = sondaj_cdos.pagini;
+        let min_err_pag = pagini.length;
+        for (let pag_nr = 0; pag_nr < pagini.length; ++pag_nr) {
+            const pag = pagini[pag_nr];
             for (let cimp of pag.cimpuri) {
                 const cimp_formular = data.get(cimp.nume);
 
@@ -129,7 +129,8 @@ export const actions = {
                     }
                 }
 
-                raspunsuri.push([cimp.nume, cimp_formular]);
+                // WARN: Trebuie de văzut cum funcționează cu Selecții Multiple
+                raspunsuri.push([cimp.nume, cimp_formular.toString()]);
             }
         }
 
@@ -151,8 +152,9 @@ export const actions = {
 
         await saveAnswers(
             session.email,
+            sondaj_cdos.id,
             session.answerId,
-            raspunsuri,
+            new Map(raspunsuri),
         );
         await deleteSession(sessionId);
         cookies.delete("sessionid", { path: "/" });

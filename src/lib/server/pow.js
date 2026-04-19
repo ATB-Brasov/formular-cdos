@@ -1,5 +1,5 @@
 // Assisted-By: Gemini 3 Flash
-import { createHash } from 'crypto';
+import { createHash } from 'node:crypto';
 
 export function verifyPoW(email, nonce, difficulty = 4) {
     const data = `${email}:${nonce}`;

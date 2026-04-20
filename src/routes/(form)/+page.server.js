@@ -23,7 +23,7 @@ async function newSession(cookies) {
         path: "/",
         httpOnly: true,
         secure: !dev,
-        sameSite: "lax",
+        sameSite: "none",
         maxAge: 60 * 60, // 1 hour
     });
     return sessionid;

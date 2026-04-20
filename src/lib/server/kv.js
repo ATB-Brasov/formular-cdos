@@ -36,9 +36,9 @@ async function initKv() {
 
         if (isLocal) {
             console.info("Connecting to local Deno KV (local.db)");
-            kvInstance = await Deno.openKv("./local.db");
+            kvInstance = await Deno.openKv("./.db/local.db");
         } else {
-            // Connects to the managed Deno KV service in the cloud
+            console.info("Connecting Deno KV cloud");
             kvInstance = await Deno.openKv();
         }
         return kvInstance;

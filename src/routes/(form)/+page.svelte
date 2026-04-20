@@ -101,7 +101,7 @@
             };
         }}
         action="?/posta"
-        class="m-auto mt-10 flex w-[500px] flex-col gap-4 p-4"
+        class="flex flex-col gap-4 p-4"
     >
         <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
 

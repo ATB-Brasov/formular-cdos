@@ -1,11 +1,11 @@
 <script>
-    import { dev } from "$app/environment";
-
     /** @type {import('./$types').PageProps} */
     let { data } = $props();
 </script>
 
-{#if dev}
+{#if data.eroare != null}
+    <div class="text-red-500">{data.eroare}</div>
+{:else}
     Data answers: 
     {#if data.answers != null}
         <div class="flex flex-col">
@@ -26,6 +26,4 @@
     {:else}
         nulll
     {/if}
-{:else}
-    Disponibil doar pentru Dezvoltare
 {/if}

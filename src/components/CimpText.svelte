@@ -46,9 +46,9 @@
         required={obligatoriu}
         class="
             w-full px-2 py-1
-            rounded border border-stone-200
-            shadow-xs placeholder:text-stone-300 dark:border-stone-500
-            bg-white dark:bg-stone-700
+            rounded border border-olive-200
+            shadow-xs placeholder:text-olive-300 dark:border-olive-500
+            bg-white dark:bg-olive-700
         "
         type={tip}
         name={nume}

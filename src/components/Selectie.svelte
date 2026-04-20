@@ -44,8 +44,8 @@
         <select
             class="
                 p-2 rounded shadow-xs
-                border border-stone-200 dark:border-stone-500
-                bg-white dark:bg-stone-700 min-w-full w-full max-w-full
+                border border-olive-200 dark:border-olive-500
+                bg-white dark:bg-olive-700 min-w-full w-full max-w-full
             "
             required={obligatoriu}
             {onblur}

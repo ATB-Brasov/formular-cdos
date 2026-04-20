@@ -8,6 +8,12 @@ const EMAILS_PREFIX = ["emails"];
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
 
 /**
+ * @typedef {Object} AdminSessionData
+ * @property {number} createdAt
+ * @property {number} lastActivity
+ */
+
+/**
  * @typedef {Object} SessionData
  * @property {string|null} email
  * @property {string} answerId
@@ -27,6 +33,28 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
   * @property {Map<string,string>} answers
   * @property {number} submittedAt
   */
+
+/**
+ * Create a new session for the admin
+ * @returns {Promise<string>} Session ID
+ */
+export async function createAdminSession() {
+    const kv = await getKv();
+    const sessionId = crypto.randomUUID();
+    const now = Date.now();
+
+    /** @type {SessionData} */
+    const sessionData = {
+        createdAt: now,
+        lastActivity: now,
+    };
+
+    await kv.set([...SESSION_PREFIX, "admin", sessionId], sessionData, {
+        expireIn: SESSION_DURATION,
+    });
+
+    return sessionId;
+}
 
 /**
  * Create a new session for an email
@@ -82,6 +110,33 @@ export async function updateSessionEmail(sessionId, email) {
             expireIn: SESSION_DURATION,
         });
     }
+}
+
+/**
+ * Get session data by session ID
+ * @param {string|undefined} sessionId The session id from Cookies, could be undefined to allow passing directly from cookies.get
+ * @returns {Promise<AdminSessionData|null>}
+ */
+ export async function getAdminSession(sessionId) {
+    if (sessionId === undefined) return null;
+
+    const kv = await getKv();
+    /** @type {Deno.KvEntryMaybe<SessionData>} */
+    const result = await kv.get([...SESSION_PREFIX, "admin", sessionId]);
+
+    if (result.value) {
+        const updated = {
+            ...result.value,
+            lastActivity: Date.now(),
+        };
+        await kv.set([...SESSION_PREFIX, "admin", sessionId], updated, {
+            expireIn: SESSION_DURATION,
+        });
+
+        return updated;
+    }
+
+    return null;
 }
 
 /**

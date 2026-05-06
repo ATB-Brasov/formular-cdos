@@ -28,7 +28,7 @@
     <span class="mb-1 font-bold">{intrebare}
         {#if obligatoriu}
             <span
-                class="px-0.5 text-lg leading-none font-bold text-red-500"
+                class="px-0.5 text-lg leading-none font-bold text-danger"
             >*</span>
         {/if}
     </span>
@@ -46,9 +46,9 @@
         required={obligatoriu}
         class="
             w-full px-2 py-1
-            rounded border border-olive-200
-            shadow-xs placeholder:text-olive-300 dark:border-olive-500
-            bg-white dark:bg-olive-700
+            rounded border border-surface-border
+            shadow-xs placeholder:text-surface-placeholder dark:border-surface-dim
+            bg-surface dark:bg-surface-dark
         "
         type={tip}
         name={nume}

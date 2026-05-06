@@ -127,7 +127,7 @@
     >
         <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
 
-        <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
+        <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
             {sondaj_cdos.descriere}
         </div>
 
@@ -141,22 +141,22 @@
         />
 
         {#if eroare_posta}
-            <span class="text-red-500">{eroare_posta}</span>
+            <span class="text-danger">{eroare_posta}</span>
         {/if}
 
         {#if form?.erori != null}
-            <span class="text-red-500">{form?.erori?.posta?.msg}</span>
+            <span class="text-danger">{form?.erori?.posta?.msg}</span>
         {/if}
 
         <div>GDPR</div>
 
-        <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
+        <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
             <div class="flex justify-center gap-4">
                 <button
                     class="
-                        rounded-md border border-blue-600 bg-blue-500 px-2
-                        py-1 text-white shadow-xs shadow-blue-600/90
-                        disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-100 disabled:shadow-olive-200/40
+                        rounded-md border border-primary-strong bg-primary px-2
+                        py-1 text-white shadow-xs shadow-primary-strong/90
+                        disabled:border-surface-border disabled:bg-surface-disabled disabled:text-surface-muted disabled:shadow-surface-border/40
                     "
                     type="button"
                     disabled={true}
@@ -166,8 +166,8 @@
 
                 <button
                     class="
-                        rounded-md border border-blue-600 bg-blue-500 px-2 py-1 text-white shadow-xs shadow-blue-600/90
-                        disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-400 disabled:shadow-olive-200/40
+                        rounded-md border border-primary-strong bg-primary px-2 py-1 text-white shadow-xs shadow-primary-strong/90
+                        disabled:border-surface-border disabled:bg-surface-disabled disabled:text-surface-muted disabled:shadow-surface-border/40
                     "
                     type="submit"
                     disabled={isMining || eroare_posta != null}
@@ -195,7 +195,7 @@
         <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
         <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>
 
-        <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
+        <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
             {pagina_activa.descriere}
         </div>
 
@@ -223,10 +223,10 @@
                                 bind:value={raspunsuri[cimp.nume]}
                             />
                         {:else}
-                            <i class="text-italic text-red-600">Nu au fost
-                                definite opțiuni pentru selecția {cimp.nume}</i>
-                        {/if}
-                    {:else if cimp.tip === "selecție-cautare"}
+                            <i class="text-italic text-danger-strong">Nu au fost
+                                    definite opțiuni pentru selecția {cimp.nume}</i>
+                            {/if}
+                        {:else if cimp.tip === "selecție-cautare"}
                         {#if cimp.optiuni !== undefined}
                             <SelectieCautare
                                 nume={cimp.nume}
@@ -237,10 +237,10 @@
                                 bind:value={raspunsuri[cimp.nume]}
                             />
                         {:else}
-                            <i class="text-italic text-red-600">Nu au fost
-                                definite opțiuni pentru selecția {cimp.nume}</i>
-                        {/if}
-                    {:else if cimp.tip === "selecție"}
+                            <i class="text-italic text-danger-strong">Nu au fost
+                                    definite opțiuni pentru selecția {cimp.nume}</i>
+                            {/if}
+                        {:else if cimp.tip === "selecție"}
                         {#if cimp.optiuni !== undefined}
                             <Selectie
                                 nume={cimp.nume}
@@ -251,16 +251,16 @@
                                 bind:value={raspunsuri[cimp.nume]}
                             />
                         {:else}
-                            <i class="text-italic text-red-600">Nu au fost
-                                definite opțiuni pentru selecția {cimp.nume}</i>
-                        {/if}
-                    {:else}
-                        <i class="text-italic text-red-600"
-                        >Tip cîmp `{cimp.tip}` necunoscut</i>
+                            <i class="text-italic text-danger-strong">Nu au fost
+                                    definite opțiuni pentru selecția {cimp.nume}</i>
+                            {/if}
+                        {:else}
+                            <i class="text-italic text-danger-strong"
+                            >Tip cîmp `{cimp.tip}` necunoscut</i>
                     {/if}
 
                     {#if eroare[cimp.nume] != null}
-                        <div class="text-sm text-red-500">
+                        <div class="text-sm text-danger">
                             {eroare[cimp.nume].msg}
                         </div>
                     {/if}
@@ -277,17 +277,16 @@
             }</span>
         </div>
 
-        <div class="w-[100wv] rounded-xl border border-olive-200 bg-white p-3">
+        <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
             <div class="flex justify-center gap-4">
                 <button
                     class="
-                        rounded-md border border-blue-600 bg-blue-500 px-2
-                        py-1 text-white shadow-xs shadow-blue-600/90
-                        disabled:border-olive-200 disabled:bg-olive-100 disabled:text-olive-100 disabled:shadow-olive-200/40
+                        rounded-md border border-primary-strong bg-primary px-2
+                        py-1 text-white shadow-xs shadow-primary-strong/90
+                        {pagina === 0 ? 'invisible' : ''}
                     "
                     type="button"
-                    disabled={pagina === 0}
-                    onclick={() => Math.max(0, pagina -= 1)}
+                    onclick={() => { if (pagina > 0) pagina -= 1; }}
                 >
                     Anterior
                 </button>
@@ -298,11 +297,11 @@
                     <button
                         type={ultima ? "submit" : "button"}
                         class="
-                            px-2 py-1 text-white bg-blue-500
-                            rounded-md border border-blue-600
-                            shadow-xs shadow-blue-600/90
-                            disabled:bg-olive-100 disabled:text-olive-400
-                            disabled:border-olive-200 disabled:shadow-olive-200/40
+                            px-2 py-1 text-white bg-primary
+                                rounded-md border border-primary-strong
+                                shadow-xs shadow-primary-strong/90
+                                disabled:bg-surface-disabled disabled:text-surface-muted
+                                disabled:border-surface-border disabled:shadow-surface-border/40
                         "
                         disabled={!btn_urmator_activ}
                         onclick={ultima ? null : () => {

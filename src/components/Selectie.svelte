@@ -44,13 +44,13 @@
             </details>
         {/if}
         {#if optiuni.eroare != null}
-            <p class="mt-1 text-sm text-amber-600 dark:text-amber-400">{optiuni.eroare}</p>
+            <p class="mt-1 text-sm text-warning dark:text-warning-dark">{optiuni.eroare}</p>
         {:else}
             <select
                 class="
                     p-2 rounded shadow-xs
-                    border border-olive-200 dark:border-olive-500
-                    bg-white dark:bg-olive-700 min-w-full w-full max-w-full
+                    border border-surface-border dark:border-surface-dim
+                    bg-surface dark:bg-surface-dark min-w-full w-full max-w-full
                 "
                 required={obligatoriu}
                 {onblur}

@@ -44,7 +44,7 @@
             </details>
         {/if}
         {#if optiuni.eroare != null}
-            <p class="mt-1 text-sm text-amber-600 dark:text-amber-400">{optiuni.eroare}</p>
+            <p class="mt-1 text-sm text-warning dark:text-warning-dark">{optiuni.eroare}</p>
         {:else}
             <div
                 class="
@@ -56,6 +56,7 @@
                     <label>
                         <input
                             type="radio"
+                            class="accent-primary"
                             name={nume}
                             bind:group={value}
                             value={opt}

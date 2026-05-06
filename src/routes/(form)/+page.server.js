@@ -159,7 +159,7 @@ export const actions = {
 
                 if (cimp.valideaza !== undefined) {
                     const err = cimp.valideaza(cimp_formular.toString());
-                    if (err !== undefined) {
+                    if (err != null) {
                         min_err_pag = Math.min(min_err_pag, pag_nr);
                         erori[cimp.nume] = {
                             msg: err,

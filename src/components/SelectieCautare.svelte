@@ -264,14 +264,14 @@
     </span>
 
     {#if desc != null}
-        <details class="mb-1 text-sm text-olive-600 dark:text-olive-300">
+        <details class="mb-1 text-sm text-surface-dim dark:text-surface-placeholder">
             <summary class="cursor-pointer">Vezi mai multe detalii&hellip;</summary>
             <span>{desc}</span>
         </details>
     {/if}
 
     {#if optiuni.eroare != null}
-        <p class="mt-1 text-sm text-amber-600 dark:text-amber-400">{optiuni.eroare}</p>
+        <p class="mt-1 text-sm text-warning dark:text-warning-dark">{optiuni.eroare}</p>
     {:else}
     <div class="relative">
         <!-- Search input -->
@@ -283,9 +283,9 @@
             required={obligatoriu && value === ""}
             class="
                 w-full px-2 py-1
-                rounded border border-olive-200 dark:border-olive-500
-                bg-white dark:bg-olive-700
-                shadow-xs placeholder:text-olive-300
+                rounded border border-surface-border dark:border-surface-dim
+                bg-surface dark:bg-surface-dark
+                shadow-xs placeholder:text-surface-placeholder
             "
             value={cautare}
             oninput={peInput}
@@ -300,8 +300,8 @@
                 class="
                     absolute z-50 mt-1 w-full
                     max-h-60 overflow-y-auto
-                    rounded border border-olive-200 dark:border-olive-500
-                    bg-white dark:bg-olive-800
+                    rounded border border-surface-border dark:border-surface-dim
+                    bg-surface dark:bg-surface-darker
                     shadow-md
                 "
             >
@@ -311,16 +311,16 @@
                             type="button"
                             class="
                                 w-full px-3 py-1.5 text-left text-sm
-                                hover:bg-blue-50 dark:hover:bg-olive-700
+                                hover:bg-primary-subtle dark:hover:bg-surface-dark
                                 {i === indexActiv
-                                    ? 'bg-blue-100 dark:bg-olive-600'
+                                    ? 'bg-primary-muted dark:bg-surface-dim'
                                     : ''}
                             "
                             onmousedown={(e) => { e.preventDefault(); selecteaza(opt); }}
                         >
                             {#each evidentiaza(cautare, opt) as seg}
                                 {#if seg.matched}
-                                    <span class="font-bold text-blue-600 dark:text-blue-300">{seg.text}</span>
+                                    <span class="font-bold text-primary-strong dark:text-primary-dim">{seg.text}</span>
                                 {:else}
                                     <span>{seg.text}</span>
                                 {/if}
@@ -332,9 +332,9 @@
         {:else if deschis && cautare !== "" && optiuniFiltrate.length === 0}
             <div class="
                 absolute z-50 mt-1 w-full
-                rounded border border-olive-200 dark:border-olive-500
-                bg-white dark:bg-olive-800
-                shadow-md px-3 py-2 text-sm text-olive-400
+                rounded border border-surface-border dark:border-surface-dim
+                bg-surface dark:bg-surface-darker
+                shadow-md px-3 py-2 text-sm text-surface-muted
             ">
                 Nicio opțiune găsită
             </div>
@@ -345,13 +345,13 @@
     {#if value}
         <div class="
             mt-2 flex items-center gap-2
-            rounded-lg border border-blue-200 bg-blue-50
+            rounded-lg border border-primary-border bg-primary-subtle
             px-3 py-2
-            dark:border-blue-800 dark:bg-blue-950
+            dark:border-primary-text dark:bg-primary-deep
         ">
             <!-- Checkmark icon -->
             <svg
-                class="h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400"
+                class="h-4 w-4 shrink-0 text-primary dark:text-primary-faint"
                 viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
             >
                 <path fill-rule="evenodd"
@@ -359,15 +359,15 @@
                     clip-rule="evenodd"
                 />
             </svg>
-            <span class="flex-1 text-sm font-medium text-blue-800 dark:text-blue-200">{value}</span>
+            <span class="flex-1 text-sm font-medium text-primary-text dark:text-primary-dim">{value}</span>
             <!-- Clear button -->
             <button
                 type="button"
                 aria-label="Șterge selecția"
                 class="
-                    ml-auto rounded p-0.5 text-blue-400
-                    hover:bg-blue-100 hover:text-blue-600
-                    dark:hover:bg-blue-900 dark:hover:text-blue-300
+                    ml-auto rounded p-0.5 text-primary-faint
+                    hover:bg-primary-muted hover:text-primary-strong
+                    dark:hover:bg-primary-text dark:hover:text-primary-dim
                 "
                 onclick={sterge}
             >

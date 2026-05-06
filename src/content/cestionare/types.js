@@ -1,12 +1,20 @@
 /** @import { SDict } from "$lib/common_types.js" */
 
 /**
- * Funcția trebuiește să întoarcă o listă de șiruri de caractere care să
- * fie folosite la crearea unei selecții.
+ * Rezultatul întors de funcția de generare a opțiunilor.
+ *
+ * @typedef {Object} RezultatOptiuni
+ * @property {string[]} optiuni Lista de opțiuni disponibile (poate fi goală)
+ * @property {string|null} eroare Mesaj descriptiv dacă nu pot fi generate opțiuni, altfel null
+ */
+
+/**
+ * Funcția trebuiește să întoarcă un obiect cu lista de opțiuni și un mesaj
+ * opțional de eroare în cazul în care nu există opțiuni disponibile.
  *
  * @callback DaOptiuniSelectie
  * @param {SDict<string>} raspunsuri Răspunsurile curente a formularului
- * @return {string[]} Lista de opțiuni pentru selecție
+ * @return {RezultatOptiuni}
  */
 
 /**

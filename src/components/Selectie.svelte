@@ -1,12 +1,14 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
 
+    /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
+
     /**
      * @typedef {Object} Props
      * @property {string} nume
      * @property {string} intrebare
      * @property {string?} [desc = null]
-     * @property {string[]} optiuni
+     * @property {RezultatOptiuni} optiuni
      * @property {string} value
      * @property {boolean} [obligatoriu=false]
      * @property {FocusEventHandler<HTMLElement>} [onblur]
@@ -41,21 +43,25 @@
                 </span>
             </details>
         {/if}
-        <select
-            class="
-                p-2 rounded shadow-xs
-                border border-olive-200 dark:border-olive-500
-                bg-white dark:bg-olive-700 min-w-full w-full max-w-full
-            "
-            required={obligatoriu}
-            {onblur}
-            name={nume}
-            bind:value
-        >
-            <option value="">Alege Opțiune</option>
-            {#each optiuni as opt}
-                <option value={opt}>{opt}</option>
-            {/each}
-        </select>
+        {#if optiuni.eroare != null}
+            <p class="mt-1 text-sm text-amber-600 dark:text-amber-400">{optiuni.eroare}</p>
+        {:else}
+            <select
+                class="
+                    p-2 rounded shadow-xs
+                    border border-olive-200 dark:border-olive-500
+                    bg-white dark:bg-olive-700 min-w-full w-full max-w-full
+                "
+                required={obligatoriu}
+                {onblur}
+                name={nume}
+                bind:value
+            >
+                <option value="">Alege Opțiune</option>
+                {#each optiuni.optiuni as opt}
+                    <option value={opt}>{opt}</option>
+                {/each}
+            </select>
+        {/if}
     </label>
 </div>

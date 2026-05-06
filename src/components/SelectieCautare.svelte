@@ -54,12 +54,14 @@
         return ni === n.length ? score : -1;
     }
 
+    /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
+
     /**
      * @typedef {Object} Props
      * @property {string} nume
      * @property {string} intrebare
      * @property {string | null} [desc=null]
-     * @property {string[]} optiuni
+     * @property {RezultatOptiuni} optiuni
      * @property {string} value
      * @property {boolean} [obligatoriu=false]
      * @property {FocusEventHandler<HTMLElement>} [onblur]
@@ -93,9 +95,9 @@
 
     const optiuniFiltrate = $derived.by(() => {
         if (cautare === "") {
-            return optiuni.map((opt) => ({ opt, score: 0 }));
+            return optiuni.optiuni.map((opt) => ({ opt, score: 0 }));
         }
-        return optiuni
+        return optiuni.optiuni
             .map((opt) => ({ opt, score: fuzzyScore(cautare, opt) }))
             .filter(({ score }) => score >= 0)
             .sort((a, b) => b.score - a.score);
@@ -256,6 +258,9 @@
         </details>
     {/if}
 
+    {#if optiuni.eroare != null}
+        <p class="mt-1 text-sm text-amber-600 dark:text-amber-400">{optiuni.eroare}</p>
+    {:else}
     <div class="relative">
         <!-- Search input -->
         <input
@@ -323,4 +328,5 @@
             </div>
         {/if}
     </div>
+    {/if}
 </div>

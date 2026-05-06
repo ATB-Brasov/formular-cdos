@@ -114,7 +114,7 @@
         cautare = "";   // search box is always empty after a pick
         deschis = false;
         indexActiv = -1;
-        inputEl?.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+        inputEl?.blur();
     }
 
     /**

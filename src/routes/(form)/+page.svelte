@@ -90,11 +90,17 @@
 
     let email = $state("");
 
-    let eroare_posta = $derived(
-        sondaj_cdos.validare_posta != null
-            ? sondaj_cdos.validare_posta(email)
-            : null,
-    );
+    // Mirror the live client-side email validation into eroare["posta"] so
+    // the template has a single error source for all posta errors (both
+    // client-side live feedback and server responses after submission).
+    $effect(() => {
+        const msg = sondaj_cdos.validare_posta?.(email) ?? null;
+        if (msg != null) {
+            eroare["posta"] = { msg, pag: 0 };
+        } else {
+            delete eroare["posta"];
+        }
+    });
 
     let isMining = $state(false);
     let nonce = $state("");
@@ -140,12 +146,12 @@
             bind:value={email}
         />
 
-        {#if eroare_posta}
-            <span class="text-danger">{eroare_posta}</span>
+        {#if eroare["posta"] != null}
+            <span class="text-danger">{eroare["posta"].msg}</span>
         {/if}
 
-        {#if form?.erori != null}
-            <span class="text-danger">{form?.erori?.posta?.msg}</span>
+        {#if eroare["_form"] != null}
+            <span class="text-danger">{eroare["_form"].msg}</span>
         {/if}
 
         <div>GDPR</div>
@@ -170,7 +176,7 @@
                         disabled:border-surface-border disabled:bg-surface-disabled disabled:text-surface-muted disabled:shadow-surface-border/40
                     "
                     type="submit"
-                    disabled={isMining || eroare_posta != null}
+                    disabled={isMining || eroare["posta"] != null}
                 >
                     {isMining ? "Începere..." : "Începe"}
                 </button>
@@ -224,9 +230,9 @@
                             />
                         {:else}
                             <i class="text-italic text-danger-strong">Nu au fost
-                                    definite opțiuni pentru selecția {cimp.nume}</i>
-                            {/if}
-                        {:else if cimp.tip === "selecție-cautare"}
+                                definite opțiuni pentru selecția {cimp.nume}</i>
+                        {/if}
+                    {:else if cimp.tip === "selecție-cautare"}
                         {#if cimp.optiuni !== undefined}
                             <SelectieCautare
                                 nume={cimp.nume}
@@ -238,9 +244,9 @@
                             />
                         {:else}
                             <i class="text-italic text-danger-strong">Nu au fost
-                                    definite opțiuni pentru selecția {cimp.nume}</i>
-                            {/if}
-                        {:else if cimp.tip === "selecție"}
+                                definite opțiuni pentru selecția {cimp.nume}</i>
+                        {/if}
+                    {:else if cimp.tip === "selecție"}
                         {#if cimp.optiuni !== undefined}
                             <Selectie
                                 nume={cimp.nume}
@@ -252,11 +258,11 @@
                             />
                         {:else}
                             <i class="text-italic text-danger-strong">Nu au fost
-                                    definite opțiuni pentru selecția {cimp.nume}</i>
-                            {/if}
-                        {:else}
-                            <i class="text-italic text-danger-strong"
-                            >Tip cîmp `{cimp.tip}` necunoscut</i>
+                                definite opțiuni pentru selecția {cimp.nume}</i>
+                        {/if}
+                    {:else}
+                        <i class="text-italic text-danger-strong"
+                        >Tip cîmp `{cimp.tip}` necunoscut</i>
                     {/if}
 
                     {#if eroare[cimp.nume] != null}

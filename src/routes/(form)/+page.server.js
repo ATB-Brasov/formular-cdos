@@ -56,7 +56,7 @@ export const actions = {
         let nonce = data.get("nonce");
         if (email == null) {
             return fail(400, {
-                erori: { email: { msg: "Cîmpul este obligatoriu" } },
+                erori: { posta: { msg: "Cînmpul este obligatoriu", pag: 0 } },
             });
         }
         email = email.toString();
@@ -66,7 +66,7 @@ export const actions = {
             : null;
         if (msg_validare != null) {
             return fail(400, {
-                erori: { email: { msg: msg_validare } },
+                erori: { posta: { msg: msg_validare, pag: 0 } },
             });
         }
 
@@ -74,14 +74,14 @@ export const actions = {
 
         if (nonce == null) {
             return fail(400, {
-                erori: { email: { msg: "Nonce este null!" } },
+                erori: { posta: { msg: "Nonce este null!", pag: 0 } },
             });
         }
         nonce = nonce.toString();
         if (!verifyPoW(email, nonce)) {
             return fail(400, {
                 erori: {
-                    email: { msg: "Invalid Proof of Work. Nice try, bot!" },
+                    posta: { msg: "Invalid Proof of Work. Nice try, bot!", pag: 0 },
                 },
             });
         }
@@ -91,9 +91,7 @@ export const actions = {
         if (answered_email != null) {
             return fail(400, {
                 erori: {
-                    posta: {
-                        msg: "Este înregistrat răspuns pe această poștă electronică",
-                    },
+                    posta: { msg: "Este înregistrat răspuns pe această poștă electronică", pag: 0 },
                 },
             });
         }
@@ -112,15 +110,15 @@ export const actions = {
     salveaza: async ({ request, cookies }) => {
         const sessionId = cookies.get("sessionid");
         if (sessionId == null) {
-            return fail(400, { msg: "Nici o sesiune nu a fost setată" });
+            return fail(400, { erori: { _form: { msg: "Nici o sesiune nu a fost setată", pag: 0 } } });
         }
         const session = await getSession(sessionId);
         if (session == null) {
-            return fail(400, { msg: "Sesiune nevalidă" });
+            return fail(400, { erori: { _form: { msg: "Sesiune nevalidă", pag: 0 } } });
         }
         if (session.email == null) {
             return fail(400, {
-                msg: "Poșta electronică a sesiunii nu a fost setată",
+                erori: { _form: { msg: "Poșta electronică a sesiunii nu a fost setată", pag: 0 } },
             });
         }
         const msg_validare = (sondaj_cdos.validare_posta != null)
@@ -128,7 +126,7 @@ export const actions = {
             : null;
         if (msg_validare != null) {
             return fail(400, {
-                erori: { email: { msg: msg_validare } },
+                erori: { posta: { msg: msg_validare, pag: 0 } },
             });
         }
 

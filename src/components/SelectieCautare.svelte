@@ -79,7 +79,7 @@
     } = $props();
 
     /** @type {string} */
-    let cautare = $state(value ?? "");
+    let cautare = $state("");
 
     /** @type {boolean} */
     let deschis = $state(false);
@@ -105,15 +105,29 @@
 
     /**
      * Called when the user picks an option from the list.
+     * Commits the value and resets the search box so the field is
+     * ready for a new search if the user changes their mind.
      * @param {string} opt
      */
     function selecteaza(opt) {
         value = opt;
-        cautare = opt;
+        cautare = "";   // search box is always empty after a pick
         deschis = false;
         indexActiv = -1;
-        // Trigger the parent's onblur-equivalent so validation runs
         inputEl?.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+    }
+
+    /**
+     * Clears the committed selection and focuses the search box so the
+     * user can immediately start a new search.
+     */
+    function sterge() {
+        value = "";
+        cautare = "";
+        deschis = false;
+        indexActiv = -1;
+        // Give the DOM a tick to re-render before focusing
+        setTimeout(() => inputEl?.focus(), 0);
     }
 
     /** @param {KeyboardEvent} e */
@@ -178,11 +192,9 @@
 
         deschis = false;
         indexActiv = -1;
-
-        // If the user typed something but never picked an option, reset the
-        // display text to the last committed value so the field isn't left
-        // in a half-edited state.
-        cautare = value;
+        // If the user typed something but never picked an option, clear the
+        // search box so it doesn't show a half-typed dead-end query.
+        cautare = "";
 
         if (onblur) onblur(/** @type {any} */ (e));
     }
@@ -267,7 +279,7 @@
             bind:this={inputEl}
             type="text"
             autocomplete="off"
-            placeholder="Caută…"
+            placeholder={value ? "Caută altă opțiune…" : "Caută…"}
             required={obligatoriu && value === ""}
             class="
                 w-full px-2 py-1
@@ -328,5 +340,42 @@
             </div>
         {/if}
     </div>
+
+    <!-- Current selection chip -->
+    {#if value}
+        <div class="
+            mt-2 flex items-center gap-2
+            rounded-lg border border-blue-200 bg-blue-50
+            px-3 py-2
+            dark:border-blue-800 dark:bg-blue-950
+        ">
+            <!-- Checkmark icon -->
+            <svg
+                class="h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400"
+                viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
+            >
+                <path fill-rule="evenodd"
+                    d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                    clip-rule="evenodd"
+                />
+            </svg>
+            <span class="flex-1 text-sm font-medium text-blue-800 dark:text-blue-200">{value}</span>
+            <!-- Clear button -->
+            <button
+                type="button"
+                aria-label="Șterge selecția"
+                class="
+                    ml-auto rounded p-0.5 text-blue-400
+                    hover:bg-blue-100 hover:text-blue-600
+                    dark:hover:bg-blue-900 dark:hover:text-blue-300
+                "
+                onclick={sterge}
+            >
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                </svg>
+            </button>
+        </div>
+    {/if}
     {/if}
 </div>

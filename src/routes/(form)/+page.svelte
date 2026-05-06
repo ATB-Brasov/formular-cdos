@@ -5,8 +5,6 @@
     import { enhance } from "$app/forms";
 
     import { solvePoW } from "$lib/miner.js";
-    import * as ds from "$lib/ds_helpers.js";
-
     import Selectie from "@components/Selectie.svelte";
     import SelectieCautare from "@components/SelectieCautare.svelte";
     import CimpText from "@components/CimpText.svelte";
@@ -24,7 +22,29 @@
      */
 
     /** @type {SDict<Eroare>} */ let eroare = $state({});
-    /** @type {SDict<string>} */ let raspunsuri = $state(form ?? {}); // TODO: Fix warning
+
+    // `form` is the value returned by the server action (e.g. after a failed
+    // submission it carries back the submitted field values + errors).
+    // We seed `raspunsuri` from it whenever the server sends a new response,
+    // but we also allow local edits in between — hence the split between a
+    // $derived "snapshot" and a locally-mutable $state copy.
+    /** @type {SDict<string>} */ let raspunsuri = $state(/** @type {SDict<string>} */ ({}));
+    $effect(() => {
+        // `$effect` runs on mount and every time `form` changes (i.e. a new
+        // server response arrives). This seeds/re-seeds the local mutable copy
+        // from whatever the server sent back, while still allowing local edits
+        // between submissions.
+        const fonte = form ?? {};
+        // Only copy string-valued keys — ignore metadata like `erori`, `pag`, `success`.
+        raspunsuri = Object.fromEntries(
+            Object.entries(fonte).filter(([, v]) => typeof v === "string")
+        );
+        // Merge server-side validation errors into the single `eroare` object
+        // so the template only needs one error source.
+        eroare = Object.fromEntries(
+            Object.entries(form?.erori ?? {}).map(([k, v]) => [k, /** @type {Eroare} */ (v)])
+        );
+    });
 
     let intrebari = sondaj_cdos.pagini;
 
@@ -58,7 +78,7 @@
 
         if (cimp.valideaza !== undefined) {
             const err = cimp.valideaza(rasp.toString());
-            if (err !== undefined) {
+            if (err != null) {
                 eroare[cimp.nume] = {
                     msg: err,
                     pag: pagina,
@@ -181,8 +201,6 @@
 
         {#each intrebari as pag, i}
             {#each pag.cimpuri as cimp}
-                {@const err = ds.get(form?.erori, cimp.nume)}
-
                 <div class:hidden={i !== pagina}>
                     {#if cimp.tip === "email" || cimp.tip === "text"}
                         <CimpText
@@ -244,12 +262,6 @@
                     {#if eroare[cimp.nume] != null}
                         <div class="text-sm text-red-500">
                             {eroare[cimp.nume].msg}
-                        </div>
-                    {/if}
-
-                    {#if err != null}
-                        <div class="text-sm text-red-500">
-                            {err.msg}
                         </div>
                     {/if}
                 </div>

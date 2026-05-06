@@ -22,17 +22,17 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
  * @property {number} lastActivity
  */
 
- /**
-  * @typedef {Object} EmailData
-  * @property {boolean} answered
-  */
+/**
+ * @typedef {Object} EmailData
+ * @property {boolean} answered
+ */
 
- /**
-  * @typedef {Object} AnswersData
-  * @property {string} answerId
-  * @property {Map<string,string>} answers
-  * @property {number} submittedAt
-  */
+/**
+ * @typedef {Object} AnswersData
+ * @property {string} answerId
+ * @property {Map<string,string>} answers
+ * @property {number} submittedAt
+ */
 
 /**
  * Create a new session for the admin
@@ -62,7 +62,7 @@ export async function createAdminSession() {
  * @param {string|null} email - User email
  * @returns {Promise<string>} Session ID
  */
-export async function createSession(formId, email=null) {
+export async function createSession(formId, email = null) {
     const kv = await getKv();
     const sessionId = crypto.randomUUID();
     const answerId = crypto.randomUUID();
@@ -117,7 +117,7 @@ export async function updateSessionEmail(sessionId, email) {
  * @param {string|undefined} sessionId The session id from Cookies, could be undefined to allow passing directly from cookies.get
  * @returns {Promise<AdminSessionData|null>}
  */
- export async function getAdminSession(sessionId) {
+export async function getAdminSession(sessionId) {
     if (sessionId === undefined) return null;
 
     const kv = await getKv();
@@ -144,7 +144,7 @@ export async function updateSessionEmail(sessionId, email) {
  * @param {string|undefined} sessionId The session id from Cookies, could be undefined to allow passing directly from cookies.get
  * @returns {Promise<SessionData|null>}
  */
- export async function getSession(sessionId) {
+export async function getSession(sessionId) {
     if (sessionId === undefined) return null;
 
     const kv = await getKv();
@@ -185,7 +185,7 @@ export async function deleteSession(sessionId) {
 export async function getAnsweredEmail(formId, email) {
     const kv = await getKv();
 
-    const hashed_email = await hashEmail(email)
+    const hashed_email = await hashEmail(email);
     /** @type {Deno.KvEntryMaybe<EmailData>} */
     const result = await kv.get([...EMAILS_PREFIX, formId, hashed_email]);
     return result.value || null;
@@ -193,12 +193,14 @@ export async function getAnsweredEmail(formId, email) {
 
 /**
  * @param {string} formId
- * @returns {Promise<Deno.KvListIterator<AnswersData>>} 
+ * @returns {Promise<Deno.KvListIterator<AnswersData>>}
  */
 export async function getListOfAnswers(formId) {
     const kv = await getKv();
     /** @type {Deno.KvListIterator<AnswersData>} */
-    const result = kv.list({ prefix: [...ANSWERS_PREFIX, formId] }, {limit: 10});
+    const result = kv.list({ prefix: [...ANSWERS_PREFIX, formId] }, {
+        limit: 10,
+    });
     return result;
 }
 
@@ -225,8 +227,8 @@ export async function getPreviousAnswers(formId, answerId) {
 export async function saveAnswers(email, formId, answerId, answers) {
     const kv = await getKv();
 
-    const hashed_email = await hashEmail(email)
-    await kv.set([...EMAILS_PREFIX, formId, hashed_email], {answered: true});
+    const hashed_email = await hashEmail(email);
+    await kv.set([...EMAILS_PREFIX, formId, hashed_email], { answered: true });
     await kv.set([...ANSWERS_PREFIX, formId, answerId], {
         answerId,
         answers,
@@ -237,11 +239,15 @@ export async function saveAnswers(email, formId, answerId, answers) {
 export async function hashEmail(/**@type{string}*/ email) {
     const hash_secret = Deno.env.get("HASH_SECRET");
     if (hash_secret == null) {
-        throw new Error("The `HASH_SECRET` environment variable was not defined!")
+        throw new Error(
+            "The `HASH_SECRET` environment variable was not defined!",
+        );
     }
     const hash_salt = Deno.env.get("HASH_SALT");
     if (hash_salt == null) {
-        throw new Error("The `HASH_SALT` environment variable was not defined!")
+        throw new Error(
+            "The `HASH_SALT` environment variable was not defined!",
+        );
     }
     const rawHash = await argon2.hash(email, {
         type: argon2.argon2id,
@@ -251,6 +257,6 @@ export async function hashEmail(/**@type{string}*/ email) {
         timeCost: 3,
         raw: true,
     });
-    const hash = Buffer.from(rawHash).toString('hex');
+    const hash = Buffer.from(rawHash).toString("hex");
     return hash;
 }

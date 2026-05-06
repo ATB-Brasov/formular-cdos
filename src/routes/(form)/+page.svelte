@@ -8,9 +8,11 @@
     import * as ds from "$lib/ds_helpers.js";
 
     import Selectie from "@components/Selectie.svelte";
+    import SelectieCautare from "@components/SelectieCautare.svelte";
     import CimpText from "@components/CimpText.svelte";
 
     import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js"; // TODO: Încărcare dinamică
+    import SelectieRadio from "@components/SelectieRadio.svelte";
 
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
@@ -155,7 +157,6 @@
             </div>
         </div>
     </form>
-
 {:else}
     <form
         method="POST"
@@ -169,7 +170,7 @@
             };
         }}
         action="?/salveaza"
-        class="m-auto mt-10 flex w-[500px] flex-col gap-4 p-4"
+        class="m-auto mt-10 flex w-125 flex-col gap-4 p-4"
     >
         <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
         <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>
@@ -193,6 +194,34 @@
                             onblur={() => aplica_validare(cimp)}
                             bind:value={raspunsuri[cimp.nume]}
                         />
+                    {:else if cimp.tip === "radio"}
+                        {#if cimp.optiuni != null}
+                            <SelectieRadio
+                                nume={cimp.nume}
+                                intrebare={cimp.titlu}
+                                obligatoriu={cimp.obligatoriu}
+                                onblur={() => aplica_validare(cimp)}
+                                optiuni={cimp.optiuni(raspunsuri)}
+                                bind:value={raspunsuri[cimp.nume]}
+                            />
+                        {:else}
+                            <i class="text-italic text-red-600">Nu au fost
+                                definite opțiuni pentru selecția {cimp.nume}</i>
+                        {/if}
+                    {:else if cimp.tip === "selecție-cautare"}
+                        {#if cimp.optiuni !== undefined}
+                            <SelectieCautare
+                                nume={cimp.nume}
+                                intrebare={cimp.titlu}
+                                obligatoriu={cimp.obligatoriu}
+                                onblur={() => aplica_validare(cimp)}
+                                optiuni={cimp.optiuni(raspunsuri)}
+                                bind:value={raspunsuri[cimp.nume]}
+                            />
+                        {:else}
+                            <i class="text-italic text-red-600">Nu au fost
+                                definite opțiuni pentru selecția {cimp.nume}</i>
+                        {/if}
                     {:else if cimp.tip === "selecție"}
                         {#if cimp.optiuni !== undefined}
                             <Selectie

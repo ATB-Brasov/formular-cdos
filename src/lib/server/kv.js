@@ -30,7 +30,6 @@ async function initKv() {
 
     isInitializing = true;
     try {
-
         // If DENO_REGION is not set, we are running locally
         const isLocal = !Deno.env.get("DENO_REGION");
 

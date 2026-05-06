@@ -1,15 +1,15 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { dev } from "$app/environment";
-import { verifyPoW } from '$lib/server/pow.js';
+import { verifyPoW } from "$lib/server/pow.js";
 
 import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js";
 import {
-    getSession,
     createSession,
     deleteSession,
-    updateSessionEmail,
     getAnsweredEmail,
+    getSession,
     saveAnswers,
+    updateSessionEmail,
 } from "$lib/server/session.js";
 
 /**
@@ -23,7 +23,7 @@ async function newSession(cookies) {
         path: "/",
         httpOnly: true,
         secure: !dev,
-        sameSite: "none",
+        sameSite: dev ? "lax" : "none",
         maxAge: 60 * 60, // 1 hour
     });
     return sessionid;
@@ -38,7 +38,7 @@ export async function load({ cookies }) {
         sessionid = await newSession(cookies);
     }
     let session = await getSession(sessionid);
-    console.dir(session)
+    console.dir(session);
     return { session };
 }
 
@@ -53,7 +53,7 @@ export const actions = {
     posta: async ({ request, cookies }) => {
         const data = await request.formData();
         let email = data.get("posta");
-        const nonce = data.get('nonce');
+        let nonce = data.get("nonce");
         if (email == null) {
             return fail(400, {
                 erori: { email: { msg: "Cîmpul este obligatoriu" } },
@@ -61,7 +61,9 @@ export const actions = {
         }
         email = email.toString();
 
-        const msg_validare = sondaj_cdos.validare_posta(email)
+        const msg_validare = (sondaj_cdos.validare_posta != null)
+            ? sondaj_cdos.validare_posta(email)
+            : null;
         if (msg_validare != null) {
             return fail(400, {
                 erori: { email: { msg: msg_validare } },
@@ -70,11 +72,18 @@ export const actions = {
 
         console.log("data.email: ", email);
 
+        if (nonce == null) {
+            return fail(400, {
+                erori: { email: { msg: "Nonce este null!" } },
+            });
+        }
+        nonce = nonce.toString();
         if (!verifyPoW(email, nonce)) {
             return fail(400, {
-                    erori: { email: { msg: "Invalid Proof of Work. Nice try, bot!" } },
-                }
-            );
+                erori: {
+                    email: { msg: "Invalid Proof of Work. Nice try, bot!" },
+                },
+            });
         }
 
         const answered_email = await getAnsweredEmail(sondaj_cdos.id, email);
@@ -110,9 +119,13 @@ export const actions = {
             return fail(400, { msg: "Sesiune nevalidă" });
         }
         if (session.email == null) {
-            return fail(400, { msg: "Poșta electronică a sesiunii nu a fost setată" });
+            return fail(400, {
+                msg: "Poșta electronică a sesiunii nu a fost setată",
+            });
         }
-        const msg_validare = sondaj_cdos.validare_posta(session.email)
+        const msg_validare = (sondaj_cdos.validare_posta != null)
+            ? sondaj_cdos.validare_posta(session.email)
+            : null;
         if (msg_validare != null) {
             return fail(400, {
                 erori: { email: { msg: msg_validare } },
@@ -123,6 +136,7 @@ export const actions = {
         /** @type { {[nume: string]: EroareValidare} } */
         const erori = {}; // Poate un Map?
 
+        /** @type {[string, string][]} */
         const raspunsuri = [];
 
         const pagini = sondaj_cdos.pagini;

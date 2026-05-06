@@ -6,7 +6,7 @@
 {#if data.eroare != null}
     <div class="text-red-500">{data.eroare}</div>
 {:else}
-    Data answers: 
+    Data answers:
     {#if data.answers != null}
         <div class="flex flex-col">
             {#each data.answers as kdata}
@@ -15,7 +15,7 @@
                 {#if answer != null}
                     {@const data = answer}
                     <div class="flex flex-row gap-6">
-                        <div>{ new Date(submitedAt).toLocaleString("ro") }</div>
+                        <div>{new Date(submitedAt).toLocaleString("ro")}</div>
                         {#each data as item}
                             <div>{item.at(1)}</div>
                         {/each}

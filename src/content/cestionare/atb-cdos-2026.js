@@ -1,6 +1,13 @@
 import { uniq } from "$lib/ds_helpers.js";
 import lista from "./lista_facultati_unitbv_2026.js";
 
+/**
+ * @param {string} nume
+ * @param {string} titlu
+ * @param {string?} [desc=null]
+ * @param {boolean} [obligatoriu=true]
+ * @returns {import("@content/cestionare/types.js").Cimp}
+ */
 function danu(nume, titlu, desc = null, obligatoriu = true) {
     return {
         nume,
@@ -18,7 +25,7 @@ export default {
     titlu: "Sondaj CDOS 2026",
     validare_posta: (posta) =>
         (!posta.endsWith("@student.unitbv.ro"))
-            ? "Folosește adresa instituțională"
+            ? "Folosește adresa instituțională de student `@student.unitbv.ro`"
             : null,
     descriere:
         "Sondaj pentru evaluarea respectării Codului de Drepturi și Obligații a Studenților din Universitatea Transilvania din Brașov.",
@@ -28,7 +35,7 @@ export default {
             descriere: "",
             cimpuri: [
                 {
-                    tip: "selecție",
+                    tip: "selecție-cautare",
                     nume: "facultatea",
                     titlu: "Facultatea",
                     obligatoriu: true,
@@ -36,7 +43,7 @@ export default {
                         lista.facultati.map((o) => o.fac).filter(uniq),
                 },
                 {
-                    tip: "selecție",
+                    tip: "radio",
                     nume: "ciclu",
                     titlu: "Ciclu de Studii",
                     optiuni: (rspi) =>

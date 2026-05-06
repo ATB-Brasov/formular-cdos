@@ -41,21 +41,24 @@
                 </span>
             </details>
         {/if}
-        <select
+        <div
             class="
-                p-2 rounded shadow-xs
-                border border-olive-200 dark:border-olive-500
-                bg-white dark:bg-olive-700 min-w-full w-full max-w-full
+                p-2 rounded flex flex-col
             "
-            required={obligatoriu}
             {onblur}
-            name={nume}
-            bind:value
         >
-            <option value="">Alege Opțiune</option>
             {#each optiuni as opt}
-                <option value={opt}>{opt}</option>
+                <label>
+                    <input
+                        type="radio"
+                        name={nume}
+                        bind:group={value}
+                        value={opt}
+                        required={obligatoriu}
+                    >
+                    {opt}
+                </label>
             {/each}
-        </select>
+        </div>
     </label>
 </div>

@@ -22,7 +22,7 @@ export function uniq(e, i, self) {
  * @param {T|null} [defaultValue=null]
  * @returns {T|null}
  */
-export function get(obj, key, defaultValue=null) {
+export function get(obj, key, defaultValue = null) {
     if (obj === undefined) return null;
     return key in obj ? obj[key] : defaultValue;
 }

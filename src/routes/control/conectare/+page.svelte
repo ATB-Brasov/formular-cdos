@@ -1,7 +1,7 @@
 <script>
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
-    let value = $state("")
+    let value = $state("");
 </script>
 
 <form method="POST">

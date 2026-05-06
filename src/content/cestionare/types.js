@@ -15,11 +15,11 @@
  * Funcție de validare a răspunsului dat.
  *
  * @param {string} valoare Valoarea răspunsului pentru cîmpulu dat
- * @return {string|undefined} Mesaj descriptiv în caz de eroare
+ * @return {string?} Mesaj descriptiv în caz de eroare
  */
 
 /**
- * @typedef {'email'|'selecție'|'text'} TipCimp
+ * @typedef {'email'|'selecție'|'selecție-cautare'|'text'|'radio'} TipCimp
  */
 
 /**
@@ -27,7 +27,7 @@
  * @property {TipCimp} tip
  * @property {string} nume
  * @property {string} titlu
- * @property {string} [desc]
+ * @property {string?} [desc]
  * @property {boolean} [obligatoriu]
  * @property {Validator} [valideaza]
  * @property {DaOptiuniSelectie} [optiuni]
@@ -44,7 +44,7 @@
  * @typedef {Object} Cestionar
  * @property {string} id
  * @property {string} titlu
- * @property {string} [descriere]
+ * @property {string?} [descriere]
  * @property {Validator} [validare_posta]
  * @property {Pagina[]} pagini
  */

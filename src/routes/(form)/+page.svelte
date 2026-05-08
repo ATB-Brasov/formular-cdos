@@ -168,7 +168,7 @@
             };
         }}
         action="?/salveaza"
-        class="m-auto mt-10 flex w-125 flex-col gap-4 p-4"
+        class="m-auto mt-10 flex w-full flex-col gap-4 p-4"
     >
         <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
         <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>

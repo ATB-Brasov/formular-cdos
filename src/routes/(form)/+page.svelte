@@ -23,19 +23,9 @@
 
     /** @type {SDict<Eroare>} */ let eroare = $state({});
 
-    // `form` is the value returned by the server action (e.g. after a failed
-    // submission it carries back the submitted field values + errors).
-    // We seed `raspunsuri` from it whenever the server sends a new response,
-    // but we also allow local edits in between — hence the split between a
-    // $derived "snapshot" and a locally-mutable $state copy.
     /** @type {SDict<string>} */ let raspunsuri = $state(/** @type {SDict<string>} */ ({}));
     $effect(() => {
-        // `$effect` runs on mount and every time `form` changes (i.e. a new
-        // server response arrives). This seeds/re-seeds the local mutable copy
-        // from whatever the server sent back, while still allowing local edits
-        // between submissions.
         const fonte = form ?? {};
-        // Only copy string-valued keys — ignore metadata like `erori`, `pag`, `success`.
         raspunsuri = Object.fromEntries(
             Object.entries(fonte).filter(([, v]) => typeof v === "string")
         );
@@ -54,10 +44,11 @@
     const btn_urmator_activ = $derived(
         (!pagina_activa
             .cimpuri
-            .map((c) => raspunsuri[c.nume] === "" && c.obligatoriu)
+            .map((c) => (raspunsuri[c.nume] === undefined || raspunsuri[c.nume] === "") && c.obligatoriu)
             .reduce((p, c) => p || c, false)) &&
-            Object.keys(eroare).length === 0,
+            Object.keys(eroare).filter((k) => eroare[k].pag === pagina).length === 0,
     );
+
 
     function inloct(/**@type{string}*/ text) {
         if (text === "") return "{}";
@@ -96,7 +87,7 @@
     $effect(() => {
         const msg = sondaj_cdos.validare_posta?.(email) ?? null;
         if (msg != null) {
-            eroare["posta"] = { msg, pag: 0 };
+            eroare["posta"] = { msg, pag: -1 };
         } else {
             delete eroare["posta"];
         }

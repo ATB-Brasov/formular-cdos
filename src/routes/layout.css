@@ -17,7 +17,7 @@
   /* Surface – olive neutral */
   --color-surface:           var(--color-white);
   --color-surface-disabled:  var(--color-olive-100);
-  --color-surface-border:    var(--color-olive-200);
+  --color-surface-border:    var(--color-olive-300);
   --color-surface-placeholder: var(--color-olive-300);
   --color-surface-muted:     var(--color-olive-400);
   --color-surface-dim:       var(--color-olive-600);

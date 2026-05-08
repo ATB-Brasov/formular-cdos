@@ -1,4 +1,9 @@
 // Assisted-By: Gemini 3 Flash
+/**
+ * @param {string} email
+ * @param {number} difficulty
+ * @returns
+ */
 export async function solvePoW(email, difficulty = 4) {
     let nonce = 0;
     const prefix = "0".repeat(difficulty);

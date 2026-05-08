@@ -67,9 +67,6 @@
  */
 
 /**
- * Normalizează o opțiune care poate fi un simplu șir sau un obiect `Optiune`
- * complet, întorcând întotdeauna un `Optiune`.
- *
  * @param {string | Optiune} opt
  * @returns {Optiune}
  */

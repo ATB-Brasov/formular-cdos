@@ -2,9 +2,6 @@
     /** @import {FocusEventHandler} from import('svelte/elements') */
 
     /**
-     * Strips Romanian (and general Latin) diacritics so that e.g.
-     * 'stiinta' matches 'Știința', 'a' matches 'ă/â', 's' matches 'ș/ş', etc.
-     *
      * Uses Unicode NFD decomposition: accented characters split into base letter
      * + combining mark, then the marks are removed.
      *
@@ -105,12 +102,7 @@
             .sort((a, b) => b.score - a.score);
     });
 
-    /**
-     * Called when the user picks an option from the list.
-     * Commits the value and resets the search box so the field is
-     * ready for a new search if the user changes their mind.
-     * @param {string} opt
-     */
+    /** @param {string} opt */
     function selecteaza(opt) {
         value = opt;
         cautare = "";   // search box is always empty after a pick
@@ -119,10 +111,6 @@
         inputEl?.blur();
     }
 
-    /**
-     * Clears the committed selection and focuses the search box so the
-     * user can immediately start a new search.
-     */
     function sterge() {
         value = "";
         cautare = "";
@@ -194,8 +182,6 @@
 
         deschis = false;
         indexActiv = -1;
-        // If the user typed something but never picked an option, clear the
-        // search box so it doesn't show a half-typed dead-end query.
         cautare = "";
 
         if (onblur) onblur(/** @type {any} */ (e));
@@ -203,10 +189,6 @@
 
     /**
      * Highlight the matched characters in a result string.
-     * Returns an array of { text, matched } segments.
-     * Matching is done on diacritic-normalised versions so that e.g. typing
-     * 's' still highlights 'ș' in the result; the original (diacritic) characters
-     * are always preserved in the output.
      *
      * @param {string} needle
      * @param {string} haystack
@@ -365,7 +347,6 @@
                 />
             </svg>
             <span class="flex-1 text-sm font-medium text-primary-text dark:text-primary-dim">{value}</span>
-            <!-- Clear button -->
             <button
                 type="button"
                 aria-label="Șterge selecția"

@@ -5,12 +5,11 @@
     import { enhance } from "$app/forms";
 
     import { solvePoW } from "$lib/miner.js";
+    import Buton from "@components/Buton.svelte";
     import Selectie from "@components/Selectie.svelte";
-    import SelectieCautare from "@components/SelectieCautare.svelte";
     import CimpText from "@components/CimpText.svelte";
 
     import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js"; // TODO: Încărcare dinamică
-    import SelectieRadio from "@components/SelectieRadio.svelte";
 
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
@@ -29,8 +28,6 @@
         raspunsuri = Object.fromEntries(
             Object.entries(fonte).filter(([, v]) => typeof v === "string")
         );
-        // Merge server-side validation errors into the single `eroare` object
-        // so the template only needs one error source.
         eroare = Object.fromEntries(
             Object.entries(form?.erori ?? {}).map(([k, v]) => [k, /** @type {Eroare} */ (v)])
         );
@@ -148,29 +145,13 @@
         <div>GDPR</div>
 
         <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
-            <div class="flex justify-center gap-4">
-                <button
-                    class="
-                        rounded-md border border-primary-strong bg-primary px-2
-                        py-1 text-white shadow-xs shadow-primary-strong/90
-                        disabled:border-surface-border disabled:bg-surface-disabled disabled:text-surface-muted disabled:shadow-surface-border/40
-                    "
-                    type="button"
-                    disabled={true}
-                >
-                    Anterior
-                </button>
-
-                <button
-                    class="
-                        rounded-md border border-primary-strong bg-primary px-2 py-1 text-white shadow-xs shadow-primary-strong/90
-                        disabled:border-surface-border disabled:bg-surface-disabled disabled:text-surface-muted disabled:shadow-surface-border/40
-                    "
+            <div class="flex justify-end gap-4">
+                <Buton
                     type="submit"
                     disabled={isMining || eroare["posta"] != null}
                 >
                     {isMining ? "Începere..." : "Începe"}
-                </button>
+                </Buton>
             </div>
         </div>
     </form>
@@ -209,48 +190,13 @@
                             onblur={() => aplica_validare(cimp)}
                             bind:value={raspunsuri[cimp.nume]}
                         />
-                    {:else if cimp.tip === "radio"}
-                        {#if cimp.optiuni != null}
-                            <SelectieRadio
-                                nume={cimp.nume}
-                                intrebare={cimp.titlu}
-                                obligatoriu={cimp.obligatoriu}
-                                onblur={() => aplica_validare(cimp)}
-                                optiuni={cimp.optiuni(raspunsuri)}
-                                bind:value={raspunsuri[cimp.nume]}
-                            />
-                        {:else}
-                            <i class="text-italic text-danger-strong">Nu au fost
-                                definite opțiuni pentru selecția {cimp.nume}</i>
-                        {/if}
-                    {:else if cimp.tip === "selecție-cautare"}
-                        {#if cimp.optiuni !== undefined}
-                            <SelectieCautare
-                                nume={cimp.nume}
-                                intrebare={cimp.titlu}
-                                obligatoriu={cimp.obligatoriu}
-                                onblur={() => aplica_validare(cimp)}
-                                optiuni={cimp.optiuni(raspunsuri)}
-                                bind:value={raspunsuri[cimp.nume]}
-                            />
-                        {:else}
-                            <i class="text-italic text-danger-strong">Nu au fost
-                                definite opțiuni pentru selecția {cimp.nume}</i>
-                        {/if}
-                    {:else if cimp.tip === "selecție"}
-                        {#if cimp.optiuni !== undefined}
-                            <Selectie
-                                nume={cimp.nume}
-                                intrebare={cimp.titlu}
-                                obligatoriu={cimp.obligatoriu}
-                                onblur={() => aplica_validare(cimp)}
-                                optiuni={cimp.optiuni(raspunsuri)}
-                                bind:value={raspunsuri[cimp.nume]}
-                            />
-                        {:else}
-                            <i class="text-italic text-danger-strong">Nu au fost
-                                definite opțiuni pentru selecția {cimp.nume}</i>
-                        {/if}
+                    {:else if cimp.tip.startsWith("selecție")}
+                        <Selectie
+                            cimp={cimp}
+                            {raspunsuri}
+                            onblur={() => aplica_validare(cimp)}
+                            bind:value={raspunsuri[cimp.nume]}
+                        />
                     {:else}
                         <i class="text-italic text-danger-strong"
                         >Tip cîmp `{cimp.tip}` necunoscut</i>
@@ -275,31 +221,19 @@
         </div>
 
         <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
-            <div class="flex justify-center gap-4">
-                <button
-                    class="
-                        rounded-md border border-primary-strong bg-primary px-2
-                        py-1 text-white shadow-xs shadow-primary-strong/90
-                        {pagina === 0 ? 'invisible' : ''}
-                    "
-                    type="button"
+            <div class="flex justify-end gap-4">
+                <Buton
+                    class={pagina === 0 ? 'invisible' : ''}
                     onclick={() => { if (pagina > 0) pagina -= 1; }}
                 >
                     Anterior
-                </button>
+                </Buton>
 
                 {@render button()}
                 {#snippet button()}
                     {@const ultima = pagina === ULTIMA_PAGINA}
-                    <button
+                    <Buton
                         type={ultima ? "submit" : "button"}
-                        class="
-                            px-2 py-1 text-white bg-primary
-                                rounded-md border border-primary-strong
-                                shadow-xs shadow-primary-strong/90
-                                disabled:bg-surface-disabled disabled:text-surface-muted
-                                disabled:border-surface-border disabled:shadow-surface-border/40
-                        "
                         disabled={!btn_urmator_activ}
                         onclick={ultima ? null : () => {
                             let tmp = pagina + 1;
@@ -307,7 +241,7 @@
                         }}
                     >
                         {ultima ? "Trimite" : "Următor"}
-                    </button>
+                    </Buton>
                 {/snippet}
             </div>
         </div>

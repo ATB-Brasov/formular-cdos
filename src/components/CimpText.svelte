@@ -24,25 +24,24 @@
     } = $props();
 </script>
 
-<label class="flex flex-col">
-    <span class="mb-1 font-bold">{intrebare}
+<div class="flex flex-col">
+    <label for={nume} class="mb-1 font-bold">
+        {intrebare}
         {#if obligatoriu}
-            <span
-                class="px-0.5 text-lg leading-none font-bold text-danger"
+            <span class="px-0.5 text-lg leading-none font-bold text-danger"
             >*</span>
         {/if}
-    </span>
+    </label>
 
     {#if desc != null}
-        <details>
+        <details class="mb-1">
             <summary>Vezi mai multe detalii&hellip;</summary>
-            <span>
-                {desc}
-            </span>
+            <span>{desc}</span>
         </details>
     {/if}
 
     <input
+        id={nume}
         required={obligatoriu}
         class="
             w-full px-2 py-1
@@ -55,4 +54,4 @@
         {onblur}
         bind:value
     />
-</label>
+</div>

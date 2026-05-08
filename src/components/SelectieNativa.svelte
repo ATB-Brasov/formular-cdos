@@ -27,14 +27,14 @@
     } = $props();
 </script>
 
-<fieldset class="flex flex-col border-none p-0">
-    <legend class="mb-1 font-bold">
+<div class="flex flex-col">
+    <label for={nume} class="mb-1 font-bold">
         {intrebare}
         {#if obligatoriu}
             <span class="px-0.5 text-lg leading-none font-bold text-danger"
             >*</span>
         {/if}
-    </legend>
+    </label>
 
     {#if desc != null}
         <details class="mb-1">
@@ -48,23 +48,28 @@
             {optiuni.eroare}
         </p>
     {:else}
-        <div class="p-2 rounded flex flex-col" {onblur}>
+        <select
+            id={nume}
+            class="
+                p-2 rounded shadow-xs
+                border border-surface-border dark:border-surface-dim
+                bg-surface dark:bg-surface-dark min-w-full w-full max-w-full
+            "
+            required={obligatoriu}
+            {onblur}
+            name={nume}
+            bind:value
+        >
+            <option value="">Alege Opțiune</option>
             {#each optiuni.optiuni.map(normOptiune) as opt}
-                <span title={opt.msg ?? ""}>
-                    <label class:opacity-50={!opt.exista}>
-                        <input
-                            type="radio"
-                            class="accent-primary"
-                            name={nume}
-                            bind:group={value}
-                            value={opt.text}
-                            disabled={!opt.exista}
-                            required={obligatoriu}
-                        >
-                        {opt.text}
-                    </label>
-                </span>
+                <option
+                    value={opt.text}
+                    disabled={!opt.exista}
+                    title={opt.msg ?? ""}
+                >
+                    {opt.text}
+                </option>
             {/each}
-        </div>
+        </select>
     {/if}
-</fieldset>
+</div>

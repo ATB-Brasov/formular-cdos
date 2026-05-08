@@ -14,7 +14,7 @@ function danu(nume, titlu, desc = null, obligatoriu = true) {
         titlu,
         desc,
         obligatoriu,
-        tip: "radio",
+        tip: "selecție-radio",
         optiuni: () => ({ optiuni: ["da", "nu", "nu știu"], eroare: null }),
     };
 }
@@ -45,13 +45,13 @@ export default {
                     }),
                 },
                 {
-                    tip: "radio",
+                    tip: "selecție-radio",
                     nume: "ciclu",
                     titlu: "Ciclu de Studii",
                     optiuni: (rspi) => ({optiuni: ["LICENȚĂ", "MASTER"], eroare: null}),
                 },
                 {
-                    tip: "radio",
+                    tip: "selecție-radio",
                     nume: "forma",
                     titlu: "Forma de Învățămînt",
                     optiuni: (rspi) => {
@@ -72,7 +72,7 @@ export default {
                     },
                 },
                 {
-                    tip: "selecție",
+                    tip: "selecție-radio",
                     nume: "programul",
                     titlu: "Programul de Învățămînt",
                     optiuni: (rspi) => {

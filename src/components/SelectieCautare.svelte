@@ -1,5 +1,6 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
+    import Buton from "@components/Buton.svelte";
 
     /**
      * Uses Unicode NFD decomposition: accented characters split into base letter
@@ -105,7 +106,7 @@
     /** @param {string} opt */
     function selecteaza(opt) {
         value = opt;
-        cautare = "";   // search box is always empty after a pick
+        cautare = ""; // search box is always empty after a pick
         deschis = false;
         indexActiv = -1;
         inputEl?.blur();
@@ -210,14 +211,20 @@
         for (let hi = 0; hi < haystack.length; hi++) {
             if (ni < n.length && h[hi] === n[ni]) {
                 if (!inMatch && hi > segStart) {
-                    parts.push({ text: haystack.slice(segStart, hi), matched: false });
+                    parts.push({
+                        text: haystack.slice(segStart, hi),
+                        matched: false,
+                    });
                     segStart = hi;
                 }
                 inMatch = true;
                 ni++;
             } else {
                 if (inMatch) {
-                    parts.push({ text: haystack.slice(segStart, hi), matched: true });
+                    parts.push({
+                        text: haystack.slice(segStart, hi),
+                        matched: true,
+                    });
                     segStart = hi;
                     inMatch = false;
                 }
@@ -237,131 +244,157 @@
     Hidden native input so the form submission still picks up `name`/`value`
     correctly (the visible input is only for search).
 -->
-<input type="hidden" name={nume} value={value} />
+<input type="hidden" name={nume} {value} />
 
 <div onfocusout={(e) => peFocusOut(e)} class="flex flex-col">
     <span class="mb-1 font-bold">
         {intrebare}
         {#if obligatoriu}
-            <span class="px-0.5 text-lg leading-none font-bold text-red-500">*</span>
+            <span class="px-0.5 text-lg leading-none font-bold text-red-500"
+            >*</span>
         {/if}
     </span>
 
     {#if desc != null}
-        <details class="mb-1 text-sm text-surface-dim dark:text-surface-placeholder">
-            <summary class="cursor-pointer">Vezi mai multe detalii&hellip;</summary>
+        <details
+            class="mb-1 text-sm text-surface-dim dark:text-surface-placeholder"
+        >
+            <summary class="cursor-pointer">
+                Vezi mai multe detalii&hellip;
+            </summary>
             <span>{desc}</span>
         </details>
     {/if}
 
     {#if optiuni.eroare != null}
-        <p class="mt-1 text-sm text-warning dark:text-warning-dark">{optiuni.eroare}</p>
+        <p class="mt-1 text-sm text-warning dark:text-warning-dark">
+            {optiuni.eroare}
+        </p>
     {:else}
-    <div class="relative">
-        <!-- Search input -->
-        <input
-            bind:this={inputEl}
-            type="text"
-            autocomplete="off"
-            placeholder={value ? "Caută altă opțiune…" : "Caută…"}
-            required={obligatoriu && value === ""}
-            class="
-                w-full px-2 py-1
-                rounded border border-surface-border dark:border-surface-dim
-                bg-surface dark:bg-surface-dark
-                shadow-xs placeholder:text-surface-placeholder
-            "
-            value={cautare}
-            oninput={peInput}
-            onfocus={() => { deschis = true; }}
-            onkeydown={peKeyDown}
-        />
-
-        <!-- Dropdown list -->
-        {#if deschis && optiuniFiltrate.length > 0}
-            <ul
-                bind:this={listaEl}
+        <div class="relative">
+            <!-- Search input -->
+            <input
+                bind:this={inputEl}
+                type="text"
+                autocomplete="off"
+                placeholder={value ? "Caută altă opțiune…" : "Caută…"}
+                required={obligatoriu && value === ""}
                 class="
-                    absolute z-50 mt-1 w-full
-                    max-h-60 overflow-y-auto
+                    w-full px-2 py-1
                     rounded border border-surface-border dark:border-surface-dim
-                    bg-surface dark:bg-surface-darker
-                    shadow-md
+                    bg-surface dark:bg-surface-dark
+                    shadow-xs placeholder:text-surface-placeholder
                 "
-            >
-                {#each optiuniFiltrate as { opt }, i}
-                    <li>
-                        <button
-                            type="button"
-                            disabled={!opt.exista}
-                            title={opt.msg ?? ""}
-                            class="
-                                w-full px-3 py-1.5 text-left text-sm
-                                hover:bg-primary-subtle dark:hover:bg-surface-dark
-                                disabled:opacity-50 disabled:cursor-not-allowed
-                                {i === indexActiv
+                value={cautare}
+                oninput={peInput}
+                onfocus={() => {
+                    deschis = true;
+                }}
+                onkeydown={peKeyDown}
+            />
+
+            <!-- Dropdown list -->
+            {#if deschis && optiuniFiltrate.length > 0}
+                <ul
+                    bind:this={listaEl}
+                    class="
+                        absolute z-50 mt-1 w-full
+                        max-h-60 overflow-y-auto
+                        rounded border border-surface-border dark:border-surface-dim
+                        bg-surface dark:bg-surface-darker
+                        shadow-md
+                    "
+                >
+                    {#each optiuniFiltrate as { opt }, i}
+                        <li>
+                            <button
+                                type="button"
+                                disabled={!opt.exista}
+                                title={opt.msg ?? ""}
+                                class="
+                                    w-full px-3 py-1.5 text-left text-sm
+                                    hover:bg-primary-subtle dark:hover:bg-surface-dark
+                                    disabled:opacity-50 disabled:cursor-not-allowed
+                                    {i === indexActiv
                                     ? 'bg-primary-muted dark:bg-surface-dim'
                                     : ''}
-                            "
-                            onmousedown={(e) => { e.preventDefault(); selecteaza(opt.text); }}
-                        >
-                            {#each evidentiaza(cautare, opt.text) as seg}
-                                {#if seg.matched}
-                                    <span class="font-bold text-primary-strong dark:text-primary-dim">{seg.text}</span>
-                                {:else}
-                                    <span>{seg.text}</span>
-                                {/if}
-                            {/each}
-                        </button>
-                    </li>
-                {/each}
-            </ul>
-        {:else if deschis && cautare !== "" && optiuniFiltrate.length === 0}
-            <div class="
-                absolute z-50 mt-1 w-full
-                rounded border border-surface-border dark:border-surface-dim
-                bg-surface dark:bg-surface-darker
-                shadow-md px-3 py-2 text-sm text-surface-muted
-            ">
-                Nicio opțiune găsită
+                                "
+                                onmousedown={(e) => {
+                                    e.preventDefault();
+                                    selecteaza(opt.text);
+                                }}
+                            >
+                                {#each evidentiaza(cautare, opt.text) as seg}
+                                    {#if seg.matched}
+                                        <span
+                                            class="font-bold text-primary-strong dark:text-primary-dim"
+                                        >{seg.text}</span>
+                                    {:else}
+                                        <span>{seg.text}</span>
+                                    {/if}
+                                {/each}
+                            </button>
+                        </li>
+                    {/each}
+                </ul>
+            {:else if deschis && cautare !== "" && optiuniFiltrate.length === 0}
+                <div
+                    class="
+                        absolute z-50 mt-1 w-full
+                        rounded border border-surface-border dark:border-surface-dim
+                        bg-surface dark:bg-surface-darker
+                        shadow-md px-3 py-2 text-sm text-surface-muted
+                    "
+                >
+                    Nicio opțiune găsită
+                </div>
+            {/if}
+        </div>
+
+        <!-- Current selection chip -->
+        {#if value}
+            <div
+                class="
+                    mt-2 flex items-center gap-2
+                    rounded-lg border border-primary-border bg-primary-subtle
+                    px-3 py-2
+                    dark:border-primary-text dark:bg-primary-deep
+                "
+            >
+                <!-- Checkmark icon -->
+                <svg
+                    class="h-4 w-4 shrink-0 text-primary dark:text-primary-faint"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                        clip-rule="evenodd"
+                    />
+                </svg>
+                <span
+                    class="flex-1 text-sm font-medium text-primary-text dark:text-primary-dim"
+                >{value}</span>
+                <Buton
+                    varianta="ghost"
+                    aria-label="Șterge selecția"
+                    class="ml-auto"
+                    onclick={sterge}
+                >
+                    <svg
+                        class="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
+                        />
+                    </svg>
+                </Buton>
             </div>
         {/if}
-    </div>
-
-    <!-- Current selection chip -->
-    {#if value}
-        <div class="
-            mt-2 flex items-center gap-2
-            rounded-lg border border-primary-border bg-primary-subtle
-            px-3 py-2
-            dark:border-primary-text dark:bg-primary-deep
-        ">
-            <!-- Checkmark icon -->
-            <svg
-                class="h-4 w-4 shrink-0 text-primary dark:text-primary-faint"
-                viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
-            >
-                <path fill-rule="evenodd"
-                    d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
-                    clip-rule="evenodd"
-                />
-            </svg>
-            <span class="flex-1 text-sm font-medium text-primary-text dark:text-primary-dim">{value}</span>
-            <button
-                type="button"
-                aria-label="Șterge selecția"
-                class="
-                    ml-auto rounded p-0.5 text-primary-faint
-                    hover:bg-primary-muted hover:text-primary-strong
-                    dark:hover:bg-primary-text dark:hover:text-primary-dim
-                "
-                onclick={sterge}
-            >
-                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-                </svg>
-            </button>
-        </div>
-    {/if}
     {/if}
 </div>

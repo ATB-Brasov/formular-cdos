@@ -2,6 +2,7 @@
     /** @import {FocusEventHandler} from import('svelte/elements') */
 
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
+    import { normOptiune } from "@content/cestionare/types.js";
 
     /**
      * @typedef {Object} Props
@@ -58,8 +59,8 @@
                 bind:value
             >
                 <option value="">Alege Opțiune</option>
-                {#each optiuni.optiuni as opt}
-                    <option value={opt}>{opt}</option>
+                {#each optiuni.optiuni.map(normOptiune) as opt}
+                    <option value={opt.text} disabled={!opt.exista} title={opt.msg ?? ""}>{opt.text}</option>
                 {/each}
             </select>
         {/if}

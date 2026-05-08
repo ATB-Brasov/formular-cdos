@@ -55,6 +55,7 @@
     }
 
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
+    import { normOptiune } from "@content/cestionare/types.js";
 
     /**
      * @typedef {Object} Props
@@ -94,11 +95,12 @@
     let listaEl = $state(null);
 
     const optiuniFiltrate = $derived.by(() => {
+        const normalizate = optiuni.optiuni.map(normOptiune);
         if (cautare === "") {
-            return optiuni.optiuni.map((opt) => ({ opt, score: 0 }));
+            return normalizate.map((opt) => ({ opt, score: 0 }));
         }
-        return optiuni.optiuni
-            .map((opt) => ({ opt, score: fuzzyScore(cautare, opt) }))
+        return normalizate
+            .map((opt) => ({ opt, score: fuzzyScore(cautare, opt.text) }))
             .filter(({ score }) => score >= 0)
             .sort((a, b) => b.score - a.score);
     });
@@ -153,7 +155,7 @@
             scrollLaActiv();
         } else if (e.key === "Enter") {
             if (indexActiv >= 0 && indexActiv < total) {
-                selecteaza(optiuniFiltrate[indexActiv].opt);
+                selecteaza(optiuniFiltrate[indexActiv].opt.text);
             }
             e.preventDefault();
         } else if (e.key === "Escape") {
@@ -309,16 +311,19 @@
                     <li>
                         <button
                             type="button"
+                            disabled={!opt.exista}
+                            title={opt.msg ?? ""}
                             class="
                                 w-full px-3 py-1.5 text-left text-sm
                                 hover:bg-primary-subtle dark:hover:bg-surface-dark
+                                disabled:opacity-50 disabled:cursor-not-allowed
                                 {i === indexActiv
                                     ? 'bg-primary-muted dark:bg-surface-dim'
                                     : ''}
                             "
-                            onmousedown={(e) => { e.preventDefault(); selecteaza(opt); }}
+                            onmousedown={(e) => { e.preventDefault(); selecteaza(opt.text); }}
                         >
-                            {#each evidentiaza(cautare, opt) as seg}
+                            {#each evidentiaza(cautare, opt.text) as seg}
                                 {#if seg.matched}
                                     <span class="font-bold text-primary-strong dark:text-primary-dim">{seg.text}</span>
                                 {:else}

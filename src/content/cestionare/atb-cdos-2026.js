@@ -48,30 +48,26 @@ export default {
                     tip: "radio",
                     nume: "ciclu",
                     titlu: "Ciclu de Studii",
-                    optiuni: (rspi) => {
-                        // if (!rspi["facultatea"]) return { optiuni: [], eroare: "Selectează mai întâi facultatea." };
-                        const optiuni = lista.facultati
-                            // .filter((o) => o.fac === rspi["facultatea"])
-                            .map((o) => o.cic)
-                            .filter(uniq);
-                        return { optiuni, eroare: optiuni.length === 0 ? "Nu au fost găsite cicluri pentru facultatea selectată." : null };
-                    },
+                    optiuni: (rspi) => ({optiuni: ["LICENȚĂ", "MASTER"], eroare: null}),
                 },
                 {
                     tip: "radio",
                     nume: "forma",
                     titlu: "Forma de Învățămînt",
                     optiuni: (rspi) => {
-                        // if (!rspi["facultatea"]) return { optiuni: [], eroare: "Selectează mai întâi facultatea." };
-                        // if (!rspi["ciclu"]) return { optiuni: [], eroare: "Selectează mai întâi ciclul de studii." };
-                        const optiuni = lista.facultati
-                            // .filter(
-                            //     (o) =>
-                            //         o.fac === rspi["facultatea"] &&
-                            //         o.cic === rspi["ciclu"],
-                            // )
+                        const filtered = lista.facultati
+                            .filter(
+                                (o) =>
+                                    o.fac === rspi["facultatea"] &&
+                                    o.cic === rspi["ciclu"],
+                            )
                             .map((o) => o.frm)
                             .filter(uniq);
+                        const optiuni = lista.facultati
+                            .map((o) => o.frm)
+                            .filter(uniq)
+                            .map(text => ({ text, exista: filtered.includes(text) }));
+
                         return { optiuni, eroare: optiuni.length === 0 ? "Nu au fost găsite forme de învățămînt pentru selecția curentă." : null };
                     },
                 },
@@ -91,7 +87,8 @@ export default {
                                     o.frm === rspi["forma"],
                             )
                             .map((o) => o.prg)
-                            .filter(uniq);
+                            .filter(uniq)
+                            .map(text => ({ text, exista: true }));
                         return { optiuni, eroare: optiuni.length === 0 ? "Nu au fost găsite programe pentru selecția curentă." : null };
                     },
                 },

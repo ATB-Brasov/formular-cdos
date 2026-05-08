@@ -2,6 +2,7 @@
     /** @import {FocusEventHandler} from import('svelte/elements') */
 
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
+    import { normOptiune } from "@content/cestionare/types.js";
 
     /**
      * @typedef {Object} Props
@@ -52,18 +53,21 @@
                 "
                 {onblur}
             >
-                {#each optiuni.optiuni as opt}
-                    <label>
-                        <input
-                            type="radio"
-                            class="accent-primary"
-                            name={nume}
-                            bind:group={value}
-                            value={opt}
-                            required={obligatoriu}
-                        >
-                        {opt}
-                    </label>
+                {#each optiuni.optiuni.map(normOptiune) as opt}
+                    <span title={opt.msg ?? ""}>
+                        <label class:opacity-50={!opt.exista}>
+                            <input
+                                type="radio"
+                                class="accent-primary"
+                                name={nume}
+                                bind:group={value}
+                                value={opt.text}
+                                disabled={!opt.exista}
+                                required={obligatoriu}
+                            >
+                            {opt.text}
+                        </label>
+                    </span>
                 {/each}
             </div>
         {/if}

@@ -1,10 +1,19 @@
 /** @import { SDict } from "$lib/common_types.js" */
 
 /**
+ * O opțiune individuală dintr-o selecție.
+ *
+ * @typedef {Object} Optiune
+ * @property {string} text   Textul afișat pentru această opțiune.
+ * @property {boolean} exista Dacă `false`, opțiunea este dezactivată (disabled).
+ * @property {string} [msg]  Mesaj tooltip afișat la hover, util când `exista` este `false`.
+ */
+
+/**
  * Rezultatul întors de funcția de generare a opțiunilor.
  *
  * @typedef {Object} RezultatOptiuni
- * @property {string[]} optiuni Lista de opțiuni disponibile (poate fi goală)
+ * @property {(string | Optiune)[]} optiuni Lista de opțiuni (poate fi goală)
  * @property {string|null} eroare Mesaj descriptiv dacă nu pot fi generate opțiuni, altfel null
  */
 
@@ -57,4 +66,16 @@
  * @property {Pagina[]} pagini
  */
 
-export {};
+/**
+ * Normalizează o opțiune care poate fi un simplu șir sau un obiect `Optiune`
+ * complet, întorcând întotdeauna un `Optiune`.
+ *
+ * @param {string | Optiune} opt
+ * @returns {Optiune}
+ */
+export function normOptiune(opt) {
+    if (typeof opt === "string") {
+        return { text: opt, exista: true };
+    }
+    return opt;
+}

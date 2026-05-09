@@ -3,30 +3,30 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
-  /* Primary – blue action colour */
-  --color-primary-subtle:    var(--color-blue-50);
-  --color-primary-muted:     var(--color-blue-100);
-  --color-primary-border:    var(--color-blue-200);
-  --color-primary-dim:       var(--color-blue-300);
-  --color-primary-faint:     var(--color-blue-400);
-  --color-primary:           var(--color-blue-500);
-  --color-primary-strong:    var(--color-blue-600);
-  --color-primary-text:      var(--color-blue-800);
-  --color-primary-deep:      var(--color-blue-950);
+    /* Primary – blue action colour */
+    --color-primary-subtle: var(--color-blue-50);
+    --color-primary-muted: var(--color-blue-100);
+    --color-primary-border: var(--color-blue-200);
+    --color-primary-dim: var(--color-blue-300);
+    --color-primary-faint: var(--color-blue-400);
+    --color-primary: var(--color-blue-500);
+    --color-primary-strong: var(--color-blue-600);
+    --color-primary-text: var(--color-blue-800);
+    --color-primary-deep: var(--color-blue-950);
 
-  /* Surface – olive neutral */
-  --color-surface:           var(--color-white);
-  --color-surface-disabled:  var(--color-olive-100);
-  --color-surface-border:    var(--color-olive-300);
-  --color-surface-placeholder: var(--color-olive-300);
-  --color-surface-muted:     var(--color-olive-400);
-  --color-surface-dim:       var(--color-olive-600);
-  --color-surface-dark:      var(--color-olive-700);
-  --color-surface-darker:    var(--color-olive-800);
+    /* Surface – olive neutral */
+    --color-surface: var(--color-white);
+    --color-surface-disabled: var(--color-olive-100);
+    --color-surface-border: var(--color-olive-300);
+    --color-surface-placeholder: var(--color-olive-300);
+    --color-surface-muted: var(--color-olive-400);
+    --color-surface-dim: var(--color-olive-600);
+    --color-surface-dark: var(--color-olive-700);
+    --color-surface-darker: var(--color-olive-800);
 
-  /* Semantic states */
-  --color-danger:            var(--color-red-500);
-  --color-danger-strong:     var(--color-red-600);
-  --color-warning:           var(--color-amber-600);
-  --color-warning-dark:      var(--color-amber-400);
+    /* Semantic states */
+    --color-danger: var(--color-red-500);
+    --color-danger-strong: var(--color-red-600);
+    --color-warning: var(--color-amber-600);
+    --color-warning-dark: var(--color-amber-400);
 }

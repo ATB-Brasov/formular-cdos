@@ -19,6 +19,50 @@ function danu(nume, titlu, desc = null, obligatoriu = true) {
     };
 }
 
+/** @type {import("@content/cestionare/types.js").Pagina} */
+const paginia_dezabilitati =
+    {
+        titlu: "Dizabilități",
+        descriere: "Studenți cu dizabilități",
+        cimpuri: [
+            {
+                titlu: "Ai dizabilități?",
+                nume: "dizabilitati",
+                desc: "Selectează toate opțiunile care se aplică ti ai caz.",
+                obligatoriu: true,
+                tip: "selecție-radio",
+                optiuni: () => {
+                    return {
+                        optiuni: [
+                            { text: "Da", exista: true },
+                            { text: "Nu", exista: true },
+                        ],
+                        eroare: null,
+                    };
+                },
+            },
+            {
+                titlu: "Ai întîmpinat discriminare din cauza dezabilităților?",
+                nume: "dizabilitati-discriminare",
+                desc: "Selectează toate opțiunile care se aplică ti ai caz.",
+                obligatoriu: true,
+                filtru_afisare: (rspi) => {
+                    return rspi.dizabilitati === "Da";
+                },
+                tip: "selecție-radio",
+                optiuni: () => {
+                    return {
+                        optiuni: [
+                            { text: "Da", exista: true },
+                            { text: "Nu", exista: true },
+                        ],
+                        eroare: null,
+                    };
+                },
+            },
+        ],
+    }
+
 /**@type{import("@content/cestionare/types.js").Cestionar}*/
 export default {
     id: "atb-cdos-2026",
@@ -49,13 +93,13 @@ export default {
                     nume: "ciclu",
                     titlu: "Ciclu de Studii",
                     obligatoriu: true,
-                    filtru_afisare: (rspi) => rspi["facultatea"] != null && rspi["facultatea"]?.trim() !== "",
                     optiuni: (rspi) => ({optiuni: ["LICENȚĂ", "MASTER"], eroare: null}),
                 },
                 {
                     tip: "selecție-radio",
                     nume: "forma",
                     titlu: "Forma de Învățămînt",
+                    obligatoriu: true,
                     optiuni: (rspi) => {
                         const filtered = lista.facultati
                             .filter(
@@ -77,6 +121,7 @@ export default {
                     tip: "selecție-radio",
                     nume: "programul",
                     titlu: "Programul de Învățămînt",
+                    obligatoriu: true,
                     optiuni: (rspi) => {
                         if (!rspi["facultatea"]) return { optiuni: [], eroare: "Selectează mai întâi facultatea." };
                         if (!rspi["ciclu"]) return { optiuni: [], eroare: "Selectează mai întâi ciclul de studii." };
@@ -96,6 +141,7 @@ export default {
                 },
             ],
         },
+        paginia_dezabilitati,
         {
             titlu: "Întrebări",
             descriere: "Întrebări pe baza Codului DOS",

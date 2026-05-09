@@ -42,13 +42,6 @@ export async function load({ cookies }) {
     return { session };
 }
 
-/**
- * @typedef {Object} EroareValidare
- * @property {string} type
- * @property {string} msg
- * @property {number} pag
- */
-
 /** @satisfies {import('./$types').Actions} */
 export const actions = {
     posta: async ({ request, cookies }) => {
@@ -57,7 +50,13 @@ export const actions = {
         let nonce = data.get("nonce");
         if (email == null) {
             return fail(400, {
-                erori: { posta: { type: "email-required", msg: "Cîmpul este obligatoriu", pag: -1 } },
+                erori: {
+                    posta: {
+                        type: "email-required",
+                        msg: "Cîmpul este obligatoriu",
+                        pag: -1,
+                    },
+                },
             });
         }
         email = email.toString();
@@ -67,7 +66,13 @@ export const actions = {
             : null;
         if (msg_validare != null) {
             return fail(400, {
-                erori: { posta: { type: "email-invalid", msg: msg_validare, pag: -1 } },
+                erori: {
+                    posta: {
+                        type: "email-invalid",
+                        msg: msg_validare,
+                        pag: -1,
+                    },
+                },
             });
         }
 
@@ -75,14 +80,24 @@ export const actions = {
 
         if (nonce == null) {
             return fail(400, {
-                erori: { posta: { type: "pow-required", msg: "Nonce este null!", pag: -1 } },
+                erori: {
+                    posta: {
+                        type: "pow-required",
+                        msg: "Nonce este null!",
+                        pag: -1,
+                    },
+                },
             });
         }
         nonce = nonce.toString();
         if (!verifyPoW(email, nonce)) {
             return fail(400, {
                 erori: {
-                    posta: { type: "pow-invalid", msg: "Invalid Proof of Work. Nice try, bot!", pag: -1 },
+                    posta: {
+                        type: "pow-invalid",
+                        msg: "Invalid Proof of Work. Nice try, bot!",
+                        pag: -1,
+                    },
                 },
             });
         }
@@ -92,7 +107,11 @@ export const actions = {
         if (answered_email != null) {
             return fail(400, {
                 erori: {
-                    posta: { type: "email-exists", msg: "Este înregistrat răspuns pe această poștă electronică", pag: -1 },
+                    posta: {
+                        type: "email-exists",
+                        msg: "Este înregistrat răspuns pe această poștă electronică",
+                        pag: -1,
+                    },
                 },
             });
         }
@@ -111,15 +130,37 @@ export const actions = {
     salveaza: async ({ request, cookies }) => {
         const sessionId = cookies.get("sessionid");
         if (sessionId == null) {
-            return fail(400, { erori: { _form: { type: "session-required", msg: "Nici o sesiune nu a fost setată", pag: 0 } } });
+            return fail(400, {
+                erori: {
+                    _form: {
+                        type: "session-required",
+                        msg: "Nici o sesiune nu a fost setată",
+                        pag: 0,
+                    },
+                },
+            });
         }
         const session = await getSession(sessionId);
         if (session == null) {
-            return fail(400, { erori: { _form: { type: "session-invalid", msg: "Sesiune nevalidă", pag: 0 } } });
+            return fail(400, {
+                erori: {
+                    _form: {
+                        type: "session-invalid",
+                        msg: "Sesiune nevalidă",
+                        pag: 0,
+                    },
+                },
+            });
         }
         if (session.email == null) {
             return fail(400, {
-                erori: { _form: { type: "email-required", msg: "Poșta electronică a sesiunii nu a fost setată", pag: 0 } },
+                erori: {
+                    _form: {
+                        type: "email-required",
+                        msg: "Poșta electronică a sesiunii nu a fost setată",
+                        pag: 0,
+                    },
+                },
             });
         }
         const msg_validare = (sondaj_cdos.validare_posta != null)
@@ -127,12 +168,14 @@ export const actions = {
             : null;
         if (msg_validare != null) {
             return fail(400, {
-                erori: { posta: { type: "email-invalid", msg: msg_validare, pag: 0 } },
+                erori: {
+                    posta: { type: "email-invalid", msg: msg_validare, pag: 0 },
+                },
             });
         }
 
         const data = await request.formData();
-        /** @type { {[nume: string]: EroareValidare} } */
+        /** @type { {[nume: string]: import("$lib/common_types.js").Eroare} } */
         const erori = {}; // Poate un Map?
 
         /** @type {[string, string][]} */

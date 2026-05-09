@@ -5,6 +5,7 @@
      * @typedef {Object} Props
      * @property {'text'|'email'} tip
      * @property {string} nume
+     * @property {string | null} [placeholder=null]
      * @property {string | null} [desc=null]
      * @property {string} intrebare
      * @property {string} value
@@ -16,6 +17,7 @@
     let {
         tip,
         nume,
+        placeholder = null,
         desc = null,
         obligatoriu = false,
         onblur,
@@ -42,6 +44,7 @@
 
     <input
         id={nume}
+        placeholder={placeholder}
         required={obligatoriu}
         class="
             w-full px-2 py-1

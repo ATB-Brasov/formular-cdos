@@ -16,6 +16,7 @@
 
     /**
      * @typedef {Object} Eroare
+     * @property {string} type
      * @property {string} msg
      * @property {number} pag
      */
@@ -65,6 +66,7 @@
         const rasp = raspunsuri[cimp.nume];
         if ((rasp === undefined || rasp === "") && cimp.obligatoriu) {
             eroare[cimp.nume] = {
+                type: "field-required",
                 msg: "Cîmpul este obligatoriu",
                 pag: pagina,
             };
@@ -75,6 +77,7 @@
             const err = cimp.valideaza(rasp.toString());
             if (err != null) {
                 eroare[cimp.nume] = {
+                    type: "field-invalid",
                     msg: err,
                     pag: pagina,
                 };
@@ -89,10 +92,11 @@
     // the template has a single error source for all posta errors (both
     // client-side live feedback and server responses after submission).
     $effect(() => {
-        const msg = sondaj_cdos.validare_posta?.(email) ?? null;
+        const msg = sondaj_cdos.validare_posta?.(email);
         if (msg != null) {
-            eroare["posta"] = { msg, pag: -1 };
+            eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
         } else {
+            if (eroare["posta"]?.type !== "email-invalid") return;
             delete eroare["posta"];
         }
     });

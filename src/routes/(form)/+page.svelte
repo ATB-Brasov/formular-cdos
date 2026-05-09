@@ -22,14 +22,18 @@
 
     /** @type {SDict<Eroare>} */ let eroare = $state({});
 
-    /** @type {SDict<string>} */ let raspunsuri = $state(/** @type {SDict<string>} */ ({}));
+    /** @type {SDict<string>} */ let raspunsuri = $state(
+        /** @type {SDict<string>} */ ({}),
+    );
     $effect(() => {
         const fonte = form ?? {};
         raspunsuri = Object.fromEntries(
-            Object.entries(fonte).filter(([, v]) => typeof v === "string")
+            Object.entries(fonte).filter(([, v]) => typeof v === "string"),
         );
         eroare = Object.fromEntries(
-            Object.entries(form?.erori ?? {}).map(([k, v]) => [k, /** @type {Eroare} */ (v)])
+            Object.entries(form?.erori ?? {}).map((
+                [k, v],
+            ) => [k, /** @type {Eroare} */ (v)]),
         );
     });
 
@@ -41,11 +45,14 @@
     const btn_urmator_activ = $derived(
         (!pagina_activa
             .cimpuri
-            .map((c) => (raspunsuri[c.nume] === undefined || raspunsuri[c.nume] === "") && c.obligatoriu)
+            .map((c) =>
+                (raspunsuri[c.nume] === undefined ||
+                    raspunsuri[c.nume] === "") && c.obligatoriu
+            )
             .reduce((p, c) => p || c, false)) &&
-            Object.keys(eroare).filter((k) => eroare[k].pag === pagina).length === 0,
+            Object.keys(eroare).filter((k) => eroare[k].pag === pagina)
+                    .length === 0,
     );
-
 
     function inloct(/**@type{string}*/ text) {
         if (text === "") return "{}";
@@ -121,7 +128,9 @@
     >
         <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
 
-        <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
+        <div
+            class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3"
+        >
             {sondaj_cdos.descriere}
         </div>
 
@@ -144,7 +153,9 @@
 
         <div>GDPR</div>
 
-        <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
+        <div
+            class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3"
+        >
             <div class="flex justify-end gap-4">
                 <Buton
                     type="submit"
@@ -173,33 +184,75 @@
         <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
         <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>
 
-        <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
+        <div
+            class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3"
+        >
             {pagina_activa.descriere}
         </div>
 
         {#each intrebari as pag, i}
             {#each pag.cimpuri as cimp}
+                {@const afiseaza = cimp.filtru_afisare ?? null}
                 <div class:hidden={i !== pagina}>
-                    {#if cimp.tip === "email" || cimp.tip === "text"}
-                        <CimpText
-                            tip={cimp.tip}
-                            intrebare={cimp.titlu}
-                            nume={cimp.nume}
-                            desc={cimp.desc}
-                            obligatoriu={cimp.obligatoriu}
-                            onblur={() => aplica_validare(cimp)}
-                            bind:value={raspunsuri[cimp.nume]}
-                        />
-                    {:else if cimp.tip.startsWith("selecție")}
-                        <Selectie
-                            cimp={cimp}
-                            {raspunsuri}
-                            onblur={() => aplica_validare(cimp)}
-                            bind:value={raspunsuri[cimp.nume]}
-                        />
+                    {#if afiseaza !== null}
+                        {#if cimp.obligatoriu}
+                            <div class="flex flex-col">
+                                <span class="mb-1 font-bold">
+                                    {cimp.titlu}
+                                    {#if cimp.obligatoriu}
+                                        <span class="px-0.5 text-lg leading-none font-bold text-danger"
+                                        >*</span>
+                                    {/if}
+                                </span>
+                            <i class="text-italic text-danger-strong"
+                            >Câmpul `{cimp.nume}` este obligatoriu însă are
+                                definit filtru de afișare</i>
+                            </div>
+                        {:else if afiseaza(raspunsuri)}
+                            {#if cimp.tip === "email" || cimp.tip === "text"}
+                                <CimpText
+                                    tip={cimp.tip}
+                                    intrebare={cimp.titlu}
+                                    nume={cimp.nume}
+                                    desc={cimp.desc}
+                                    obligatoriu={cimp.obligatoriu}
+                                    onblur={() => aplica_validare(cimp)}
+                                    bind:value={raspunsuri[cimp.nume]}
+                                />
+                            {:else if cimp.tip.startsWith("selecție")}
+                                <Selectie
+                                    {cimp}
+                                    {raspunsuri}
+                                    onblur={() => aplica_validare(cimp)}
+                                    bind:value={raspunsuri[cimp.nume]}
+                                />
+                            {:else}
+                                <i class="text-italic text-danger-strong"
+                                >Tip cîmp `{cimp.tip}` necunoscut</i>
+                            {/if}
+                        {/if}
                     {:else}
-                        <i class="text-italic text-danger-strong"
-                        >Tip cîmp `{cimp.tip}` necunoscut</i>
+                        {#if cimp.tip === "email" || cimp.tip === "text"}
+                            <CimpText
+                                tip={cimp.tip}
+                                intrebare={cimp.titlu}
+                                nume={cimp.nume}
+                                desc={cimp.desc}
+                                obligatoriu={cimp.obligatoriu}
+                                onblur={() => aplica_validare(cimp)}
+                                bind:value={raspunsuri[cimp.nume]}
+                            />
+                        {:else if cimp.tip.startsWith("selecție")}
+                            <Selectie
+                                {cimp}
+                                {raspunsuri}
+                                onblur={() => aplica_validare(cimp)}
+                                bind:value={raspunsuri[cimp.nume]}
+                            />
+                        {:else}
+                            <i class="text-italic text-danger-strong"
+                            >Tip cîmp `{cimp.tip}` necunoscut</i>
+                        {/if}
                     {/if}
 
                     {#if eroare[cimp.nume] != null}
@@ -220,11 +273,15 @@
             }</span>
         </div>
 
-        <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
+        <div
+            class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3"
+        >
             <div class="flex justify-end gap-4">
                 <Buton
-                    class={pagina === 0 ? 'invisible' : ''}
-                    onclick={() => { if (pagina > 0) pagina -= 1; }}
+                    class={pagina === 0 ? "invisible" : ""}
+                    onclick={() => {
+                        if (pagina > 0) pagina -= 1;
+                    }}
                 >
                     Anterior
                 </Buton>

@@ -48,6 +48,8 @@ export default {
                     tip: "selecție-radio",
                     nume: "ciclu",
                     titlu: "Ciclu de Studii",
+                    obligatoriu: true,
+                    filtru_afisare: (rspi) => rspi["facultatea"] != null && rspi["facultatea"]?.trim() !== "",
                     optiuni: (rspi) => ({optiuni: ["LICENȚĂ", "MASTER"], eroare: null}),
                 },
                 {

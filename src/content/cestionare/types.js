@@ -17,6 +17,14 @@
  * @property {string|null} eroare Mesaj descriptiv dacă nu pot fi generate opțiuni, altfel null
  */
 
+ /**
+  * Această funcție este apelată pentru a determina dacă un câmp trebuie afișat în funcție de răspunsurile curente.
+  *
+  * @callback AfiseazaCimp
+  * @param {SDict<string>} raspunsuri Răspunsurile curente a formularului
+  * @return {boolean}
+  */
+
 /**
  * Funcția trebuiește să întoarcă un obiect cu lista de opțiuni și un mesaj
  * opțional de eroare în cazul în care nu există opțiuni disponibile.
@@ -45,6 +53,7 @@
  * @property {string} nume
  * @property {string} titlu
  * @property {string?} [desc]
+ * @property {AfiseazaCimp?} [filtru_afisare]
  * @property {boolean} [obligatoriu]
  * @property {Validator} [valideaza]
  * @property {DaOptiuniSelectie} [optiuni]

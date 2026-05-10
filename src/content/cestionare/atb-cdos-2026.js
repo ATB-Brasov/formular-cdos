@@ -65,10 +65,7 @@ export default {
                     nume: "ciclu",
                     titlu: "Ciclu de Studii",
                     obligatoriu: true,
-                    filtru_afisare: (rspi) =>
-                        rspi["facultatea"] != null &&
-                        rspi["facultatea"]?.trim() !== "",
-                    optiuni: (rspi) => ({
+                    optiuni: () => ({
                         optiuni: ["LICENȚĂ", "MASTER"],
                         eroare: null,
                     }),
@@ -147,10 +144,46 @@ export default {
                         };
                     },
                 },
-        // Mai adăugăm următoarele întrebări:
-        // "Te încadrezi în categoria studenților cu dizabilități?" (implicit nu)
-        // "Ai desfășurat practica de specialitate?" (implicit da)
-        // "Ai participat în cadrul taberelor studențești?" (implicit nu)
+                danu(
+                    "participare-tabere",
+                    "Ai participat în cadrul taberelor studențești?",
+                    {
+                        optiuni: () => {
+                            return {
+                                optiuni: ["da", "nu"],
+                                eroare: null,
+                            };
+                        },
+                    },
+                ),
+                danu(
+                    "student-cu-dizabilități",
+                    "Te încadrezi în categoria studenților cu dizabilități?",
+                    {
+                        optiuni: () => {
+                            return {
+                                optiuni: ["da", "nu"],
+                                eroare: null,
+                            };
+                        },
+                    },
+                ),
+                danu(
+                    "practică-de-specialitate",
+                    "Ai desfășurat practica de specialitate?",
+                    {
+                        optiuni: () => {
+                            return {
+                                optiuni: ["da", "nu"],
+                                eroare: null,
+                            };
+                        },
+                    },
+                ),
+                // Mai adăugăm următoarele întrebări:
+                // "Te încadrezi în categoria studenților cu dizabilități?" (implicit nu)
+                // "Ai desfășurat practica de specialitate?" (implicit da)
+                // "Ai participat în cadrul taberelor studențești?" (implicit nu)
             ],
         },
         {
@@ -248,7 +281,7 @@ export default {
                 ),
                 danu(
                     "acad_consult_progr",
-                    "Ai fost consultat(ă) în stabilirea datelor de examinare? [art. 7 (1) u)]",
+                    "Ai fost consultat(ă) în stabilirea datelor (dăților?) de examinare? [art. 7 (1) u)]",
                 ),
                 danu(
                     "acad_consiliere_gr",
@@ -264,12 +297,12 @@ export default {
                 ),
                 danu(
                     "acad_contesta_note",
-                    "Ai avut posibilitatea să contești notele primite? [art. 7 r)]",
+                    "Ți s-a restricționat dreptul de a contesta notele primite? [art. 7 r)]",
                 ),
-                danu(
-                    "acad_ore_suprapuse",
-                    "Ai avut ore suprapuse și ești nevoit să lipsești de la un un curs pentru a participa la altul?",
-                ),
+                // danu(
+                //     "acad_ore_suprapuse",
+                //     "Ai avut ore suprapuse ca să fii nevoit să lipsești de la un un curs pentru a participa la altul? (care articol??)",
+                // ),
                 danu(
                     "acad_tutore_indrum",
                     "Ai beneficiat de un tutore sau îndrumător de an? [art. 7 i)]",
@@ -364,12 +397,13 @@ export default {
         {
             // afișăm numai dacă studentul răspunde că a făcut practica de specialitate în prima secțiune
             titlu: "Practica de Specialitate",
+            filtru_afisare: (rspi) => rspi["practica-de-specialitate"] === "da",
             descriere:
                 "Această secțiune analizează calitatea stagiilor de practică",
             cimpuri: [
                 danu(
                     "prac_parteneri_li",
-                    "Ti-a fost prezentată lista partenerilor de practică ai universității din domeniul tău de studiu pe parcursul anului universitar? [art. 9 (1) c)]",
+                    "Ți-a fost prezentată lista partenerilor de practică ai universității din domeniul tău de studiu pe parcursul anului universitar? [art. 9 (1) c)]",
                 ),
                 danu(
                     "prac_cost_deplas_s",
@@ -400,6 +434,7 @@ export default {
         {
             // afișăm numai în cazul dacă studentul a răspuns că a participat în cadrul taberelor studențești
             titlu: "Tabere Studențești",
+            filtru_afisare: (rspi) => rspi["participare-tabere"] === "da",
             descriere:
                 "Această secțiune evaluează accesul studenților la programele de tabere",
             cimpuri: [
@@ -409,7 +444,7 @@ export default {
                 ),
                 danu(
                     "tab_credite_sesiun",
-                    "Ai putut beneficia de creditele oferite în cadrul sesiunilor de formare profesională organizate la tabere conforme cu carta? [art. 14 (2)]",
+                    "Ai putut beneficia de creditele oferite în cadrul sesiunilor de formare profesională organizate la tabere conforme cu Carta Universității? [art. 14 (2)]",
                 ),
                 danu(
                     "tab_formare_ec_ect",
@@ -424,9 +459,14 @@ export default {
         {
             // afișăm numai dacă studentul răspunde că se încadrează în categoria studențîlor cu dizabilități în prima secțiune
             titlu: "Studenți cu Dizabilități",
+            filtru_afisare: (rspi) => rspi["student-cu-dizabilități"] === "da",
             descriere:
                 "Urmărim evaluarea gradului de accesibilitate și a condițiilor specifice oferite studenților cu nevoi speciale pentru a asigura un proces educațional incluziv și echitabil.",
             cimpuri: [
+                danu(
+                    "dizab_info_comun_s",
+                    "Ai beneficiat de servicii de informare și comunicații adecvate? [art. 6 (3) c)]",
+                ),
                 danu(
                     "dizab_conditii_ade",
                     "Consideri că ți s-au asigurat condiții adecvate pentru desfășurarea studiilor cu dizabilități? [art. 6 (1)]",
@@ -438,14 +478,10 @@ export default {
                 danu(
                     "dizab_practic_spri",
                     "Ai putut beneficia de sprijin pentru identificare și derularea practicii de specialitate? [art. 6 (3) b)]",
-                ),
-                danu(
-                    "dizab_info_comun_s",
-                    "Ai beneficiat de servicii de informare și comunicații adecvate? [art. 6 (3) c)]",
-                ),
-                danu(
-                    "dizab_tabere_acces",
-                    "Ți-a fost restricționat dreptul de a participa la tabere studențești? [art. 6 (3) d)]",
+                    {
+                        filtru_afisare: (rspi) =>
+                            rspi["dizab_practic_spri"] === "da",
+                    },
                 ),
             ],
         },

@@ -4,6 +4,7 @@
 
     import { enhance } from "$app/forms";
     import { page } from "$app/state";
+    import { dev } from "$app/environment";
 
     import Buton from "@components/Buton.svelte";
     import Selectie from "@components/Selectie.svelte";
@@ -247,6 +248,11 @@
                 <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
                     {#each pag.cimpuri as cimp, nr}
                         <div class="scroll-mt-5" bind:this={cimpuri[cimp.nume]}>
+                        {#if dev}
+                            <div class="text-surface-muted text-mono text-xs">
+                                id: {cimp.nume} ({nr + 1})
+                            </div>
+                        {/if}
 
                         {#if cimp.filtru_afisare == null || cimp.filtru_afisare(raspunsuri)}
                             {#if cimp.tip === "email" || cimp.tip === "text"}
@@ -271,12 +277,12 @@
                                     Tip cîmp `{cimp.tip}` necunoscut
                                 </div>
                             {/if}
-                        {/if}
 
-                        {#if eroare[cimp.nume] != null}
-                            <div class="text-sm text-danger">
-                                {eroare[cimp.nume].msg}
-                            </div>
+                            {#if eroare[cimp.nume] != null}
+                                <div class="text-sm text-danger">
+                                    {eroare[cimp.nume].msg}
+                                </div>
+                            {/if}
                         {/if}
                         </div>
                     {/each}

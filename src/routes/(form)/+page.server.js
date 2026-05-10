@@ -175,6 +175,7 @@ export const actions = {
         }
 
         const data = await request.formData();
+        const dataDict = Object.fromEntries(data.entries().map(([nume, valoare]) => [nume, valoare.toString()]));
         /** @type { {[nume: string]: import("$lib/common_types.js").Eroare} } */
         const erori = {}; // Poate un Map?
 
@@ -185,11 +186,14 @@ export const actions = {
         let min_err_pag = pagini.length;
         for (let pag_nr = 0; pag_nr < pagini.length; ++pag_nr) {
             const pag = pagini[pag_nr];
+            if (pag.filtru_afisare != null && !pag.filtru_afisare?.(dataDict)) {
+                continue;
+            }
             for (let cimp of pag.cimpuri) {
                 const cimp_formular = data.get(cimp.nume);
 
                 if (!cimp_formular) {
-                    if (cimp.obligatoriu) {
+                    if (cimp.filtru_afisare != null && !cimp.filtru_afisare?.(dataDict) || cimp.obligatoriu) {
                         erori[cimp.nume] = {
                             type: "field-required",
                             msg: "Cîmpul este obligatoriu",

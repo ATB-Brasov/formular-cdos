@@ -64,6 +64,7 @@
  * @property {string} titlu
  * @property {string} descriere
  * @property {Cimp[]} cimpuri
+ * @property {AfiseazaCimp?} [filtru_afisare]
  */
 
 /**

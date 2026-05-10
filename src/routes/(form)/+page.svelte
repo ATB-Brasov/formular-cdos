@@ -119,7 +119,8 @@
         {/if}
 
         {#each intrebari as pag, i}
-            {#each pag.cimpuri as cimp}
+            {#if pag.filtru_afisare == null || pag.filtru_afisare(raspunsuri)}
+            {#each pag.cimpuri as cimp, nr}
                 <div class:hidden={i !== pagina}>
                     {#if cimp.filtru_afisare == null || cimp.filtru_afisare(raspunsuri)}
                         {#if cimp.tip === "email" || cimp.tip === "text"}
@@ -152,6 +153,7 @@
                     {/if}
                 </div>
             {/each}
+            {/if}
         {/each}
 
         <div>
@@ -170,7 +172,9 @@
                 <Buton
                     class={pagina === 0 ? "invisible" : ""}
                     onclick={() => {
-                        if (pagina > 0) pagina -= 1;
+                        do {
+                            if (pagina > 0) pagina -= 1;
+                        } while (pagina > 0 && intrebari[pagina].filtru_afisare != null && !intrebari[pagina].filtru_afisare?.(raspunsuri));
                     }}
                 >
                     Anterior
@@ -183,8 +187,10 @@
                         type={ultima ? "submit" : "button"}
                         disabled={!btn_urmator_activ}
                         onclick={ultima ? null : () => {
-                            let tmp = pagina + 1;
-                            if (tmp <= ULTIMA_PAGINA) pagina = tmp;
+                            do {
+                                let tmp = pagina + 1;
+                                if (tmp <= ULTIMA_PAGINA) pagina = tmp;
+                            } while (pagina <= ULTIMA_PAGINA && intrebari[pagina].filtru_afisare != null && !intrebari[pagina].filtru_afisare?.(raspunsuri));
                         }}
                     >
                         {ultima ? "Trimite" : "Următor"}

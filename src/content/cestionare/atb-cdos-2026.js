@@ -165,7 +165,10 @@ export default {
                 danu(
                     "gen_mod_contract_s",
                     "Contractele de studii au fost modificate în timpul anului? [art. 3 (3)] [LÎS 199/2023 art. 34 (1)]",
-                    { desc: "Contractul de studii încheiat între Universitate și student nu poate fi modificat pe parcursul anului universitar. Un an universitar începe de pe 1 octombrie până pe 29 septembrie conform Legii Învățământului Superior. Contractul conține obiectul contractului, drepturile și obligațiile părților, cuantumul taxei de școlarizare și modalitatea de plata, după caz, răspunderea părților și termenul de valabilitate a contractului." },
+                    {
+                        desc:
+                            "Contractul de studii încheiat între Universitate și student nu poate fi modificat pe parcursul anului universitar. Un an universitar începe de pe 1 octombrie până pe 29 septembrie conform Legii Învățământului Superior. Contractul conține obiectul contractului, drepturile și obligațiile părților, cuantumul taxei de școlarizare și modalitatea de plata, după caz, răspunderea părților și termenul de valabilitate a contractului.",
+                    },
                 ),
                 danu(
                     "gen_acces_org_std",
@@ -174,12 +177,18 @@ export default {
                 danu(
                     "gen_gratuit_acte_s",
                     "Ai fost taxat pentru eliberarea actelor de studii? [art. 11 (2)]",
-                    "Toate actele de studii eliberate de Unitbv, precum și cele care atestă statutul de student, precum adeverințele, carnetele sau legitimațiile, se eliberează în mod gratuit. În cazul eliberării duplicatelor actelor de studii se poate percepe o taxă.",
+                    {
+                        desc:
+                            "Toate actele de studii eliberate de Unitbv, precum și cele care atestă statutul de student, precum adeverințele, carnetele sau legitimațiile, se eliberează în mod gratuit. În cazul eliberării duplicatelor actelor de studii se poate percepe o taxă.",
+                    },
                 ),
                 danu(
                     "gen_transp_faci_st",
                     "Ți-au fost restricționate facilitățile de transport de care dispui conform prevederilor legale? [art. 11 (3)]",
-                    "Studenții înmatriculați la forma de învățământ cu frecvență beneficiază de facilități de transport conform prevederilor legale.",
+                    {
+                        desc:
+                            "Studenții înmatriculați la forma de învățământ cu frecvență beneficiază de facilități de transport conform prevederilor legale.",
+                    },
                 ),
             ],
         },
@@ -192,12 +201,18 @@ export default {
                 danu(
                     "acad_info_fisa_dis",
                     "Ai primit în primele 2 săptămâni de semestru informații complete despre fiecare disciplină (conținut, evaluare, bibliografie, cerințe)? [art. 7 (1) g)]",
-                    "Fișa disciplinei este un document care trebuie prezentată de profesor la începutul semestrului, și conține toate informațiile relevante despre desfășurarea cursului (date despre program, date despre disciplină, timp total estimat, competențe, evaluare, etc.)",
+                    {
+                        desc:
+                            "Fișa disciplinei este un document care trebuie prezentată de profesor la începutul semestrului, și conține toate informațiile relevante despre desfășurarea cursului (date despre program, date despre disciplină, timp total estimat, competențe, evaluare, etc.)",
+                    },
                 ),
                 danu(
                     "acad_suport_curs_g",
                     "Ai acces gratuit la suport de curs și materiale didactice pentru disciplinele tale? [art. 7 (1) e)]",
-                    "Suportul de curs explică conținutul unui curs universitar. Conține teoria predată, exemple, uneori exerciții și bibliografie",
+                    {
+                        desc:
+                            "Suportul de curs explică conținutul unui curs universitar. Conține teoria predată, exemple, uneori exerciții și bibliografie",
+                    },
                 ),
                 danu(
                     "acad_mobil_erasmu_s",
@@ -214,7 +229,10 @@ export default {
                 danu(
                     "acad_eval_obiectiv",
                     "Consideri că ai fost evaluat(ă) obiectiv? [art. 7 (1) q)]",
-                    "O evaluare obiectivă presupune respectarea baremului de corectare anunțat la începutul semestrului în fișa disciplinei, lipsa subiectivismului și aplicarea acelorași criterii pentru toți studenții examinați."
+                    {
+                        desc:
+                            "O evaluare obiectivă presupune respectarea baremului de corectare anunțat la începutul semestrului în fișa disciplinei, lipsa subiectivismului și aplicarea acelorași criterii pentru toți studenții examinați.",
+                    },
                 ),
                 danu(
                     "acad_rezult_exam_t",
@@ -223,7 +241,10 @@ export default {
                 danu(
                     "acad_acces_sit_sco",
                     "Ai acces la situația ta școlară și la documentele universitare relevante? [art. 7 (1) k)]",
-                    "Deciziile luate în cadrul structurilor universitare, regulamente sau rapoarte ",
+                    {
+                        desc:
+                            "Prin documente universitare relevante se înțelege: deciziile luate în cadrul structurilor universitare, regulamente sau rapoarte ",
+                    },
                 ),
                 danu(
                     "acad_consult_progr",
@@ -321,6 +342,10 @@ export default {
                 danu(
                     "soc_termen_concurs",
                     "S-a respectat termenul de cel puțin 5 zile lucrătoare pentru înscrierea la concursurile organizate? [art. 12 (1) g)]",
+                    {
+                        desc:
+                            "Exemplu concurs: De făcut! Afco, Crosul Universitar...",
+                    },
                 ),
                 danu(
                     "soc_raspuns_scris",
@@ -348,8 +373,11 @@ export default {
                 ),
                 danu(
                     "prac_cost_deplas_s",
-                    "În cazul practicii desfășurate în afara Brașovului, ți-au fost acoperite costurile de masă, cazare și transport? [art. 9 (1) b)]",
-                    "dreptul de a beneficia de acoperirea costurilor necesare pentru efectuarea practicii comasate, pentru perioada prevăzută în planurile de învătământ, inclusiv cheltuieli de masă, cazare și transport, in situațiile in care practica se desfășoara in afara centrului universitar respectiv, conform prevederilor art. 128 alin. (25) din Legea nr. 199/2023, cu modificările și completarile ulterioare;"
+                    "(De revăzut) În cazul practicii desfășurate în afara Brașovului, ți-au fost acoperite costurile de masă, cazare și transport? [art. 9 (1) b)]",
+                    {
+                        desc:
+                            "dreptul de a beneficia de acoperirea costurilor necesare pentru efectuarea practicii comasate, pentru perioada prevăzută în planurile de învătământ, inclusiv cheltuieli de masă, cazare și transport, in situațiile in care practica se desfășoara in afara centrului universitar respectiv, conform prevederilor art. 128 alin. (25) din Legea nr. 199/2023, cu modificările și completarile ulterioare;",
+                    },
                 ),
                 danu(
                     "prac_cazare_camin",
@@ -386,7 +414,10 @@ export default {
                 danu(
                     "tab_formare_ec_ect",
                     "În urma participării la activități de formare profesională în cadrul taberelor tematice, ai putut primi credite de tip ECVET sau ECTS? [art. 14 (3)]",
-                    "Creditele ECVET (Sistemul European de Credite pentru Învățare și Formare) și ECTS (sistemul european de transfer și acumulare a creditelor) sunt sisteme de calificare a volumului de învățare și a volumului de lucru asociat. ECTS se concentrează pe ciclurile academice (licență, master, doctorat), iar ECVET se aplică în contextul formării profesionale pe parcursul vieții.",
+                    {
+                        desc:
+                            "Creditele ECVET (Sistemul European de Credite pentru Învățare și Formare) și ECTS (sistemul european de transfer și acumulare a creditelor) sunt sisteme de calificare a volumului de învățare și a volumului de lucru asociat. ECTS se concentrează pe ciclurile academice (licență, master, doctorat), iar ECVET se aplică în contextul formării profesionale pe parcursul vieții.",
+                    },
                 ),
             ],
         },
@@ -399,7 +430,10 @@ export default {
                 danu(
                     "dizab_conditii_ade",
                     "Consideri că ți s-au asigurat condiții adecvate pentru desfășurarea studiilor cu dizabilități? [art. 6 (1)]",
-                    "Studenții cu dizabilități fizice au dreptul la acces adaptat în spațiile universitare, la asigurarea unui interpret mimico-gestual, precum și la condiții adecvate pentru desfășurarea a activităților academice, cum ar fi materiale educaționale și suport de curs personalizate în funcție de dizabilitate, adaptarea metodelor de evaluare în acord cu dizabilitatea, însoțitor în timpul susținerii examenului, etc.",
+                    {
+                        desc:
+                            "Studenții cu dizabilități fizice au dreptul la acces adaptat în spațiile universitare, la asigurarea unui interpret mimico-gestual, precum și la condiții adecvate pentru desfășurarea a activităților academice, cum ar fi materiale educaționale și suport de curs personalizate în funcție de dizabilitate, adaptarea metodelor de evaluare în acord cu dizabilitatea, însoțitor în timpul susținerii examenului, etc.",
+                    },
                 ),
                 danu(
                     "dizab_practic_spri",

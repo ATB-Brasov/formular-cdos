@@ -35,51 +35,6 @@ function danu(nume, titlu, optiuni_obj = {}) {
     };
 }
 
-/** @type {import("@content/cestionare/types.js").Pagina} */
-const paginia_dezabilitati =
-    {
-        titlu: "Dizabilități",
-        descriere: "Studenți cu dizabilități",
-        filtru_afisare: (rspi) => rspi["forma"] === "ID",
-        cimpuri: [
-            {
-                titlu: "Ai dizabilități?",
-                nume: "dizabilitati",
-                desc: "Selectează toate opțiunile care se aplică ti ai caz.",
-                obligatoriu: true,
-                tip: "selecție-radio",
-                optiuni: () => {
-                    return {
-                        optiuni: [
-                            { text: "Da", exista: true },
-                            { text: "Nu", exista: true },
-                        ],
-                        eroare: null,
-                    };
-                },
-            },
-            {
-                titlu: "Ai întîmpinat discriminare din cauza dezabilităților?",
-                nume: "dizabilitati-discriminare",
-                desc: "Selectează toate opțiunile care se aplică ti ai caz.",
-                obligatoriu: true,
-                filtru_afisare: (rspi) => {
-                    return rspi.dizabilitati === "Da";
-                },
-                tip: "selecție-radio",
-                optiuni: () => {
-                    return {
-                        optiuni: [
-                            { text: "Da", exista: true },
-                            { text: "Nu", exista: true },
-                        ],
-                        eroare: null,
-                    };
-                },
-            },
-        ],
-    }
-
 /**@type{import("@content/cestionare/types.js").Cestionar}*/
 export default {
     id: "atb-cdos-2026",
@@ -110,7 +65,13 @@ export default {
                     nume: "ciclu",
                     titlu: "Ciclu de Studii",
                     obligatoriu: true,
-                    optiuni: (rspi) => ({optiuni: ["LICENȚĂ", "MASTER"], eroare: null}),
+                    filtru_afisare: (rspi) =>
+                        rspi["facultatea"] != null &&
+                        rspi["facultatea"]?.trim() !== "",
+                    optiuni: (rspi) => ({
+                        optiuni: ["LICENȚĂ", "MASTER"],
+                        eroare: null,
+                    }),
                 },
                 {
                     tip: "selecție-radio",
@@ -129,9 +90,17 @@ export default {
                         const optiuni = lista.facultati
                             .map((o) => o.frm)
                             .filter(uniq)
-                            .map(text => ({ text, exista: filtered.includes(text) }));
+                            .map((text) => ({
+                                text,
+                                exista: filtered.includes(text),
+                            }));
 
-                        return { optiuni, eroare: optiuni.length === 0 ? "Nu au fost găsite forme de învățămînt pentru selecția curentă." : null };
+                        return {
+                            optiuni,
+                            eroare: optiuni.length === 0
+                                ? "Nu au fost găsite forme de învățămînt pentru selecția curentă."
+                                : null,
+                        };
                     },
                 },
                 {
@@ -140,9 +109,26 @@ export default {
                     titlu: "Programul de Învățămînt",
                     obligatoriu: true,
                     optiuni: (rspi) => {
-                        if (!rspi["facultatea"]) return { optiuni: [], eroare: "Selectează mai întâi facultatea." };
-                        if (!rspi["ciclu"]) return { optiuni: [], eroare: "Selectează mai întâi ciclul de studii." };
-                        if (!rspi["forma"]) return { optiuni: [], eroare: "Selectează mai întâi forma de învățămînt." };
+                        if (!rspi["facultatea"]) {
+                            return {
+                                optiuni: [],
+                                eroare: "Selectează mai întâi facultatea.",
+                            };
+                        }
+                        if (!rspi["ciclu"]) {
+                            return {
+                                optiuni: [],
+                                eroare:
+                                    "Selectează mai întâi ciclul de studii.",
+                            };
+                        }
+                        if (!rspi["forma"]) {
+                            return {
+                                optiuni: [],
+                                eroare:
+                                    "Selectează mai întâi forma de învățămînt.",
+                            };
+                        }
                         const optiuni = lista.facultati
                             .filter(
                                 (o) =>
@@ -152,138 +138,281 @@ export default {
                             )
                             .map((o) => o.prg)
                             .filter(uniq)
-                            .map(text => ({ text, exista: true }));
-                        return { optiuni, eroare: optiuni.length === 0 ? "Nu au fost găsite programe pentru selecția curentă." : null };
+                            .map((text) => ({ text, exista: true }));
+                        return {
+                            optiuni,
+                            eroare: optiuni.length === 0
+                                ? "Nu au fost găsite programe pentru selecția curentă."
+                                : null,
+                        };
                     },
                 },
+        // Mai adăugăm următoarele întrebări:
+        // "Te încadrezi în categoria studenților cu dizabilități?" (implicit nu)
+        // "Ai desfășurat practica de specialitate?" (implicit da)
+        // "Ai participat în cadrul taberelor studențești?" (implicit nu)
             ],
         },
-        paginia_dezabilitati,
         {
-            titlu: "Întrebări",
-            descriere: "Întrebări pe baza Codului DOS",
+            titlu: "Reguli Generale și Drepturi Contractuale",
+            descriere:
+                "Această secțiune vizează respectarea principiilor de bază privind nediscriminarea, stabilitatea contractului de studii și gratuitatea serviciilor administrative oferite de Universitate.",
             cimpuri: [
                 danu(
-                    "discriminarea",
-                    "Ai simțit discriminare sau tratamente inechitabile din partea cadrelor didactice? [art. 1] ",
+                    "gen_nediscrim_did",
+                    "Ai simțit discriminare sau tratamente inechitabile din partea cadrelor didactice? [art. 1]",
                 ),
                 danu(
-                    "schim-contr-stud",
+                    "gen_mod_contract_s",
                     "Contractele de studii au fost modificate în timpul anului? [art. 3 (3)] [LÎS 199/2023 art. 34 (1)]",
                     { desc: "Contractul de studii încheiat între Universitate și student nu poate fi modificat pe parcursul anului universitar. Un an universitar începe de pe 1 octombrie până pe 29 septembrie conform Legii Învățământului Superior. Contractul conține obiectul contractului, drepturile și obligațiile părților, cuantumul taxei de școlarizare și modalitatea de plata, după caz, răspunderea părților și termenul de valabilitate a contractului." },
                 ),
                 danu(
-                    "acces-org",
-                    "Ți-a fost restricționat accesul la structuri sau organizații studențești? [art.4 (1)]",
+                    "gen_acces_org_std",
+                    "Ți-a fost restricționat accesul la structuri sau organizații studențești? [art. 4 (1)]",
                 ),
                 danu(
-                    "diz-asig-stud",
-                    "Consideri că ți s-au asigurat condiții adecvate pentru desfășurarea studiilor cu dizabilități?  [art. 6 (1)]",
-                    { desc: "Studenții cu dizabilități fizice au dreptul la acces adaptat în spațiile universitare, la asigurarea unui interpret mimico-gestual, precum și la condiții adecvate pentru desfășurarea a activităților academice, cum ar fi materiale educaționale și suport de curs personalizate în funcție de dizabilitate, adaptarea metodelor de evaluare în acord cu dizabilitatea, însoțitor în timpul susținerii examenului, etc." },
+                    "gen_gratuit_acte_s",
+                    "Ai fost taxat pentru eliberarea actelor de studii? [art. 11 (2)]",
+                    "Toate actele de studii eliberate de Unitbv, precum și cele care atestă statutul de student, precum adeverințele, carnetele sau legitimațiile, se eliberează în mod gratuit. În cazul eliberării duplicatelor actelor de studii se poate percepe o taxă.",
                 ),
                 danu(
-                    "diz-sprijin-practica",
-                    "Ai putut beneficia de sprijin pentru identificare și derularea practicii de specialitate?  [art. 6 (3) b)]",
+                    "gen_transp_faci_st",
+                    "Ți-au fost restricționate facilitățile de transport de care dispui conform prevederilor legale? [art. 11 (3)]",
+                    "Studenții înmatriculați la forma de învățământ cu frecvență beneficiază de facilități de transport conform prevederilor legale.",
+                ),
+            ],
+        },
+
+        {
+            titlu: "Calitatea Procesului Educațional",
+            descriere:
+                "Această secțiune analizează drepturile academice fundamentale",
+            cimpuri: [
+                danu(
+                    "acad_info_fisa_dis",
+                    "Ai primit în primele 2 săptămâni de semestru informații complete despre fiecare disciplină (conținut, evaluare, bibliografie, cerințe)? [art. 7 (1) g)]",
+                    "Fișa disciplinei este un document care trebuie prezentată de profesor la începutul semestrului, și conține toate informațiile relevante despre desfășurarea cursului (date despre program, date despre disciplină, timp total estimat, competențe, evaluare, etc.)",
                 ),
                 danu(
-                    "diz-benef-info",
-                    "Ai beneficiat de servicii de informare și comunicații adecvate?  [art. 6 (3) c)]",
+                    "acad_suport_curs_g",
+                    "Ai acces gratuit la suport de curs și materiale didactice pentru disciplinele tale? [art. 7 (1) e)]",
+                    "Suportul de curs explică conținutul unui curs universitar. Conține teoria predată, exemple, uneori exerciții și bibliografie",
                 ),
                 danu(
-                    "diz-rest-tab",
-                    "Ți-a fost restricționat dreptul de a participa la tabere studențești?  [art. 6 (3) d)]",
+                    "acad_mobil_erasmu_s",
+                    "Ți s-au prezentat oportunitățile de mobilitate (Erasmus etc.) și ai avut acces la consiliere gratuită pentru acestea? [art. 7 (1) b)]",
                 ),
                 danu(
-                    "fisa-disciplina",
-                    "Ai primit fișa disciplinei în cadrul primelor 2 săptămâni de curs al semestrului? [art. 7 g)]",
-                    { desc: "Toate informațiile esențiale despre o disciplină: denumirea, obiectivele, conținutul pe săptămâni, metodele de predare și evaluare, bibliografia și competențele urmărite." },
+                    "acad_eval_prof_ano",
+                    "Ai posibilitatea reală de a evalua anonim cadrele didactice și cursurile urmate? [art. 7 (1) j)]",
                 ),
                 danu(
-                    "mod-eval",
+                    "acad_feedback_prof",
+                    "Ai primit mereu un feedback de la profesor, când l-ai cerut? [art. 7 (1) p)]",
+                ),
+                danu(
+                    "acad_eval_obiectiv",
+                    "Consideri că ai fost evaluat(ă) obiectiv? [art. 7 (1) q)]",
+                    "O evaluare obiectivă presupune respectarea baremului de corectare anunțat la începutul semestrului în fișa disciplinei, lipsa subiectivismului și aplicarea acelorași criterii pentru toți studenții examinați."
+                ),
+                danu(
+                    "acad_rezult_exam_t",
+                    "Ți-au fost comunicate rezultatele examenelor în decurs de 2–3 zile? (mai mult de 24h) [art. 7 (1) q)]",
+                ),
+                danu(
+                    "acad_acces_sit_sco",
+                    "Ai acces la situația ta școlară și la documentele universitare relevante? [art. 7 (1) k)]",
+                    "Deciziile luate în cadrul structurilor universitare, regulamente sau rapoarte ",
+                ),
+                danu(
+                    "acad_consult_progr",
+                    "Ai fost consultat(ă) în stabilirea datelor de examinare? [art. 7 (1) u)]",
+                ),
+                danu(
+                    "acad_consiliere_gr",
+                    "Beneficiezi de servicii gratuite de consiliere (academic, psihologic, profesional)? [art. 7 (1) m)]",
+                ),
+                danu(
+                    "acad_limit_ore_zi_8",
+                    "Programul tău zilnic de cursuri respectă limita de maximum 8 ore [art. 7 (4)]",
+                ),
+                danu(
+                    "acad_modific_evalu",
                     "Modalitatea de evaluare a fost schimbată fără acordul tău? [art. 7 g)]",
                 ),
                 danu(
-                    "suport-curs",
-                    "Ți s-a acordat  suport de curs gratuit în format fizic sau electronic? [art. 7 e)]",
-                    { desc: "Suportul de curs explică conținutul unui curs universitar. Conține teoria predată, exemple, uneori exerciții și bibliografie. " },
-                ),
-                danu(
-                    "feedback-prof",
-                    "Ai primit mereu un feedback de la profesor, când l-ai cerut ? [art. 7 p)]",
-                ),
-                danu(
-                    "contestare-note",
+                    "acad_contesta_note",
                     "Ai avut posibilitatea să contești notele primite? [art. 7 r)]",
                 ),
                 danu(
-                    "comunicare-rezultate-examene",
-                    "Ți-au fost comunicate rezultatele examenelor în decurs de 2–3 zile? (mai mult de 24h) [art. 7 q)]",
-                ),
-                danu(
-                    "ore-suprapuse",
+                    "acad_ore_suprapuse",
                     "Ai avut ore suprapuse și ești nevoit să lipsești de la un un curs pentru a participa la altul?",
                 ),
                 danu(
-                    "8-ore-activitate",
-                    "Ai avut mai mult de 8 ore de activitatea academică pe zi? [art. 7 (4)]",
+                    "acad_tutore_indrum",
+                    "Ai beneficiat de un tutore sau îndrumător de an? [art. 7 i)]",
+                ),
+            ],
+        },
+        {
+            titlu: "Transparența Taxelor Universitare",
+            descriere:
+                "Evaluarea modului în care Universitatea comunică mecanismele de stabilire a taxelor, cuantumul acestora și termenele de plată, conform principiului transparenței financiare.",
+            cimpuri: [
+                danu(
+                    "taxe_inform_stabi",
+                    "Ai fost informat(ă) despre modul în care se stabilesc taxele universitare? [art. 8 (1)]",
                 ),
                 danu(
-                    "îndrumător-de-an",
-                    "Ai avut un îndrumător de an activ? (???) [art. 7 i)]",
+                    "taxe_detalii_clar",
+                    "Ai primit informații clare despre toate tipurile de taxe (număr, cuantum, termene)? [art. 8 (2)]",
                 ),
                 danu(
-                    "publicarea-decizii-regulamente",
-                    "Deciziile luate în cadrul structurilor universitare,  regulamentele sau rapoartele au fost publicate? [art. 7 k)]",
+                    "taxe_publ_termen_3",
+                    "Au fost taxele publicate cu cel puțin 3 luni înainte de începerea anului universitar? [art. 8 (2)]",
                 ),
                 danu(
-                    "practica-finanțare",
-                    "Ai primit finanțare pentru practică în alte localități? [art. 9 b)]",
+                    "taxe_suplim_nejust",
+                    "Ți s-au perceput taxe suplimentare nejustificate (ex: pentru reclasificare între locuri cu taxă/buget)? [art.8]",
+                ),
+            ],
+        },
+        {
+            titlu: "Reprezentarea Studenților",
+            descriere:
+                "Se urmărește evaluarea modului în care studenții sunt implicați în procesul decizional și eficiența canalelor de comunicare dintre reprezentanți și comunitatea academică.",
+            cimpuri: [
+                danu(
+                    "repr_info_hotariri",
+                    "Ești informat și consultat de către studenții reprezentanți în legătură cu hotărârile votate în structurile de conducere? [art. 10 (2) e)]",
                 ),
                 danu(
-                    "practica-drepturi-info",
-                    "Ai fost informat despre drepturile tale în timpul practicii?",
+                    "repr_alegeri_liber",
+                    "Consideri că procesul de alegere a studenților reprezentanți a fost direct, secret și universal, fără implicarea cadrelor didactice? [art. 10 (3), (6), (11)]",
                 ),
                 danu(
-                    "practica-lista-locuri",
-                    "Universitatea ți-a acordat o listă cu posibile locuri de practică? [art. 9 (2)]",
+                    "repr_eval_anuala_s",
+                    "Ai participat la evaluarea anuală anonimă a activității studenților reprezentanți?",
                 ),
                 danu(
-                    "taxă-pentru-eliberare-acte",
-                    "Ai fost taxat pentru eliberarea actelor de studii? [art. 11 (2)]",
-                    { desc: "Toate actele de studii eliberate de Unitbv, precum și cele care atestă statutul de student, precum adeverințele, carnetele sau legitimațiile, se eliberează în mod gratuit. În cazul eliberării duplicatelor actelor de studii se poate percepe o taxă." },
+                    "repr_disem_statis",
+                    "Rezultatele statistice ale evaluării reprezentanților ți-au fost diseminate prin canalele oficiale?",
+                ),
+            ],
+        },
+        {
+            titlu: "Drepturi Sociale și Mediul Universitar",
+            descriere:
+                "Evaluăm accesul la serviciile de asistență medicală, facilitățile sportive și respectarea termenelor administrative pentru asigurarea unui mediu sigur și sănătos.",
+            cimpuri: [
+                danu(
+                    "soc_asist_med_psi",
+                    "Ai avut acces gratuit la asistență medicală, stomatologică și psihologică în cabinetele universității? [art. 12 (1) a)]",
                 ),
                 danu(
-                    "facilități-transport",
-                    "Ți-au fost restricționate facilitățile de transport care le dispui conform prevederilor legale? [art. 11 (3)]",
-                    { desc: "Studenții înmatriculați la formă de învățământ cu frecvență în Universitatea Transilvania beneficiază de facilități de transport conform prevederilor legale, pana la împlinirea vârstei de 30 de ani." },
+                    "soc_acces_spatii_u",
+                    "Ai avut acces gratuit în spațiile universitare pentru organizarea de proiecte studențești (în afara orarului)? [art. 12 (1) d)]",
                 ),
                 danu(
-                    "medie-bursă-merit",
-                    "A fost postată ultima medie pentru bursa de merit? (???)",
+                    "soc_baze_sport_gr",
+                    "Ai avut acces gratuit la bazele sportive ale universității în afara orarului didactic? [art. 12 (1) j)]",
                 ),
                 danu(
-                    "info-servicii",
-                    "Ai fost informat despre drepturile și serviciile disponibile (consiliere, medical etc.)? [art. 12 a)]",
+                    "soc_termen_concurs",
+                    "S-a respectat termenul de cel puțin 5 zile lucrătoare pentru înscrierea la concursurile organizate? [art. 12 (1) g)]",
                 ),
                 danu(
-                    "acces-rapoarte-cadre-didactice",
-                    "Rapoartele de evaluare a cadrelor didactice sunt accesibile și ușor de găsit?",
+                    "soc_raspuns_scris",
+                    "Ai primit răspuns scris (fizic sau electronic) la cererile semnate și depuse către universitate? [art. 12 (1) f)]",
                 ),
                 danu(
-                    "prob-nemenționate",
-                    "Ai avut alte probleme care nu au fost menționate mai sus ?",
+                    "soc_gratuit_cazare",
+                    "Ți s-a respectat dreptul la gratuitate la cazare în cămine (pentru categorii defavorizate)? [art. 12 (4)]*",
                 ),
-                {
-                    tip: "text",
-                    nume: "problema",
-                    titlu: "Descrie problema întâmpinată:",
-                },
-                {
-                    tip: "text",
-                    nume: "propuneri",
-                    titlu:
-                        "Ce soluții ai avea pentru a remedia această/aceste problemă/probleme?",
-                },
+                danu(
+                    "soc_mediu_sigur_st",
+                    "Consideri că universitatea îți oferă un mediu de învățare sigur și sănătos? [art. 12 (1) i)]",
+                ),
+            ],
+        },
+        {
+            // afișăm numai dacă studentul răspunde că a făcut practica de specialitate în prima secțiune
+            titlu: "Practica de Specialitate",
+            descriere:
+                "Această secțiune analizează calitatea stagiilor de practică",
+            cimpuri: [
+                danu(
+                    "prac_parteneri_li",
+                    "Ti-a fost prezentată lista partenerilor de practică ai universității din domeniul tău de studiu pe parcursul anului universitar? [art. 9 (1) c)]",
+                ),
+                danu(
+                    "prac_cost_deplas_s",
+                    "În cazul practicii desfășurate în afara Brașovului, ți-au fost acoperite costurile de masă, cazare și transport? [art. 9 (1) b)]",
+                    "dreptul de a beneficia de acoperirea costurilor necesare pentru efectuarea practicii comasate, pentru perioada prevăzută în planurile de învătământ, inclusiv cheltuieli de masă, cazare și transport, in situațiile in care practica se desfășoara in afara centrului universitar respectiv, conform prevederilor art. 128 alin. (25) din Legea nr. 199/2023, cu modificările și completarile ulterioare;"
+                ),
+                danu(
+                    "prac_cazare_camin",
+                    "Ai beneficiat de cazare în căminele universității pe perioada practicii obligatorii? [art. 9 (1) d)]",
+                ),
+                danu(
+                    "prac_tutore_indru",
+                    "Ai beneficiat de un tutore de practică care să îți îndrume activitatea? [art. 9 (1) e)]",
+                ),
+                danu(
+                    "prac_eval_calitat",
+                    "Ai avut posibilitatea de a evalua calitatea stagiului de practică și de a sesiza eventuale deficiențe? [art. 9 (1) f)]",
+                ),
+                danu(
+                    "prac_recuno_indiv",
+                    "Ti-a fost recunoscută practica efectuată individual după evaluarea îndeplinirii obiectivelor? [art. 9 (1) g)]",
+                ),
+            ],
+        },
+        {
+            // afișăm numai în cazul dacă studentul a răspuns că a participat în cadrul taberelor studențești
+            titlu: "Tabere Studențești",
+            descriere:
+                "Această secțiune evaluează accesul studenților la programele de tabere",
+            cimpuri: [
+                danu(
+                    "tab_acces_restrict",
+                    "Ți-a fost restricționat accesul la taberele studențești? [art. 14 (1)]",
+                ),
+                danu(
+                    "tab_credite_sesiun",
+                    "Ai putut beneficia de creditele oferite în cadrul sesiunilor de formare profesională organizate la tabere conforme cu carta? [art. 14 (2)]",
+                ),
+                danu(
+                    "tab_formare_ec_ect",
+                    "În urma participării la activități de formare profesională în cadrul taberelor tematice, ai putut primi credite de tip ECVET sau ECTS? [art. 14 (3)]",
+                    "Creditele ECVET (Sistemul European de Credite pentru Învățare și Formare) și ECTS (sistemul european de transfer și acumulare a creditelor) sunt sisteme de calificare a volumului de învățare și a volumului de lucru asociat. ECTS se concentrează pe ciclurile academice (licență, master, doctorat), iar ECVET se aplică în contextul formării profesionale pe parcursul vieții.",
+                ),
+            ],
+        },
+        {
+            // afișăm numai dacă studentul răspunde că se încadrează în categoria studențîlor cu dizabilități în prima secțiune
+            titlu: "Studenți cu Dizabilități",
+            descriere:
+                "Urmărim evaluarea gradului de accesibilitate și a condițiilor specifice oferite studenților cu nevoi speciale pentru a asigura un proces educațional incluziv și echitabil.",
+            cimpuri: [
+                danu(
+                    "dizab_conditii_ade",
+                    "Consideri că ți s-au asigurat condiții adecvate pentru desfășurarea studiilor cu dizabilități? [art. 6 (1)]",
+                    "Studenții cu dizabilități fizice au dreptul la acces adaptat în spațiile universitare, la asigurarea unui interpret mimico-gestual, precum și la condiții adecvate pentru desfășurarea a activităților academice, cum ar fi materiale educaționale și suport de curs personalizate în funcție de dizabilitate, adaptarea metodelor de evaluare în acord cu dizabilitatea, însoțitor în timpul susținerii examenului, etc.",
+                ),
+                danu(
+                    "dizab_practic_spri",
+                    "Ai putut beneficia de sprijin pentru identificare și derularea practicii de specialitate? [art. 6 (3) b)]",
+                ),
+                danu(
+                    "dizab_info_comun_s",
+                    "Ai beneficiat de servicii de informare și comunicații adecvate? [art. 6 (3) c)]",
+                ),
+                danu(
+                    "dizab_tabere_acces",
+                    "Ți-a fost restricționat dreptul de a participa la tabere studențești? [art. 6 (3) d)]",
+                ),
             ],
         },
     ],

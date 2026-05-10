@@ -1,21 +1,37 @@
+/** @import { AfiseazaCimp } from "@content/cestionare/types.js" */
 import { uniq } from "$lib/ds_helpers.js";
 import lista from "./lista_facultati_unitbv_2026.js";
 
 /**
+ * @typedef {object} OptiuniDanu
+ * @property {string | null} [desc=null]
+ * @property {boolean} [obligatoriu=true]
+ * @property {import("@content/cestionare/types.js").AfiseazaCimp | null} [filtru_afisare=null]
+ * @property {() => ({ optiuni: string[]; eroare: string? })} [optiuni=() => ({ optiuni: ["da", "nu", "nu știu"], eroare: null })]
+ */
+
+/**
  * @param {string} nume
  * @param {string} titlu
- * @param {string?} [desc=null]
- * @param {boolean} [obligatoriu=true]
+ * @param {OptiuniDanu} [optiuni_obj={}]
  * @returns {import("@content/cestionare/types.js").Cimp}
  */
-function danu(nume, titlu, desc = null, obligatoriu = true) {
+function danu(nume, titlu, optiuni_obj = {}) {
+    const {
+        desc = null,
+        obligatoriu = true,
+        filtru_afisare = null,
+        optiuni = () => ({ optiuni: ["da", "nu", "nu știu"], eroare: null }),
+    } = optiuni_obj;
+
     return {
         nume,
         titlu,
         desc,
         obligatoriu,
+        filtru_afisare,
         tip: "selecție-radio",
-        optiuni: () => ({ optiuni: ["da", "nu", "nu știu"], eroare: null }),
+        optiuni,
     };
 }
 

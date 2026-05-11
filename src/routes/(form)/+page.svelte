@@ -10,22 +10,70 @@
 
     import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js"; // TODO: Încărcare dinamică
     import Intrare from "./Intrare.svelte";
+    import { onMount } from "svelte";
 
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
 
+    let pagina = $state(0);
     /** @type {SDict<Eroare>} */ let eroare = $state({});
-
     /** @type {SDict<string>} */ let raspunsuri = $state(
         /** @type {SDict<string>} */ ({}),
     );
 
+    /** @param {"urmator" | "precedent"} directie */
+    function scimbaPagina(directie) {
+        if (directie === "urmator" && pagina < ULTIMA_PAGINA) {
+            do {
+                let tmp = pagina + 1;
+                if (tmp <= ULTIMA_PAGINA) pagina = tmp;
+            } while (
+                pagina <= ULTIMA_PAGINA &&
+                intrebari[pagina].filtru_afisare != null &&
+                !intrebari[pagina].filtru_afisare?.(raspunsuri)
+            );
+        } else if (directie === "precedent" && pagina > 0) {
+            do {
+                if (pagina > 0) pagina -= 1;
+            } while (
+                pagina > 0 && intrebari[pagina].filtru_afisare != null &&
+                !intrebari[pagina].filtru_afisare?.(raspunsuri)
+            );
+        }
+        localStorage.setItem("pagina", pagina.toString());
+    }
+
+    onMount(() => {
+        const raspunsuriSalvate = localStorage.getItem("raspunsuri");
+        if (raspunsuriSalvate) {
+            try {
+                const newRaspunsuri = JSON.parse(raspunsuriSalvate);
+                if (typeof newRaspunsuri === "object") {
+                    raspunsuri = newRaspunsuri;
+                }
+                const paginaSalvata = localStorage.getItem("pagina");
+                if (paginaSalvata) {
+                    pagina = parseInt(paginaSalvata);
+                }
+            } catch (e) {
+                console.error(
+                    "Nu am putut incărca răspunsurile din localStorage",
+                    e,
+                );
+            }
+        }
+    });
+
     $effect(() => {
-        const sursa = form ?? {};
+        if (form == null) return;
+        if (form.pag != null) {
+            pagina = form.pag;
+            localStorage.setItem("pagina", pagina.toString());
+        }
+
         /** @type {SDict<string>} */ const newRaspunsuri = {};
         /** @type {SDict<Eroare>} */ const newEroare = {};
-
-        for (const [k, v] of Object.entries(sursa)) {
+        for (const [k, v] of Object.entries(form)) {
             if (typeof v === "string") {
                 newRaspunsuri[k] = v;
             }
@@ -33,8 +81,16 @@
         for (const [k, v] of Object.entries(form?.erori ?? {})) {
             newEroare[k] = /** @type {Eroare} */ (v);
         }
+
         raspunsuri = newRaspunsuri;
         eroare = newEroare;
+    });
+
+    $effect(() => {
+        if (Object.keys(raspunsuri).length > 0) {
+            console.log("Save to local storage");
+            localStorage.setItem("raspunsuri", JSON.stringify(raspunsuri));
+        }
     });
 
     let intrebari = sondaj_cdos.pagini;
@@ -49,7 +105,6 @@
         return raspunsuri[nume] == null || raspunsuri[nume]?.trim() === "";
     }
 
-    let pagina = $derived(form?.pag ?? 0);
     const ULTIMA_PAGINA = intrebari.length - 1;
     const pagina_activa = $derived(intrebari[pagina]);
     const btn_urmator_activ = $derived(
@@ -111,48 +166,49 @@
         <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>
 
         {#if pagina_activa.descriere}
-        <div
-            class="w-full rounded-xl border border-surface-border bg-surface p-3"
-        >
-            {pagina_activa.descriere}
-        </div>
+            <div
+                class="w-full rounded-xl border border-surface-border bg-surface p-3"
+            >
+                {pagina_activa.descriere}
+            </div>
         {/if}
 
         {#each intrebari as pag, i}
             {#if pag.filtru_afisare == null || pag.filtru_afisare(raspunsuri)}
-            {#each pag.cimpuri as cimp, nr}
-                <div class:hidden={i !== pagina}>
-                    {#if cimp.filtru_afisare == null || cimp.filtru_afisare(raspunsuri)}
-                        {#if cimp.tip === "email" || cimp.tip === "text"}
-                            <CimpText
-                                tip={cimp.tip}
-                                intrebare={cimp.titlu}
-                                nume={cimp.nume}
-                                desc={cimp.desc}
-                                obligatoriu={cimp.obligatoriu}
-                                onblur={() => aplica_validare(cimp)}
-                                bind:value={raspunsuri[cimp.nume]}
-                            />
-                        {:else if cimp.tip.startsWith("selecție")}
-                            <Selectie
-                                {cimp}
-                                {raspunsuri}
-                                onblur={() => aplica_validare(cimp)}
-                                bind:value={raspunsuri[cimp.nume]}
-                            />
-                        {:else}
-                            <div class="text-italic text-danger-strong"
-                            >Tip cîmp `{cimp.tip}` necunoscut</div>
+                {#each pag.cimpuri as cimp, nr}
+                    <div class:hidden={i !== pagina}>
+                        {#if cimp.filtru_afisare == null || cimp.filtru_afisare(raspunsuri)}
+                            {#if cimp.tip === "email" || cimp.tip === "text"}
+                                <CimpText
+                                    tip={cimp.tip}
+                                    intrebare={cimp.titlu}
+                                    nume={cimp.nume}
+                                    desc={cimp.desc}
+                                    obligatoriu={cimp.obligatoriu}
+                                    onblur={() => aplica_validare(cimp)}
+                                    bind:value={raspunsuri[cimp.nume]}
+                                />
+                            {:else if cimp.tip.startsWith("selecție")}
+                                <Selectie
+                                    {cimp}
+                                    {raspunsuri}
+                                    onblur={() => aplica_validare(cimp)}
+                                    bind:value={raspunsuri[cimp.nume]}
+                                />
+                            {:else}
+                                <div class="text-italic text-danger-strong">
+                                    Tip cîmp `{cimp.tip}` necunoscut
+                                </div>
+                            {/if}
                         {/if}
-                    {/if}
 
-                    {#if eroare[cimp.nume] != null}
-                        <div class="text-sm text-danger">
-                            {eroare[cimp.nume].msg}
-                        </div>
-                    {/if}
-                </div>
-            {/each}
+                        {#if eroare[cimp.nume] != null}
+                            <div class="text-sm text-danger">
+                                {eroare[cimp.nume].msg}
+                            </div>
+                        {/if}
+                    </div>
+                {/each}
             {/if}
         {/each}
 
@@ -161,8 +217,7 @@
             din facultatea
             <span class="font-bold">{raspunsuri["facultatea"] || "{}"}</span>
             specializaera <span class="font-bold">
-                {raspunsuri["programul"] || "{}"}</span
-            >
+                {raspunsuri["programul"] || "{}"}</span>
         </div>
 
         <div
@@ -172,9 +227,7 @@
                 <Buton
                     class={pagina === 0 ? "invisible" : ""}
                     onclick={() => {
-                        do {
-                            if (pagina > 0) pagina -= 1;
-                        } while (pagina > 0 && intrebari[pagina].filtru_afisare != null && !intrebari[pagina].filtru_afisare?.(raspunsuri));
+                        scimbaPagina("precedent");
                     }}
                 >
                     Anterior
@@ -186,12 +239,7 @@
                     <Buton
                         type={ultima ? "submit" : "button"}
                         disabled={!btn_urmator_activ}
-                        onclick={ultima ? null : () => {
-                            do {
-                                let tmp = pagina + 1;
-                                if (tmp <= ULTIMA_PAGINA) pagina = tmp;
-                            } while (pagina <= ULTIMA_PAGINA && intrebari[pagina].filtru_afisare != null && !intrebari[pagina].filtru_afisare?.(raspunsuri));
-                        }}
+                        onclick={ultima ? null : () => scimbaPagina("urmator")}
                     >
                         {ultima ? "Trimite" : "Următor"}
                     </Buton>

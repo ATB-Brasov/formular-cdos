@@ -1,4 +1,4 @@
-/** @import { AfiseazaCimp } from "@content/cestionare/types.js" */
+/** @import { AfiseazaCimp, Cimp } from "@content/cestionare/types.js" */
 import { uniq } from "$lib/ds_helpers.js";
 import lista from "./lista_facultati_unitbv_2026.js";
 
@@ -6,22 +6,26 @@ import lista from "./lista_facultati_unitbv_2026.js";
  * @typedef {object} OptiuniDanu
  * @property {string | null} [desc=null]
  * @property {boolean} [obligatoriu=true]
- * @property {import("@content/cestionare/types.js").AfiseazaCimp | null} [filtru_afisare=null]
+ * @property {AfiseazaCimp | null} [filtru_afisare=null]
  * @property {() => ({ optiuni: string[]; eroare: string? })} [optiuni=() => ({ optiuni: ["da", "nu", "nu știu"], eroare: null })]
  */
 
+ /** @typedef {(nume:string, titlu:string, optiuni_obj?: OptiuniDanu) => Cimp} RadioConstructor */
+
 /**
+ * Base function for creating radio selection fields.
  * @param {string} nume
  * @param {string} titlu
+ * @param {string[]} valori_implicite
  * @param {OptiuniDanu} [optiuni_obj={}]
- * @returns {import("@content/cestionare/types.js").Cimp}
+ * @returns {Cimp}
  */
-function da_nustiu(nume, titlu, optiuni_obj = {}) {
+function _radio(nume, titlu, valori_implicite, optiuni_obj = {}) {
     const {
         desc = null,
         obligatoriu = true,
         filtru_afisare = null,
-        optiuni = () => ({ optiuni: ["da", "nu", "nu știu"], eroare: null }),
+        optiuni = () => ({ optiuni: valori_implicite, eroare: null }),
     } = optiuni_obj;
 
     return {
@@ -34,81 +38,50 @@ function da_nustiu(nume, titlu, optiuni_obj = {}) {
         optiuni,
     };
 }
+
+/** @type {RadioConstructor} */
 function da_nu(nume, titlu, optiuni_obj = {}) {
-    const {
-        desc = null,
-        obligatoriu = true,
-        filtru_afisare = null,
-        optiuni = () => ({ optiuni: ["da", "nu",], eroare: null }),
-    } = optiuni_obj;
-
-    return {
-        nume,
-        titlu,
-        desc,
-        obligatoriu,
-        filtru_afisare,
-        tip: "selecție-radio",
-        optiuni,
-    };
+    return _radio(nume, titlu, ["da", "nu"], optiuni_obj);
 }
 
+/** @type {RadioConstructor} */
+function da_nustiu(nume, titlu, optiuni_obj = {}) {
+    return _radio(nume, titlu, ["da", "nu", "nu știu"], optiuni_obj);
+}
+
+/** @type {RadioConstructor} */
 function da_nu_caz(nume, titlu, optiuni_obj = {}) {
-    const {
-        desc = null,
-        obligatoriu = true,
-        filtru_afisare = null,
-        optiuni = () => ({ optiuni: ["da", "nu", "nu e cazul"], eroare: null }),
-    } = optiuni_obj;
-
-    return {
-        nume,
-        titlu,
-        desc,
-        obligatoriu,
-        filtru_afisare,
-        tip: "selecție-radio",
-        optiuni,
-    };
+    return _radio(nume, titlu, ["da", "nu", "nu e cazul"], optiuni_obj);
 }
 
+/** @type {RadioConstructor} */
 function grad(nume, titlu, optiuni_obj = {}) {
-    const {
-        desc = null,
-        obligatoriu = true,
-        filtru_afisare = null,
-        optiuni = () => ({ optiuni: ["da, în toate cazurile", "da, în majoritatea cazurilor","da, uneori","nu","nu știu"], eroare: null }),
-    } = optiuni_obj;
+     const {
+         desc = null,
+         obligatoriu = true,
+         filtru_afisare = null,
+         optiuni = () => ({ optiuni: ["da, în toate cazurile", "da, în majoritatea cazurilor","da, uneori","nu","nu știu"], eroare: null }),
+     } = optiuni_obj;
 
-    return {
-        nume,
-        titlu,
-        desc,
-        obligatoriu,
-        filtru_afisare,
-        tip: "selecție-radio",
-        optiuni,
-    };
+     return {
+         nume,
+         titlu,
+         desc,
+         obligatoriu,
+         filtru_afisare,
+         tip: "selecție-radio",
+         optiuni,
+     };
 }
 
+/** @type {RadioConstructor} */
 function grad_p(nume, titlu, optiuni_obj = {}) {
-// precis - fără nu știu
-    const {
-        desc = null,
-        obligatoriu = true,
-        filtru_afisare = null,
-        optiuni = () => ({ optiuni: ["da, toate", "majoritatea cazurilor","uneori","nu",], eroare: null }),
-    } = optiuni_obj;
-
-    return {
-        nume,
-        titlu,
-        desc,
-        obligatoriu,
-        filtru_afisare,
-        tip: "selecție-radio",
-        optiuni,
-    };
+    return _radio(nume, titlu, [
+        "da, mereu",
+        "da, des",
+        "uneori",
+        "nu",
+    ], optiuni_obj);
 }
 
 /**@type{import("@content/cestionare/types.js").Cestionar}*/
@@ -271,14 +244,13 @@ export default {
                     "gen_nediscrim_did",
                     "Ai simțit discriminare sau tratamente inechitabile din partea cadrelor didactice? [art. 1]",
                     {
-
                         optiuni: () => {
                             return {
-                                optiuni: ["da, deseori","da, rareori", "nu"],
+                                optiuni: ["da, deseori", "da, rareori", "nu"],
                                 eroare: null,
                             };
-                        }, }
-
+                        },
+                    },
                 ),
                 da_nustiu(
                     "gen_mod_contract_s",
@@ -476,15 +448,19 @@ export default {
                 grad_p(
                     "soc_mediu_sigur_st",
                     "Consideri că universitatea îți oferă un mediu de învățare sigur și sănătos? [art. 12 (1) i)]",
-{
+                    {
                         optiuni: () => {
                             return {
-                                optiuni: ["da", "în marea parte","mai puțin", "nu"],
+                                optiuni: [
+                                    "da",
+                                    "în marea parte",
+                                    "mai puțin",
+                                    "nu",
+                                ],
                                 eroare: null,
                             };
                         },
-},
-
+                    },
                 ),
             ],
         },
@@ -539,14 +515,14 @@ export default {
                 da_nustiu(
                     "tab_credite_sesiun",
                     "Ai putut beneficia de creditele oferite în cadrul sesiunilor de formare profesională organizate la tabere conforme cu Carta Universității? [art. 14 (2)]",
-{
+                    {
                         optiuni: () => {
                             return {
-                                optiuni: ["da", "nu","nu e cazul", "nu știu"],
+                                optiuni: ["da", "nu", "nu e cazul", "nu știu"],
                                 eroare: null,
                             };
                         },
-}
+                    },
                 ),
                 da_nu_caz(
                     "tab_formare_ec_ect",

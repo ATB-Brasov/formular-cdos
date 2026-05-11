@@ -169,7 +169,7 @@ export default {
                 danu(
                     "schim-contr-stud",
                     "Contractele de studii au fost modificate în timpul anului? [art. 3 (3)] [LÎS 199/2023 art. 34 (1)]",
-                    "Contractul de studii încheiat între Universitate și student nu poate fi modificat pe parcursul anului universitar. Un an universitar începe de pe 1 octombrie până pe 29 septembrie conform Legii Învățământului Superior. Contractul conține obiectul contractului, drepturile și obligațiile părților, cuantumul taxei de școlarizare și modalitatea de plata, după caz, răspunderea părților și termenul de valabilitate a contractului.",
+                    { desc: "Contractul de studii încheiat între Universitate și student nu poate fi modificat pe parcursul anului universitar. Un an universitar începe de pe 1 octombrie până pe 29 septembrie conform Legii Învățământului Superior. Contractul conține obiectul contractului, drepturile și obligațiile părților, cuantumul taxei de școlarizare și modalitatea de plata, după caz, răspunderea părților și termenul de valabilitate a contractului." },
                 ),
                 danu(
                     "acces-org",
@@ -178,7 +178,7 @@ export default {
                 danu(
                     "diz-asig-stud",
                     "Consideri că ți s-au asigurat condiții adecvate pentru desfășurarea studiilor cu dizabilități?  [art. 6 (1)]",
-                    "Studenții cu dizabilități fizice au dreptul la acces adaptat în spațiile universitare, la asigurarea unui interpret mimico-gestual, precum și la condiții adecvate pentru desfășurarea a activităților academice, cum ar fi materiale educaționale și suport de curs personalizate în funcție de dizabilitate, adaptarea metodelor de evaluare în acord cu dizabilitatea, însoțitor în timpul susținerii examenului, etc.",
+                    { desc: "Studenții cu dizabilități fizice au dreptul la acces adaptat în spațiile universitare, la asigurarea unui interpret mimico-gestual, precum și la condiții adecvate pentru desfășurarea a activităților academice, cum ar fi materiale educaționale și suport de curs personalizate în funcție de dizabilitate, adaptarea metodelor de evaluare în acord cu dizabilitatea, însoțitor în timpul susținerii examenului, etc." },
                 ),
                 danu(
                     "diz-sprijin-practica",
@@ -195,7 +195,7 @@ export default {
                 danu(
                     "fisa-disciplina",
                     "Ai primit fișa disciplinei în cadrul primelor 2 săptămâni de curs al semestrului? [art. 7 g)]",
-                    "Toate informațiile esențiale despre o disciplină: denumirea, obiectivele, conținutul pe săptămâni, metodele de predare și evaluare, bibliografia și competențele urmărite.",
+                    { desc: "Toate informațiile esențiale despre o disciplină: denumirea, obiectivele, conținutul pe săptămâni, metodele de predare și evaluare, bibliografia și competențele urmărite." },
                 ),
                 danu(
                     "mod-eval",
@@ -204,7 +204,7 @@ export default {
                 danu(
                     "suport-curs",
                     "Ți s-a acordat  suport de curs gratuit în format fizic sau electronic? [art. 7 e)]",
-                    "Suportul de curs explică conținutul unui curs universitar. Conține teoria predată, exemple, uneori exerciții și bibliografie. ",
+                    { desc: "Suportul de curs explică conținutul unui curs universitar. Conține teoria predată, exemple, uneori exerciții și bibliografie. " },
                 ),
                 danu(
                     "feedback-prof",
@@ -249,12 +249,12 @@ export default {
                 danu(
                     "taxă-pentru-eliberare-acte",
                     "Ai fost taxat pentru eliberarea actelor de studii? [art. 11 (2)]",
-                    "Toate actele de studii eliberate de Unitbv, precum și cele care atestă statutul de student, precum adeverințele, carnetele sau legitimațiile, se eliberează în mod gratuit. În cazul eliberării duplicatelor actelor de studii se poate percepe o taxă.",
+                    { desc: "Toate actele de studii eliberate de Unitbv, precum și cele care atestă statutul de student, precum adeverințele, carnetele sau legitimațiile, se eliberează în mod gratuit. În cazul eliberării duplicatelor actelor de studii se poate percepe o taxă." },
                 ),
                 danu(
                     "facilități-transport",
                     "Ți-au fost restricționate facilitățile de transport care le dispui conform prevederilor legale? [art. 11 (3)]",
-                    "Studenții înmatriculați la formă de învățământ cu frecvență în Universitatea Transilvania beneficiază de facilități de transport conform prevederilor legale, pana la împlinirea vârstei de 30 de ani.",
+                    { desc: "Studenții înmatriculați la formă de învățământ cu frecvență în Universitatea Transilvania beneficiază de facilități de transport conform prevederilor legale, pana la împlinirea vârstei de 30 de ani." },
                 ),
                 danu(
                     "medie-bursă-merit",

@@ -77,7 +77,7 @@ function grad(nume, titlu, optiuni_obj = {}) {
         desc = null,
         obligatoriu = true,
         filtru_afisare = null,
-        optiuni = () => ({ optiuni: ["da, toate", "majoritatea cazurilor","uneori","nu","nu știu"], eroare: null }),
+        optiuni = () => ({ optiuni: ["da, în toate cazurile", "da, în majoritatea cazurilor","da, uneori","nu","nu știu"], eroare: null }),
     } = optiuni_obj;
 
     return {
@@ -364,7 +364,7 @@ export default {
                             "Prin documente universitare relevante se înțelege: deciziile luate în cadrul structurilor universitare, regulamente sau rapoarte ",
                     },
                 ),
-                grad_p(
+                grad(
                     "acad_consult_progr",
                     "Ai fost consultat(ă) în stabilirea datelor de examinare? [art. 7 (1) u)]",
                 ),

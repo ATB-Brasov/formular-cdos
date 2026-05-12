@@ -10,7 +10,8 @@
     --color-primary-dim: var(--color-blue-300);
     --color-primary-faint: var(--color-blue-400);
     --color-primary: var(--color-blue-500);
-    --color-primary-strong: var(--color-blue-600);
+    --color-primary-hover: var(--color-blue-600);
+    --color-primary-strong: var(--color-blue-700);
     --color-primary-text: var(--color-blue-800);
     --color-primary-deep: var(--color-blue-950);
 
@@ -23,10 +24,14 @@
     --color-surface-dim: var(--color-olive-600);
     --color-surface-dark: var(--color-olive-700);
     --color-surface-darker: var(--color-olive-800);
+    --color-surface-hover: var(--color-olive-100);
+
 
     /* Semantic states */
     --color-danger: var(--color-red-500);
     --color-danger-strong: var(--color-red-600);
+    --color-danger-hover: var(--color-red-700);
     --color-warning: var(--color-amber-600);
     --color-warning-dark: var(--color-amber-400);
+    --color-warning-hover: var(--color-amber-700);
 }

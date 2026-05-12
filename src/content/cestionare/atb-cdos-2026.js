@@ -193,6 +193,49 @@ export default {
                         };
                     },
                 },
+                {
+                    tip: "selecție-radio",
+                    nume: "anul",
+                    titlu: "Anul de studiu",
+                    obligatoriu: true,
+                    optiuni: (rspi) => {
+                        const ani = lista.facultati
+                            .filter(
+                                (o) =>
+                                    o.fac === rspi["facultatea"] &&
+                                    o.cic === rspi["ciclu"] &&
+                                    o.prg === rspi["programul"] &&
+                                    o.frm === rspi["forma"],
+                            )
+                            .map((o) => o.ani);
+
+                        let an = ani.at(0)
+                        if (an == null) {
+                            return {
+                                optiuni: [],
+                                eroare: "Eroare internă: nu au fost găsite ani de studiu pentru selecția curentă.",
+                            };
+                        }
+
+                        const optiuni = Array.from({ length: an }, (_, i) => i + 1).map(String)
+
+                        return {
+                            optiuni,
+                            eroare: null,
+                        };
+                    },
+                },
+                // Mai adăugăm următoarele întrebări:
+                // "Te încadrezi în categoria studenților cu dizabilități?" (implicit nu)
+                // "Ai desfășurat practica de specialitate?" (implicit da)
+                // "Ai participat în cadrul taberelor studențești?" (implicit nu)
+            ],
+        },
+        {
+            titlu: "Cazuri speciale",
+            descriere:
+                "Această secțiune vizează respectarea principiilor de bază privind nediscriminarea, stabilitatea contractului de studii și gratuitatea serviciilor administrative oferite de Universitate.",
+            cimpuri: [
                 da_nustiu(
                     "participare-tabere",
                     "Ai participat în cadrul taberelor studențești?",
@@ -218,7 +261,7 @@ export default {
                     },
                 ),
                 da_nustiu(
-                    "practică-de-specialitate",
+                    "practica-de-specialitate",
                     "Ai desfășurat practica de specialitate?",
                     {
                         optiuni: () => {
@@ -229,11 +272,7 @@ export default {
                         },
                     },
                 ),
-                // Mai adăugăm următoarele întrebări:
-                // "Te încadrezi în categoria studenților cu dizabilități?" (implicit nu)
-                // "Ai desfășurat practica de specialitate?" (implicit da)
-                // "Ai participat în cadrul taberelor studențești?" (implicit nu)
-            ],
+            ]
         },
         {
             titlu: "Reguli Generale și Drepturi Contractuale",

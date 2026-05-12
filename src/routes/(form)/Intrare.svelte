@@ -81,9 +81,7 @@
         }
 
         isMining = true;
-        setTimeout(() => {
-            formElement?.dispatchEvent(new Event("submit"));
-        }, 0);
+        setTimeout(() => { formElement?.requestSubmit(); }, 0);
     }
 </script>
 

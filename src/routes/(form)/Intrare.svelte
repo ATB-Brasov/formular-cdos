@@ -7,19 +7,30 @@
     import CimpText from "@components/CimpText.svelte";
 
     import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js"; // TODO: Încărcare dinamică
+    import { onMount } from "svelte";
 
     /**
      * @typedef {Object} Props
      * @property {SDict<Eroare>} eroare
+     * @property {number} pagina
      */
 
     /** @type {Props & Record<string, unknown>} */
-    let { eroare } = $props();
+    let {
+        eroare = $bindable(),
+        pagina = $bindable(),
+    } = $props();
 
     let isMining = $state(false);
-    let email = $state("");
     let formElement = /** @type {HTMLFormElement?} */ $state();
+
+    let email = $state("");
     let gdprConsent = $state(false);
+
+    onMount(() => {
+        email = localStorage.getItem("posta") ?? "";
+        gdprConsent = localStorage.getItem("gdpr-consent") === "true";
+    });
 
     $effect(() => {
         if (!gdprConsent) {
@@ -28,8 +39,10 @@
                 msg: "Trebuie să acceptați politica de confidențialitate",
                 pag: -1,
             };
+            localStorage.setItem("gdpr-consent", "false")
         } else {
             delete eroare["gdpr-consent"];
+            localStorage.setItem("gdpr-consent", "true")
         }
     });
 
@@ -89,9 +102,14 @@
                 isMining = false;
             });
 
-        return async ({ update }) => {
-            await update();
+        return async ({ result, update }) => {
+            if (result.type === "success") {
+                pagina = 0;
+                localStorage.setItem("pagina", "0")
+                localStorage.setItem("posta", email)
+            }
             isMining = false;
+            await update();
         };
     }}
     action="?/posta"

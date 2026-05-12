@@ -15,7 +15,7 @@
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
 
-    let pagina = $state(0);
+    let pagina = $state(data.session?.email ? 0 : -1);
     /** @type {SDict<Eroare>} */ let eroare = $state({});
     /** @type {SDict<string>} */ let raspunsuri = $state(
         /** @type {SDict<string>} */ ({}),
@@ -31,6 +31,11 @@
                     break;
                 case "precedent":
                     tmp -= 1;
+                    if (tmp === -1) {
+                        pagina = tmp;
+                        localStorage.setItem("pagina", pagina.toString());
+                        return;
+                    }
                     break;
                 default:
                     return;
@@ -89,7 +94,6 @@
 
     $effect(() => {
         if (Object.keys(raspunsuri).length > 0) {
-            console.log("Save to local storage");
             localStorage.setItem("raspunsuri", JSON.stringify(raspunsuri));
         }
     });
@@ -148,14 +152,14 @@
 
 <h1 class="text-4xl font-bold mb-4">{sondaj_cdos.titlu}</h1>
 
-{#if !data.session?.email}
+{#if pagina === -1}
     <div
         class="w-full rounded-xl border border-surface-border bg-surface mt-4 mb-8 p-3"
     >
         {sondaj_cdos.descriere}
     </div>
 
-    <Intrare {eroare} />
+    <Intrare bind:eroare bind:pagina/>
 {:else}
     <div class="flex flex-wrap gap-2 mb-8">
         {#each intrebari as pag, i}
@@ -191,15 +195,7 @@
 
     <form
         method="POST"
-        use:enhance={({}) => {
-            return async ({ result, update }) => {
-                if (result.type !== "success") {
-                    update({ reset: false });
-                } else {
-                    update();
-                }
-            };
-        }}
+        use:enhance
         action="?/salveaza"
         class="mt-4 flex w-full flex-col gap-4"
     >
@@ -247,7 +243,7 @@
         >
             <div class="flex justify-end gap-4">
                 <Buton
-                    class={pagina === 0 ? "invisible" : ""}
+                    class={pagina === -1 ? "invisible" : ""}
                     onclick={() => {
                         scimbaPagina("precedent");
                     }}

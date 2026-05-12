@@ -13,13 +13,12 @@
      * @property {SDict<Eroare>} eroare
      */
 
-
     /** @type {Props & Record<string, unknown>} */
     let { eroare } = $props();
 
     let isMining = $state(false);
-    let nonce = $state("");
     let email = $state("");
+    let formElement = /** @type {HTMLFormElement?} */ $state();
 
 
     // Mirror the live client-side email validation into eroare["posta"] so
@@ -40,19 +39,18 @@
 
 <form
     method="POST"
+    bind:this={formElement}
     use:enhance={async ({ formData, cancel }) => {
-        // Assisted-By: Gemini 3 Flash
         isMining = true;
-
-        try {
-            const solvedNonce = await solvePoW(email, 4);
-            nonce = solvedNonce.toString();
-            formData.append("nonce", nonce);
-        } catch (err) {
-            cancel();
-            isMining = false;
-        }
-        console.log("Solved PoW with nonce:", nonce);
+        await solvePoW(email, 4)
+            .then(nonce => {
+                formData.append("nonce", nonce.toString());
+                console.log("Solved PoW with nonce:", nonce);
+            })
+            .catch(() => {
+                cancel();
+                isMining = false;
+            });
 
         return async ({ update }) => {
             await update();
@@ -91,10 +89,21 @@
     <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
         <div class="flex justify-end gap-4">
             <Buton
-                type="submit"
-                disabled={isMining || eroare["posta"]?.type === "email-invalid"}
+                type="button"
+                onclick={() => {
+                    const msg = sondaj_cdos.validare_posta?.(email);
+                    if (msg != null) {
+                        eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
+                        return;
+                    }
+                    isMining = true;
+                    setTimeout(() => {
+                        formElement?.dispatchEvent(new Event("submit"));
+                    }, 0);
+                }}
+                disabled={isMining}
             >
-                {isMining ? "Se trimite..." : "Începe"}
+                {isMining ? "Se începe..." : "Începe"}
             </Buton>
         </div>
     </div>

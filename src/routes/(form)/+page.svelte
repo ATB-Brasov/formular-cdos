@@ -23,23 +23,24 @@
 
     /** @param {"urmator" | "precedent"} directie */
     function scimbaPagina(directie) {
-        if (directie === "urmator" && pagina < ULTIMA_PAGINA) {
-            do {
-                let tmp = pagina + 1;
-                if (tmp <= ULTIMA_PAGINA) pagina = tmp;
-            } while (
-                pagina <= ULTIMA_PAGINA &&
-                intrebari[pagina].filtru_afisare != null &&
-                !intrebari[pagina].filtru_afisare?.(raspunsuri)
-            );
-        } else if (directie === "precedent" && pagina > 0) {
-            do {
-                if (pagina > 0) pagina -= 1;
-            } while (
-                pagina > 0 && intrebari[pagina].filtru_afisare != null &&
-                !intrebari[pagina].filtru_afisare?.(raspunsuri)
-            );
+        let tmp = pagina;
+        while (true) {
+            switch (directie) {
+                case "urmator":
+                    tmp += 1;
+                    break;
+                case "precedent":
+                    tmp -= 1;
+                    break;
+                default:
+                    return;
+            }
+            if (tmp < 0 || tmp > ULTIMA_PAGINA) return;
+            const filtru = intrebari[tmp].filtru_afisare;
+            if (filtru == null) break;
+            if (filtru(raspunsuri)) break;
         }
+        pagina = tmp;
         localStorage.setItem("pagina", pagina.toString());
     }
 
@@ -145,9 +146,49 @@
     }
 </script>
 
+<h1 class="text-4xl font-bold mb-4">{sondaj_cdos.titlu}</h1>
+
 {#if !data.session?.email}
+    <div
+        class="w-full rounded-xl border border-surface-border bg-surface mt-4 mb-8 p-3"
+    >
+        {sondaj_cdos.descriere}
+    </div>
+
     <Intrare {eroare} />
 {:else}
+    <div class="flex flex-wrap gap-2 mb-8">
+        {#each intrebari as pag, i}
+            <button
+                aria-label="Pagina {i + 1}"
+                disabled={pag.filtru_afisare != null && !pag.filtru_afisare(raspunsuri)}
+                onclick={() => {
+                    pagina = i;
+                    localStorage.setItem("pagina", pagina.toString());
+                }}
+                class={[
+                    "px-1 py-0.5 rounded-full w-12 disabled:bg-surface-disabled transition-colors duration-200",
+                    i === pagina
+                        ? "bg-primary"
+                        : "bg-surface-border hover:bg-surface-secondary",
+                    i < pagina && Object.values(eroare).some((e) => e.pag === i)
+                        ? "border-2 border-danger-strong"
+                        : "opacity-75",
+                ]}
+            >
+            </button>
+        {/each}
+    </div>
+
+    <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>
+    {#if pagina_activa.descriere}
+        <div
+            class="w-full rounded-xl border border-surface-border bg-surface mt-4 p-3"
+        >
+            {pagina_activa.descriere}
+        </div>
+    {/if}
+
     <form
         method="POST"
         use:enhance={({}) => {
@@ -160,19 +201,8 @@
             };
         }}
         action="?/salveaza"
-        class="m-auto mt-10 flex w-full flex-col gap-4 p-4"
+        class="mt-4 flex w-full flex-col gap-4"
     >
-        <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
-        <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>
-
-        {#if pagina_activa.descriere}
-            <div
-                class="w-full rounded-xl border border-surface-border bg-surface p-3"
-            >
-                {pagina_activa.descriere}
-            </div>
-        {/if}
-
         {#each intrebari as pag, i}
             {#if pag.filtru_afisare == null || pag.filtru_afisare(raspunsuri)}
                 {#each pag.cimpuri as cimp, nr}
@@ -211,14 +241,6 @@
                 {/each}
             {/if}
         {/each}
-
-        <div>
-            Salut <span class="font-bold">{raspunsuri["posta"] || "{}"}</span>
-            din facultatea
-            <span class="font-bold">{raspunsuri["facultatea"] || "{}"}</span>
-            specializaera <span class="font-bold">
-                {raspunsuri["programul"] || "{}"}</span>
-        </div>
 
         <div
             class="w-full rounded-xl border border-surface-border bg-surface p-3"

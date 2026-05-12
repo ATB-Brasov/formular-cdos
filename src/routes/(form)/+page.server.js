@@ -175,7 +175,9 @@ export const actions = {
         }
 
         const data = await request.formData();
-        const dataDict = Object.fromEntries(data.entries().map(([nume, valoare]) => [nume, valoare.toString()]));
+        const dataDict = Object.fromEntries(
+            data.entries().map(([nume, valoare]) => [nume, valoare.toString()]),
+        );
         /** @type { {[nume: string]: import("$lib/common_types.js").Eroare} } */
         const erori = {}; // Poate un Map?
 
@@ -193,7 +195,10 @@ export const actions = {
                 const cimp_formular = data.get(cimp.nume);
 
                 if (!cimp_formular) {
-                    if (cimp.filtru_afisare != null && !cimp.filtru_afisare?.(dataDict) || cimp.obligatoriu) {
+                    if (
+                        cimp.filtru_afisare != null &&
+                            !cimp.filtru_afisare?.(dataDict) || cimp.obligatoriu
+                    ) {
                         erori[cimp.nume] = {
                             type: "field-required",
                             msg: "Cîmpul este obligatoriu",

@@ -27,10 +27,10 @@
 </script>
 
 <div class="flex flex-col">
-    <label for={nume} class="mb-1 font-bold">
+    <label for={nume} class="mb-1 text-lg font-bold">
         {intrebare}
         {#if obligatoriu}
-            <span class="px-0.5 text-lg leading-none font-bold text-danger"
+            <span class="px-0.5 leading-none font-bold text-danger"
             >*</span>
         {/if}
     </label>
@@ -38,7 +38,7 @@
     {#if desc != null}
         <details class="mb-1">
             <summary>Vezi mai multe detalii&hellip;</summary>
-            <span>{desc}</span>
+            <span class="py-0.5 text-sm">{@html desc}</span>
         </details>
     {/if}
 

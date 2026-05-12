@@ -40,6 +40,7 @@ const paginia_dezabilitati =
     {
         titlu: "Dizabilități",
         descriere: "Studenți cu dizabilități",
+        filtru_afisare: (rspi) => rspi["forma"] === "ID",
         cimpuri: [
             {
                 titlu: "Ai dizabilități?",

@@ -19,13 +19,29 @@
     let isMining = $state(false);
     let email = $state("");
     let formElement = /** @type {HTMLFormElement?} */ $state();
+    let gdprConsent = $state(false);
 
-
-    // Mirror the live client-side email validation into eroare["posta"] so
-    // the template has a single error source for all posta errors (both
-    // client-side live feedback and server responses after submission).
     $effect(() => {
-        if (email === "") return;
+        if (!gdprConsent) {
+            eroare["gdpr-consent"] = {
+                type: "required",
+                msg: "Trebuie să acceptați politica de confidențialitate",
+                pag: -1,
+            };
+        } else {
+            delete eroare["gdpr-consent"];
+        }
+    });
+
+    $effect(() => {
+        if (email === "") {
+            eroare["posta"] = {
+                type: "email-invalid",
+                msg: "Adresa de poștei electronice este obligatorie",
+                pag: -1,
+            };
+            return;
+        }
         const msg = sondaj_cdos.validare_posta?.(email);
         if (msg != null) {
             eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
@@ -34,8 +50,29 @@
             delete eroare["posta"];
         }
     });
-</script>
 
+    function handleSubmit() {
+        const msg = sondaj_cdos.validare_posta?.(email);
+        if (msg != null) {
+            eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
+            return;
+        }
+
+        if (!gdprConsent) {
+            eroare["gdpr-consent"] = {
+                type: "required",
+                msg: "Trebuie să acceptați politica de confidențialitate",
+                pag: -1,
+            };
+            return;
+        }
+
+        isMining = true;
+        setTimeout(() => {
+            formElement?.dispatchEvent(new Event("submit"));
+        }, 0);
+    }
+</script>
 
 <form
     method="POST"
@@ -43,7 +80,7 @@
     use:enhance={async ({ formData, cancel }) => {
         isMining = true;
         await solvePoW(email, 4)
-            .then(nonce => {
+            .then((nonce) => {
                 formData.append("nonce", nonce.toString());
                 console.log("Solved PoW with nonce:", nonce);
             })
@@ -58,18 +95,15 @@
         };
     }}
     action="?/posta"
-    class="flex flex-col gap-4 p-4"
+    class="flex flex-col gap-6"
 >
-    <h1 class="text-4xl font-bold">{sondaj_cdos.titlu}</h1>
-
-    <div class="w-full rounded-xl border border-surface-border bg-surface p-3">
-        {sondaj_cdos.descriere}
-    </div>
-
     <CimpText
         tip={"email"}
         intrebare={"Adresa poștei instituționale"}
-        desc={`Avem nevoie de poșta electronică pentru a verifica statutul de student al unitbv și a preveni completări repetate. Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu răspunsurile date. (TODO: GDPR)`}
+        desc={`
+            Adresa de e-mail va fi folosită pentru a detecta completare repetată a formularului.
+            Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu
+            răspunsurile colectate. Pentru mai multe informații, consultați <a href="/politica-confidentialitate" target="_blank" class="underline">politica de confidențialitate</a>.`}
         nume={"posta"}
         placeholder={"exemplu@student.unitbv.ro"}
         obligatoriu={true}
@@ -84,23 +118,32 @@
         <span class="text-danger">{eroare["_form"].msg}</span>
     {/if}
 
-    <div>GDPR</div>
+    <div class="flex items-center gap-2">
+        <input
+            bind:checked={gdprConsent}
+            type="checkbox"
+            id="gdpr-consent"
+            name="gdpr-consent"
+            required
+            class="h-3.5 w-3.5 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
+        />
+        <label for="gdpr-consent" class="leading-0 pb-0.5">
+            Am citit și sunt de acord cu <a
+                href="/politica-confidentialitate"
+                class="underline"
+            >politica de confidențialitate</a>.
+        </label>
+    </div>
 
-    <div class="w-[100wv] rounded-xl border border-surface-border bg-surface p-3">
+    {#if eroare["gdpr-consent"] != null}
+        <span class="text-danger">{eroare["gdpr-consent"].msg}</span>
+    {/if}
+
+    <div class="w-full rounded-xl border border-surface-border bg-surface p-3">
         <div class="flex justify-end gap-4">
             <Buton
                 type="button"
-                onclick={() => {
-                    const msg = sondaj_cdos.validare_posta?.(email);
-                    if (msg != null) {
-                        eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
-                        return;
-                    }
-                    isMining = true;
-                    setTimeout(() => {
-                        formElement?.dispatchEvent(new Event("submit"));
-                    }, 0);
-                }}
+                onclick={handleSubmit}
                 disabled={isMining}
             >
                 {isMining ? "Se începe..." : "Începe"}

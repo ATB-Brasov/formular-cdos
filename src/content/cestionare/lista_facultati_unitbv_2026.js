@@ -373,13 +373,6 @@ export default {
             prg: "Silvicultură",
         },
         {
-            ani: 4,
-            fac: "05-Silvicultură și Exploatări Forestiere",
-            cic: "LICENȚĂ",
-            frm: "IF",
-            prg: "Silvicultură (trunchi comun)",
-        },
-        {
             ani: 2,
             fac: "05-Silvicultură și Exploatări Forestiere",
             cic: "MASTER",

@@ -38,6 +38,14 @@
 
     /** @param {"urmator" | "precedent"} directie */
     function scimbaPagina(directie) {
+        intrebari[pagina].cimpuri.forEach(c => aplica_validare(c))
+        const err = Object.entries(eroare)
+        if (err.length > 0) {
+            const e = err.at(0)
+            e && cimpuri[e?.[0]].scrollIntoView()
+            return
+        }
+
         let tmp = pagina;
         while (true) {
             switch (directie) {
@@ -63,6 +71,8 @@
         }
         seteaza_pagina(tmp, { whence: "scimbaPagina::final" });
     }
+
+    /** @type {SDict<HTMLElement>} */ let cimpuri = $state( {})
 
     onMount(() => {
         const raspunsuriSalvate = localStorage.getItem("raspunsuri");
@@ -236,6 +246,8 @@
             {#if pag.filtru_afisare == null || pag.filtru_afisare(raspunsuri)}
                 <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
                     {#each pag.cimpuri as cimp, nr}
+                        <div class="scroll-mt-5" bind:this={cimpuri[cimp.nume]}>
+
                         {#if cimp.filtru_afisare == null || cimp.filtru_afisare(raspunsuri)}
                             {#if cimp.tip === "email" || cimp.tip === "text"}
                                 <CimpText
@@ -266,6 +278,7 @@
                                 {eroare[cimp.nume].msg}
                             </div>
                         {/if}
+                        </div>
                     {/each}
                 </div>
             {/if}
@@ -291,7 +304,7 @@
                         <Buton
                             class="min-w-22"
                             type={ultima ? "submit" : "button"}
-                            disabled={!btn_urmator_activ}
+                            disabled={false && !btn_urmator_activ}
                             onclick={ultima ? null : () => scimbaPagina("urmator")}
                         >
                             {ultima ? "Trimite" : "Următor"}

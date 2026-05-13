@@ -597,7 +597,7 @@ export default {
                     "Ai putut beneficia de sprijin pentru identificare și derularea practicii de specialitate? [art. 6 (3) b)]",
                     {
                         filtru_afisare: (rspi) =>
-                            rspi["practică-de-specialitate"] === "da",
+                            rspi["practica-de-specialitate"] === "da",
                     },
                 ),
             ],

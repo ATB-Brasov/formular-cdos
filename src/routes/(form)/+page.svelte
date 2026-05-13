@@ -3,14 +3,18 @@
     /** @import { SDict, Eroare } from "$lib/common_types.js" */
 
     import { enhance } from "$app/forms";
+    import { page } from '$app/state';
 
     import Buton from "@components/Buton.svelte";
     import Selectie from "@components/Selectie.svelte";
     import CimpText from "@components/CimpText.svelte";
 
-    import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js"; // TODO: Încărcare dinamică
     import Intrare from "./Intrare.svelte";
     import { onMount } from "svelte";
+
+    const sondaj_cdos = (page.url.searchParams.get("test") === "true"
+        ? await import("@content/cestionare/atb-cdos-2026_test.js")
+        : await import("@content/cestionare/atb-cdos-2026.js")).default;
 
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();

@@ -134,16 +134,16 @@
         <span class="text-danger">{eroare["_form"].msg}</span>
     {/if}
 
-    <div class="flex items-center gap-2">
+    <div class="flex sm:items-center gap-4">
         <input
             bind:checked={gdprConsent}
             type="checkbox"
             id="gdpr-consent"
             name="gdpr-consent"
             required
-            class="h-3.5 w-3.5 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
+            class="h-4 w-4 mt-1 sm:mt-0 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
         />
-        <label for="gdpr-consent" class="leading-0 pb-0.5">
+        <label for="gdpr-consent" class="sm:leading-0 sm:pb-0.5">
             Am citit și sunt de acord cu <a
                 href="/politica-confidentialitate"
                 class="underline"
@@ -155,7 +155,12 @@
         <span class="text-danger">{eroare["gdpr-consent"].msg}</span>
     {/if}
 
-    <div class="w-full rounded-xl border border-surface-border bg-surface p-3">
+</form>
+
+<div
+    class="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[60ch]"
+>
+    <div class="m-4 rounded-xl border border-surface-border bg-surface p-3">
         <div class="flex justify-end gap-4">
             <Buton
                 type="button"
@@ -166,4 +171,4 @@
             </Buton>
         </div>
     </div>
-</form>
+</div>

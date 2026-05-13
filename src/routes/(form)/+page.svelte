@@ -3,7 +3,7 @@
     /** @import { SDict, Eroare } from "$lib/common_types.js" */
 
     import { enhance } from "$app/forms";
-    import { page } from '$app/state';
+    import { page } from "$app/state";
 
     import Buton from "@components/Buton.svelte";
     import Selectie from "@components/Selectie.svelte";
@@ -12,9 +12,10 @@
     import Intrare from "./Intrare.svelte";
     import { onMount } from "svelte";
 
-    const sondaj_cdos = (page.url.searchParams.get("test") === "true"
-        ? await import("@content/cestionare/atb-cdos-2026_test.js")
-        : await import("@content/cestionare/atb-cdos-2026.js")).default;
+    const sondaj_cdos =
+        (page.url.searchParams.get("test") === "true"
+            ? await import("@content/cestionare/atb-cdos-2026_test.js")
+            : await import("@content/cestionare/atb-cdos-2026.js")).default;
 
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
@@ -25,12 +26,12 @@
         /** @type {SDict<string>} */ ({}),
     );
 
-     /**
-      * @param {number} pag
-      * @param {{whence: string}} [options]
-      */
+    /**
+     * @param {number} pag
+     * @param {{whence: string}} [options]
+     */
     function seteaza_pagina(pag, options) {
-        if (options?.whence != null) console.log(options.whence)
+        if (options?.whence != null) console.log(options.whence);
         pagina = pag;
         localStorage.setItem("pagina", pagina.toString());
     }
@@ -46,7 +47,9 @@
                 case "precedent":
                     tmp -= 1;
                     if (tmp === -1) {
-                        seteaza_pagina(tmp, {whence: "scimbaPagina::case precedent"})
+                        seteaza_pagina(tmp, {
+                            whence: "scimbaPagina::case precedent",
+                        });
                         return;
                     }
                     break;
@@ -58,7 +61,7 @@
             if (filtru == null) break;
             if (filtru(raspunsuri)) break;
         }
-        seteaza_pagina(tmp, {whence:"scimbaPagina::final"})
+        seteaza_pagina(tmp, { whence: "scimbaPagina::final" });
     }
 
     onMount(() => {
@@ -83,8 +86,8 @@
     });
 
     $effect(() => {
-        if (form == null)     return;
-        if (form.pag != null) seteaza_pagina(form.pag, {whence:"$effect"})
+        if (form == null) return;
+        if (form.pag != null) seteaza_pagina(form.pag, { whence: "$effect" });
 
 
         /** @type {SDict<string>} */ const newRaspunsuri = {};
@@ -164,9 +167,21 @@
     const pagini_vizibile = $derived(
         intrebari.filter((p) =>
             p.filtru_afisare == null || p.filtru_afisare(raspunsuri)
-        ),
+),
     );
 </script>
+
+{#if page.url.searchParams.get("test") === "true"}
+    <div
+        class="fixed bottom-6 left-6 rounded bg-primary-subtle border border-primary-border z-200 px-4 py-2 font-mono"
+    >
+        <span class="inline sm:hidden">xs</span>
+        <span class="hidden sm:inline md:hidden">sm</span>
+        <span class="hidden md:inline lg:hidden">md</span>
+        <span class="hidden lg:inline xl:hidden">lg</span>
+        <span class="hidden xl:inline">xl</span>
+    </div>
+{/if}
 
 <h1 class="text-4xl font-bold mb-4">{sondaj_cdos.titlu}</h1>
 
@@ -177,7 +192,7 @@
         {sondaj_cdos.descriere}
     </div>
 
-    <Intrare bind:eroare bind:pagina/>
+    <Intrare bind:eroare bind:pagina />
 {:else}
     <div class="flex flex-wrap gap-2 mb-8">
         {#each intrebari as pag, i}
@@ -189,12 +204,12 @@
                     localStorage.setItem("pagina", pagina.toString());
                 }}
                 class={[
-                    "px-1 py-0.5 rounded-full w-12 disabled:bg-surface-disabled transition-colors duration-200",
+                    "px-1 py-0.5 rounded-full grow disabled:bg-surface-disabled transition-colors duration-200",
                     i === pagina
                         ? "bg-primary"
                         : "bg-surface-border hover:bg-surface-secondary",
                     i < pagina && Object.values(eroare).some((e) => e.pag === i)
-                        ? "border-2 border-danger-strong"
+                        ? "border-2 border-danger-strong bg-danger-strong"
                         : "opacity-75",
                 ]}
             >
@@ -215,12 +230,12 @@
         method="POST"
         use:enhance
         action="?/salveaza"
-        class="mt-4 flex w-full flex-col gap-4"
+        class="mt-4 w-full mb-26"
     >
         {#each intrebari as pag, i}
             {#if pag.filtru_afisare == null || pag.filtru_afisare(raspunsuri)}
-                {#each pag.cimpuri as cimp, nr}
-                    <div class:hidden={i !== pagina}>
+                <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
+                    {#each pag.cimpuri as cimp, nr}
                         {#if cimp.filtru_afisare == null || cimp.filtru_afisare(raspunsuri)}
                             {#if cimp.tip === "email" || cimp.tip === "text"}
                                 <CimpText
@@ -251,34 +266,41 @@
                                 {eroare[cimp.nume].msg}
                             </div>
                         {/if}
-                    </div>
-                {/each}
+                    {/each}
+                </div>
             {/if}
         {/each}
 
         <div
-            class="w-full rounded-xl border border-surface-border bg-surface p-3"
+            class="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[60ch]"
         >
-            <div class="flex justify-end gap-4">
-                <Buton
-                    class={pagina === -1 ? "invisible" : ""}
-                    onclick={() => scimbaPagina("precedent") }
-                >
-                    Anterior
-                </Buton>
-
-                {@render button()}
-                {#snippet button()}
-                    {@const ultima = intrebari[pagina].idx === pagini_vizibile.at(-1)?.idx}
+            <div
+                class="m-4 rounded-xl border border-surface-border bg-surface p-3"
+            >
+                <div class="flex justify-end gap-4">
                     <Buton
-                        type={ultima ? "submit" : "button"}
-                        disabled={!btn_urmator_activ}
-                        onclick={ultima ? null : () => scimbaPagina("urmator")}
+                        class={pagina === -1 ? "invisible" : ""}
+                        onclick={() => scimbaPagina("precedent")}
                     >
-                        {ultima ? "Trimite" : "Următor"}
+                        Anterior
                     </Buton>
-                {/snippet}
+
+                    {@render button()}
+                    {#snippet button()}
+                        {@const ultima = intrebari[pagina].idx === pagini_vizibile.at(-1)?.idx}
+                        <Buton
+                            class="min-w-22"
+                            type={ultima ? "submit" : "button"}
+                            disabled={!btn_urmator_activ}
+                            onclick={ultima ? null : () => scimbaPagina("urmator")}
+                        >
+                            {ultima ? "Trimite" : "Următor"}
+                        </Buton>
+                    {/snippet}
+                </div>
             </div>
         </div>
+
     </form>
+
 {/if}

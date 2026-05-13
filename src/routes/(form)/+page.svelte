@@ -25,6 +25,16 @@
         /** @type {SDict<string>} */ ({}),
     );
 
+     /**
+      * @param {number} pag
+      * @param {{whence: string}} [options]
+      */
+    function seteaza_pagina(pag, options) {
+        if (options?.whence != null) console.log(options.whence)
+        pagina = pag;
+        localStorage.setItem("pagina", pagina.toString());
+    }
+
     /** @param {"urmator" | "precedent"} directie */
     function scimbaPagina(directie) {
         let tmp = pagina;
@@ -36,8 +46,7 @@
                 case "precedent":
                     tmp -= 1;
                     if (tmp === -1) {
-                        pagina = tmp;
-                        localStorage.setItem("pagina", pagina.toString());
+                        seteaza_pagina(tmp, {whence: "scimbaPagina::case precedent"})
                         return;
                     }
                     break;
@@ -49,8 +58,7 @@
             if (filtru == null) break;
             if (filtru(raspunsuri)) break;
         }
-        pagina = tmp;
-        localStorage.setItem("pagina", pagina.toString());
+        seteaza_pagina(tmp, {whence:"scimbaPagina::final"})
     }
 
     onMount(() => {
@@ -75,11 +83,9 @@
     });
 
     $effect(() => {
-        if (form == null) return;
-        if (form.pag != null) {
-            pagina = form.pag;
-            localStorage.setItem("pagina", pagina.toString());
-        }
+        if (form == null)     return;
+        if (form.pag != null) seteaza_pagina(form.pag, {whence:"$effect"})
+
 
         /** @type {SDict<string>} */ const newRaspunsuri = {};
         /** @type {SDict<Eroare>} */ const newEroare = {};
@@ -92,7 +98,9 @@
             newEroare[k] = /** @type {Eroare} */ (v);
         }
 
-        raspunsuri = newRaspunsuri;
+        if (Object.entries(newRaspunsuri).length > 0) {
+            raspunsuri = newRaspunsuri;
+        }
         eroare = newEroare;
     });
 
@@ -102,7 +110,7 @@
         }
     });
 
-    let intrebari = sondaj_cdos.pagini;
+    let intrebari = sondaj_cdos.pagini.map((p, idx) => ({...p, idx}));
 
     /**
      * Verifică dacă răspunsul este gol sau nu.
@@ -152,6 +160,12 @@
             };
         }
     }
+
+    const pagini_vizibile = $derived(
+        intrebari.filter((p) =>
+            p.filtru_afisare == null || p.filtru_afisare(raspunsuri)
+        ),
+    );
 </script>
 
 <h1 class="text-4xl font-bold mb-4">{sondaj_cdos.titlu}</h1>
@@ -248,16 +262,14 @@
             <div class="flex justify-end gap-4">
                 <Buton
                     class={pagina === -1 ? "invisible" : ""}
-                    onclick={() => {
-                        scimbaPagina("precedent");
-                    }}
+                    onclick={() => scimbaPagina("precedent") }
                 >
                     Anterior
                 </Buton>
 
                 {@render button()}
                 {#snippet button()}
-                    {@const ultima = pagina === ULTIMA_PAGINA}
+                    {@const ultima = intrebari[pagina].idx === pagini_vizibile.at(-1)?.idx}
                     <Buton
                         type={ultima ? "submit" : "button"}
                         disabled={!btn_urmator_activ}

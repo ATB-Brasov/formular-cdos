@@ -135,7 +135,7 @@ export const actions = {
                     _form: {
                         type: "session-required",
                         msg: "Nici o sesiune nu a fost setată",
-                        pag: 0,
+                        pag: -1,
                     },
                 },
             });
@@ -147,7 +147,7 @@ export const actions = {
                     _form: {
                         type: "session-invalid",
                         msg: "Sesiune nevalidă",
-                        pag: 0,
+                        pag: -1,
                     },
                 },
             });
@@ -158,7 +158,7 @@ export const actions = {
                     _form: {
                         type: "email-required",
                         msg: "Poșta electronică a sesiunii nu a fost setată",
-                        pag: 0,
+                        pag: -1,
                     },
                 },
             });
@@ -196,8 +196,8 @@ export const actions = {
 
                 if (!cimp_formular) {
                     if (
-                        cimp.filtru_afisare != null &&
-                            !cimp.filtru_afisare?.(dataDict) || cimp.obligatoriu
+                        (cimp.filtru_afisare == null ||
+                            cimp.filtru_afisare?.(dataDict)) && cimp.obligatoriu
                     ) {
                         erori[cimp.nume] = {
                             type: "field-required",

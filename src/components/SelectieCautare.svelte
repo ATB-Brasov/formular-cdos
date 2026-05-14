@@ -1,6 +1,7 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
     import Buton from "@components/Buton.svelte";
+    import CadruCimp from "@components/CadruCimp.svelte";
 
     /**
      * Uses Unicode NFD decomposition: accented characters split into base letter
@@ -52,6 +53,8 @@
         return ni === n.length ? score : -1;
     }
 
+    /** @import {Eroare} from import('$lib/common_types') */
+    /** @import { Validator } from import('@content/cestionare/types')*/
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
     import { normOptiune } from "@content/cestionare/types.js";
 
@@ -61,6 +64,8 @@
      * @property {string} intrebare
      * @property {string | null} [desc=null]
      * @property {RezultatOptiuni} optiuni
+     * @property {Eroare} eroare
+     * @property {Validator} [valideaza]
      * @property {string} value
      * @property {boolean} [obligatoriu=false]
      * @property {FocusEventHandler<HTMLElement>} [onblur]
@@ -74,6 +79,8 @@
         intrebare,
         desc = null,
         optiuni,
+        valideaza,
+        eroare = $bindable(),
         value = $bindable(),
     } = $props();
 
@@ -175,7 +182,7 @@
      * Close the dropdown when focus leaves the whole widget.
      * @param {FocusEvent} e
      */
-    function peFocusOut(e) {
+    function onFocusOut(e) {
         // relatedTarget is the element receiving focus; if it's still inside our
         // container we leave the dropdown open.
         const related = /** @type {Node | null} */ (e.relatedTarget);
@@ -246,26 +253,7 @@
 -->
 <input type="hidden" name={nume} {value} />
 
-<div onfocusout={(e) => peFocusOut(e)} class="flex flex-col">
-    <span class="mb-1 font-bold">
-        {intrebare}
-        {#if obligatoriu}
-            <span class="px-0.5 text-lg leading-none font-bold text-red-500"
-            >*</span>
-        {/if}
-    </span>
-
-    {#if desc != null}
-        <details
-            class="mb-1 text-sm text-surface-dim dark:text-surface-placeholder"
-        >
-            <summary class="cursor-pointer">
-                Vezi mai multe detalii&hellip;
-            </summary>
-            <span>{desc}</span>
-        </details>
-    {/if}
-
+<CadruCimp bind:eroare {value} {valideaza} {onFocusOut} {intrebare} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}
@@ -397,4 +385,4 @@
             </div>
         {/if}
     {/if}
-</div>
+</CadruCimp>

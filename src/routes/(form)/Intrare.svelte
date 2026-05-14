@@ -11,7 +11,7 @@
 
     /**
      * @typedef {Object} Props
-     * @property {SDict<Eroare>} eroare
+     * @property {SDict<Eroare|null>} eroare
      * @property {number} pagina
      */
 
@@ -115,7 +115,7 @@
 >
     <CimpText
         tip={"email"}
-        intrebare={"Adresa poștei instituționale"}
+        titlu={"Adresa poștei instituționale"}
         desc={`
             Adresa de e-mail va fi folosită pentru a detecta completare repetată a formularului.
             Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu

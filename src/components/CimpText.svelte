@@ -1,50 +1,52 @@
 <script>
+    import CadruCimp from './CadruCimp.svelte';
+
     /** @import {FocusEventHandler} from import('svelte/elements') */
+    /** @import {Eroare} from import('$lib/common_types') */
+    /** @import { Validator } from import('@content/cestionare/types')*/
 
     /**
      * @typedef {Object} Props
      * @property {'text'|'email'} tip
      * @property {string} nume
-     * @property {string | null} [placeholder=null]
      * @property {string | null} [desc=null]
-     * @property {string} intrebare
-     * @property {string} value
+     * @property {string} titlu
      * @property {boolean} [obligatoriu=false]
+     * @property {string | null} [placeholder=null]
+     * @property {string} value
+     * @property {Eroare} eroare
+     * @property {Validator} [valideaza]
      * @property {FocusEventHandler<HTMLElement>} [onblur]
      */
 
     /** @type {Props} */
     let {
-        tip,
         nume,
-        placeholder = null,
+        titlu: intrebare,
         desc = null,
         obligatoriu = false,
+
+        tip,
+        placeholder = null,
         onblur,
-        intrebare,
+        valideaza,
+        eroare = $bindable(),
         value = $bindable(),
     } = $props();
+
 </script>
 
-<div class="flex flex-col">
-    <label for={nume} class="mb-1 text-lg font-bold">
-        {intrebare}
-        {#if obligatoriu}
-            <span class="px-0.5 leading-none font-bold text-danger"
-            >*</span>
-        {/if}
-    </label>
-
-    {#if desc != null}
-        <details class="mb-1">
-            <summary>Vezi mai multe detalii&hellip;</summary>
-            <span>{@html desc}</span>
-        </details>
-    {/if}
-
+<CadruCimp
+    {intrebare}
+    {desc}
+    {obligatoriu}
+    {valideaza}
+    {value}
+    bind:eroare
+>
     <input
         id={nume}
-        placeholder={placeholder}
+        {placeholder}
         required={obligatoriu}
         class="
             w-full px-2 py-1
@@ -57,4 +59,4 @@
         {onblur}
         bind:value
     />
-</div>
+</CadruCimp>

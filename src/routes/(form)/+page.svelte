@@ -22,7 +22,7 @@
     let { data, form } = $props();
 
     let pagina = $state(data.session?.email ? 0 : -1);
-    /** @type {SDict<Eroare>} */ let eroare = $state({});
+    /** @type {SDict<Eroare|null>} */ let eroare = $state({});
     /** @type {SDict<string>} */ let raspunsuri = $state(
         /** @type {SDict<string>} */ ({}),
     );
@@ -39,11 +39,12 @@
 
     /** @param {"urmator" | "precedent"} directie */
     function scimbaPagina(directie) {
+        Object.entries(eroare).forEach(([k, _]) => eroare[k] = null)
         intrebari[pagina].cimpuri.forEach(c => aplica_validare(c))
-        const err = Object.entries(eroare)
+        const err = Object.entries(eroare).filter(([_, v]) => v != null)
         if (err.length > 0) {
             const e = err.at(0)
-            e && cimpuri[e?.[0]].scrollIntoView()
+            e && cimpuri[e[0]].scrollIntoView()
             return
         }
 
@@ -145,17 +146,18 @@
                 (c.filtru_afisare == null || c.filtru_afisare(raspunsuri)) &&
                 c.obligatoriu,
         ) &&
-            !Object.keys(eroare).some((k) => eroare[k].pag === pagina),
+            !Object.keys(eroare).some((k) => eroare[k]?.pag === pagina),
     );
 
     function aplica_validare(/**@type{Cimp}*/ cimp) {
-        delete eroare[cimp.nume];
+        eroare[cimp.nume] = null;
 
         const rasp = raspunsuri[cimp.nume];
         let errorMsg = null;
         let errorType = null;
 
-        if (raspunsGol(cimp.nume) && cimp.obligatoriu) {
+        if (raspunsGol(cimp.nume)) {
+            if (!cimp.obligatoriu) return
             errorType = "field-required";
             errorMsg = "Cîmpul este obligatoriu";
         } else if (cimp.valideaza != null) {
@@ -219,7 +221,7 @@
                     i === pagina
                         ? "bg-primary"
                         : "bg-surface-border hover:bg-surface-secondary",
-                    i < pagina && Object.values(eroare).some((e) => e.pag === i)
+                    i < pagina && Object.values(eroare).some((e) => e?.pag === i)
                         ? "border-2 border-danger-strong bg-danger-strong"
                         : "opacity-75",
                 ]}
@@ -257,18 +259,17 @@
                         {#if cimp.filtru_afisare == null || cimp.filtru_afisare(raspunsuri)}
                             {#if cimp.tip === "email" || cimp.tip === "text"}
                                 <CimpText
+                                    {...cimp}
                                     tip={cimp.tip}
-                                    intrebare={cimp.titlu}
-                                    nume={cimp.nume}
-                                    desc={cimp.desc}
-                                    obligatoriu={cimp.obligatoriu}
-                                    onblur={() => aplica_validare(cimp)}
+                                    eroare={eroare[cimp.nume]}
+                                    onblur={() => false && aplica_validare(cimp)}
                                     bind:value={raspunsuri[cimp.nume]}
                                 />
                             {:else if cimp.tip.startsWith("selecție")}
                                 <Selectie
                                     {cimp}
                                     {raspunsuri}
+                                    bind:eroare={eroare[cimp.nume]}
                                     onblur={() => aplica_validare(cimp)}
                                     bind:value={raspunsuri[cimp.nume]}
                                 />
@@ -278,9 +279,9 @@
                                 </div>
                             {/if}
 
-                            {#if eroare[cimp.nume] != null}
+                            {#if false && eroare[cimp.nume] != null}
                                 <div class="text-sm text-danger">
-                                    {eroare[cimp.nume].msg}
+                                    {eroare[cimp.nume]?.msg}
                                 </div>
                             {/if}
                         {/if}

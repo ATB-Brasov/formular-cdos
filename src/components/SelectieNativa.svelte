@@ -1,8 +1,11 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
+    /** @import {Eroare} from import('$lib/common_types') */
+    /** @import { Validator } from import('@content/cestionare/types')*/
 
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
     import { normOptiune } from "@content/cestionare/types.js";
+    import CadruCimp from "./CadruCimp.svelte";
 
     /**
      * @typedef {Object} Props
@@ -12,6 +15,8 @@
      * @property {RezultatOptiuni} optiuni
      * @property {string} value
      * @property {boolean} [obligatoriu=false]
+     * @property {Eroare} eroare
+     * @property {Validator} [valideaza]
      * @property {FocusEventHandler<HTMLElement>} [onblur]
      */
 
@@ -23,26 +28,13 @@
         intrebare,
         desc = null,
         optiuni,
+        valideaza,
+        eroare = $bindable(),
         value = $bindable(),
     } = $props();
 </script>
 
-<div class="flex flex-col">
-    <label for={nume} class="mb-1 font-bold">
-        {intrebare}
-        {#if obligatoriu}
-            <span class="px-0.5 text-lg leading-none font-bold text-danger"
-            >*</span>
-        {/if}
-    </label>
-
-    {#if desc != null}
-        <details class="mb-1">
-            <summary>Vezi mai multe detalii&hellip;</summary>
-            <span>{desc}</span>
-        </details>
-    {/if}
-
+<CadruCimp {valideaza} bind:eroare {value} {intrebare} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}
@@ -72,4 +64,4 @@
             {/each}
         </select>
     {/if}
-</div>
+</CadruCimp>

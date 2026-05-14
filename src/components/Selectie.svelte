@@ -1,6 +1,8 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
     /** @import { Cimp } from "@content/cestionare/types.js" */
+    /** @import {Eroare} from import('$lib/common_types') */
+    /** @import { Validator } from import('@content/cestionare/types')*/
 
     import SelectieNativa from "@components/SelectieNativa.svelte";
     import SelectieCautare from "@components/SelectieCautare.svelte";
@@ -11,6 +13,8 @@
      * @property {Cimp} cimp
      * @property {Record<string, string>} raspunsuri
      * @property {string} value
+     * @property {Eroare} eroare
+     * @property {Validator} [valideaza]
      * @property {FocusEventHandler<HTMLElement>} [onblur]
      */
 
@@ -19,8 +23,21 @@
         cimp,
         raspunsuri,
         onblur,
+        valideaza,
+        eroare = $bindable(),
         value = $bindable(),
     } = $props();
+
+    const optiuni = $derived(cimp.optiuni?.(raspunsuri))
+    $effect(() => {
+        if (optiuni == null) return
+        const optii = optiuni.optiuni.map((v) =>
+            typeof v === "string" ? v : v.exista ? v.text : null
+        ).filter((v) => v != null);
+        if (!optii.includes(value)) {
+            value = "";
+        }
+    });
 
     const props_comuni = $derived({
         nume: cimp.nume,
@@ -28,33 +45,34 @@
         desc: cimp.desc,
         obligatoriu: cimp.obligatoriu,
         onblur,
+        valideaza,
     });
-
 </script>
 
 
-{#if cimp.optiuni == null}
+{#if optiuni == null}
     <i class="text-italic text-danger-strong">
         Nu a fost definită funcția `optiuni` pentru cîmpul `{cimp.nume}`
     </i>
 {:else}
-    {@const rez = cimp.optiuni(raspunsuri)}
     {#if cimp.tip === "selecție-nativa"}
         <SelectieNativa
             {...props_comuni}
-            optiuni={rez}
+            {optiuni}
+            bind:eroare
             bind:value
         />
     {:else if cimp.tip === "selecție-cautare"}
         <SelectieCautare
             {...props_comuni}
-            optiuni={rez}
+            {optiuni}
             bind:value
         />
     {:else if cimp.tip === "selecție-radio"}
         <SelectieRadio
             {...props_comuni}
-            optiuni={rez}
+            {optiuni}
+            bind:eroare
             bind:value
         />
     {:else}

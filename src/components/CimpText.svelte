@@ -38,7 +38,7 @@
     {#if desc != null}
         <details class="mb-1">
             <summary>Vezi mai multe detalii&hellip;</summary>
-            <span class="py-0.5 text-sm">{@html desc}</span>
+            <span>{@html desc}</span>
         </details>
     {/if}
 

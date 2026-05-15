@@ -59,7 +59,7 @@
         bind:value={
             () => value,
             (v) => {
-                eroare = aplicaValidare(v, valideaza)
+                eroare = aplicaValidare(v, obligatoriu, valideaza)
                 value = v
             }
         }

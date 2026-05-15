@@ -36,7 +36,7 @@
     let facade = {
         get value() { return value; },
         set value(v) { 
-            eroare = aplicaValidare(v, valideaza)
+            eroare = aplicaValidare(v, obligatoriu, valideaza)
             value = v;
         }
     };

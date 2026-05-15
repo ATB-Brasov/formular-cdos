@@ -97,7 +97,7 @@ function raspunsGol(value) {
     return value == null || value?.trim() === "";
 }
 
-export function aplicaValidare(value, valideaza) {
+export function aplicaValidare(value, obligatoriu, valideaza) {
     let err
     if (raspunsGol(value)) {
         err = !obligatoriu ? null :  {

@@ -112,7 +112,7 @@
 
     /** @param {string} opt */
     function selecteaza(opt) {
-        eroare = aplicaValidare(opt, valideaza)
+        eroare = aplicaValidare(opt, obligatoriu, valideaza)
         value = opt;
         cautare = ""; // search box is always empty after a pick
         deschis = false;

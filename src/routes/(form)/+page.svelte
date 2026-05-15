@@ -112,15 +112,27 @@
                 newRaspunsuri[k] = v;
             }
         }
-        for (const [k, v] of Object.entries(form?.erori ?? {})) {
-            console.dir(k, v)
-            newEroare[k] = /** @type {Eroare} */ (v);
-        }
-
         if (Object.entries(newRaspunsuri).length > 0) {
             raspunsuri = newRaspunsuri;
         }
-        eroare = newEroare;
+
+        const errEntries = Object.entries(form?.erori ?? {})
+            .sort((a, b) => {
+                const erA = a[1];
+                const erB = b[1];
+                if (erA == null || erB == null) return 0
+                return erA.pag - erB.pag
+            })
+        if (errEntries.length > 0) {
+            for (const [k, v] of errEntries) {
+                newEroare[k] = /** @type {Eroare} */ (v);
+            }
+            eroare = newEroare;
+            const e = errEntries[0];
+            seteaza_pagina(e[1].pag, {whence: "$effect::errEntries"})
+            if (e[1].pag >= 0)
+                cimpuri[e[0]].scrollIntoView()
+        }
     });
 
     $effect(() => {
@@ -153,7 +165,7 @@
             !Object.keys(eroare).some((k) => eroare[k]?.pag === pagina),
     );
 
-    function aplica_validare(/**@type{Cimp}*/ cimp) {
+    function aplica_validare(/**@type{Cimp}*/ cimp, /**@type{number}*/pag = pagina) {
         eroare[cimp.nume] = null;
 
         const rasp = raspunsuri[cimp.nume];
@@ -161,7 +173,11 @@
         let errorType = null;
 
         if (raspunsGol(cimp.nume)) {
-            if (!cimp.obligatoriu) return
+            
+            if ((cimp.filtru_afisare != null && !cimp.filtru_afisare(raspunsuri)) 
+                || !cimp.obligatoriu) {
+                return
+            }
             errorType = "field-required";
             errorMsg = "Cîmpul este obligatoriu";
         } else if (cimp.valideaza != null) {
@@ -176,7 +192,7 @@
             eroare[cimp.nume] = {
                 type: errorType,
                 msg: errorMsg,
-                pag: pagina,
+                pag,
             };
         }
     }
@@ -186,6 +202,31 @@
             p.filtru_afisare == null || p.filtru_afisare(raspunsuri)
 ),
     );
+
+    let formElement = /** @type {HTMLFormElement?} */ $state();
+    function handleSubmit() {
+        Object.entries(eroare).forEach(([k, _]) => eroare[k] = null)
+        const cimps = intrebari.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1)
+        cimps.forEach(c => aplica_validare(c, c.pag))
+        const err = Object.entries(eroare).filter(([_, v]) => v != null)
+        err.sort((a, b) => {
+            const erA = a[1];
+            const erB = b[1];
+            if (erA == null || erB == null) return 0
+            return erA.pag - erB.pag
+        })
+        console.log(err.map(e => e[1]?.pag))
+
+        if (err.length > 0) {
+            const e = err[0]
+            if (e[1] != null) {
+                seteaza_pagina(e[1].pag, {whence: "/::handleSubmit"})
+                cimpuri[e[0]].scrollIntoView()
+            }
+            return
+        }
+        setTimeout(() => { formElement?.requestSubmit(); }, 0);
+    }
 </script>
 
 {#if test}
@@ -248,6 +289,7 @@
         use:enhance
         action="?/salveaza"
         class="mt-4 w-full mb-26"
+        bind:this={formElement}
     >
 
         {#if test}
@@ -319,9 +361,9 @@
                         {@const ultima = intrebari[pagina].idx === pagini_vizibile.at(-1)?.idx}
                         <Buton
                             class="min-w-22"
-                            type={ultima ? "submit" : "button"}
+                            type="button"
                             disabled={false && !btn_urmator_activ}
-                            onclick={ultima ? null : () => scimbaPagina("urmator")}
+                            onclick={ultima ? handleSubmit : () => scimbaPagina("urmator")}
                         >
                             {ultima ? "Trimite" : "Următor"}
                         </Buton>

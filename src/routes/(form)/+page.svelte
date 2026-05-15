@@ -29,6 +29,11 @@
         /** @type {SDict<string>} */ ({}),
     );
 
+    $effect(() => {
+        pagina;
+        setTimeout(notifyParentOfHeightChange, 0);
+    })
+
     /**
      * @param {number} pag
      * @param {{whence: string}} [options]
@@ -37,7 +42,6 @@
         if (options?.whence != null) console.log(options.whence);
         pagina = pag;
         localStorage.setItem("pagina", pagina.toString());
-        setTimeout(notifyParentOfHeightChange, 0);
     }
 
     /** @param {"urmator" | "precedent"} directie */
@@ -189,8 +193,8 @@
         let errorType = null;
 
         if (raspunsGol(cimp.nume)) {
-            
-            if ((cimp.filtru_afisare != null && !cimp.filtru_afisare(raspunsuri)) 
+
+            if ((cimp.filtru_afisare != null && !cimp.filtru_afisare(raspunsuri))
                 || !cimp.obligatoriu) {
                 return
             }
@@ -261,7 +265,7 @@
 
 <div bind:this={forIframe}>
 
-<h1 class="text-4xl font-bold mb-4">{sondaj_cdos.titlu}</h1>
+<h1 class="text-4xl font-bold mt-8 mb-4">{sondaj_cdos.titlu}</h1>
 
 {#if pagina === -1}
     <div
@@ -320,7 +324,7 @@
             {#if pag.filtru_afisare == null || pag.filtru_afisare(raspunsuri)}
                 <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
                     {#each pag.cimpuri as cimp, nr}
-                        <div class="scroll-mt-5" bind:this={cimpuri[cimp.nume]}>
+                        <div class="scroll-mt-32" bind:this={cimpuri[cimp.nume]}>
                         {#if dev}
                             <div class="text-surface-muted text-mono text-xs">
                                 id: {cimp.nume} ({nr + 1})

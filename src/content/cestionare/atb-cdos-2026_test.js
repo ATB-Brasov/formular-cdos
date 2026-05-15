@@ -95,7 +95,7 @@ export default {
             titlu: "Date Academice",
             descriere: "",
             cimpuri: [
-                {tip: "text", nume: "nume", titlu: "Nume", valideaza: (v) => v === "a" ? null : "aaaa"},
+                {tip: "text", nume: "nume", titlu: "Nume", valideaza: (v) => v === "a" ? null : "Lasă gol, e doar pentru test"},
                 {
                     tip: "selecție-cautare",
                     nume: "facultatea",

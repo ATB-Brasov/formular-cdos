@@ -25,14 +25,7 @@
 
     let pagina = $state(data.session?.email ? 0 : -1);
     /** @type {SDict<Eroare|null>} */ let eroare = $state({});
-    /** @type {SDict<string>} */ let raspunsuri = $state(
-        /** @type {SDict<string>} */ ({}),
-    );
-
-    $effect(() => {
-        pagina;
-        setTimeout(notifyParentOfHeightChange, 0);
-    })
+    /** @type {SDict<string>} */ let raspunsuri = $state({});
 
     /**
      * @param {number} pag
@@ -82,6 +75,8 @@
     }
 
     /** @type {SDict<HTMLElement>} */ let cimpuri = $state( {})
+    /**@type{ResizeObserver}*/ let observer
+    /**@type{HTMLElement?}*/   let forIframe
 
     function notifyParentOfHeightChange() {
         if (forIframe) {
@@ -98,7 +93,6 @@
 
     onMount(() => {
         notifyParentOfHeightChange();
-        window.addEventListener('resize', notifyParentOfHeightChange);
         const raspunsuriSalvate = localStorage.getItem("raspunsuri");
         if (raspunsuriSalvate) {
             try {
@@ -117,6 +111,16 @@
                 );
             }
         }
+
+        observer = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                if (entry.target.id === "formWrapper") {
+                    setTimeout(notifyParentOfHeightChange, 0);
+                }
+            }
+        });
+        setTimeout(() => forIframe && observer.observe(forIframe), 0)
+        return () => { observer?.disconnect() };
     });
 
     $effect(() => {
@@ -185,7 +189,11 @@
             !Object.keys(eroare).some((k) => eroare[k]?.pag === pagina),
     );
 
-    function aplica_validare(/**@type{Cimp}*/ cimp, /**@type{number}*/pag = pagina) {
+    /**
+     * @param {Cimp} cimp
+     * @param {number} [pag=pagina]
+     */
+    function aplica_validare(cimp, pag=pagina) {
         eroare[cimp.nume] = null;
 
         const rasp = raspunsuri[cimp.nume];
@@ -224,7 +232,6 @@
     );
 
     let formElement = /** @type {HTMLFormElement?} */ $state();
-    let forIframe = /** @type {HTMLElement?} */ $state();
 
     function handleSubmit() {
         Object.entries(eroare).forEach(([k, _]) => eroare[k] = null)
@@ -263,7 +270,7 @@
     </div>
 {/if}
 
-<div bind:this={forIframe}>
+<div id="formWrapper" bind:this={forIframe}>
 
 <h1 class="text-4xl font-bold mt-8 mb-4">{sondaj_cdos.titlu}</h1>
 

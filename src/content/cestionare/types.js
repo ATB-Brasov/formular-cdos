@@ -20,7 +20,7 @@
  /**
   * Această funcție este apelată pentru a determina dacă un câmp trebuie afișat în funcție de răspunsurile curente.
   *
-  * @callback AfiseazaCimp
+  * @callback AscundeCimp
   * @param {SDict<string>} raspunsuri Răspunsurile curente a formularului
   * @return {boolean}
   */
@@ -53,7 +53,7 @@
  * @property {string} nume
  * @property {string} titlu
  * @property {string?} [desc]
- * @property {AfiseazaCimp?} [filtru_afisare]
+ * @property {AscundeCimp?} [ascunde]
  * @property {boolean} [obligatoriu]
  * @property {Validator} [valideaza]
  * @property {DaOptiuniSelectie} [optiuni]
@@ -64,7 +64,7 @@
  * @property {string} titlu
  * @property {string} descriere
  * @property {Cimp[]} cimpuri
- * @property {AfiseazaCimp?} [filtru_afisare]
+ * @property {AscundeCimp?} [ascunde]
  */
 
 /**
@@ -97,6 +97,13 @@ function raspunsGol(value) {
     return value == null || value?.trim() === "";
 }
 
+/**
+ *
+ * @param {string} value
+ * @param {boolean} obligatoriu
+ * @param {Validator} valideaza
+ * @returns
+ */
 export function aplicaValidare(value, obligatoriu, valideaza) {
     let err
     if (raspunsGol(value)) {

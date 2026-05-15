@@ -33,7 +33,7 @@
         if (optiuni == null) return
         const optii = optiuni.optiuni.map((v) =>
             typeof v === "string" ? v : v.exista ? v.text : null
-        ).filter((v) => v != null);
+        )
         if (!optii.includes(value)) {
             value = "";
         }

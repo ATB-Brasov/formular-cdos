@@ -67,9 +67,7 @@
                     return;
             }
             if (tmp < 0 || tmp > ULTIMA_PAGINA) return;
-            const filtru = intrebari[tmp].filtru_afisare;
-            if (filtru == null) break;
-            if (filtru(raspunsuri)) break;
+            if (!intrebari[tmp].ascunde?.(raspunsuri)) break;
         }
         seteaza_pagina(tmp, { whence: "scimbaPagina::final" });
     }
@@ -183,7 +181,7 @@
         !pagina_activa.cimpuri.some(
             (c) =>
                 raspunsGol(c.nume) &&
-                (c.filtru_afisare == null || c.filtru_afisare(raspunsuri)) &&
+                (!c.ascunde?.(raspunsuri)) &&
                 c.obligatoriu,
         ) &&
             !Object.keys(eroare).some((k) => eroare[k]?.pag === pagina),
@@ -201,11 +199,14 @@
         let errorType = null;
 
         if (raspunsGol(cimp.nume)) {
-
-            if ((cimp.filtru_afisare != null && !cimp.filtru_afisare(raspunsuri))
-                || !cimp.obligatoriu) {
-                return
+            if (
+                intrebari[pag].ascunde?.(raspunsuri)
+                || cimp.ascunde?.(raspunsuri)
+                || !cimp.obligatoriu
+            ) {
+                return // Câmpul nu este obligatoriu, nu-l mai verificăm
             }
+
             errorType = "field-required";
             errorMsg = "Cîmpul este obligatoriu";
         } else if (cimp.valideaza != null) {
@@ -226,9 +227,7 @@
     }
 
     const pagini_vizibile = $derived(
-        intrebari.filter((p) =>
-            p.filtru_afisare == null || p.filtru_afisare(raspunsuri)
-),
+        intrebari.filter((p) => !p.ascunde?.(raspunsuri)),
     );
 
     let formElement = /** @type {HTMLFormElement?} */ $state();
@@ -287,7 +286,7 @@
         {#each intrebari as pag, i}
             <button
                 aria-label="Pagina {i + 1}"
-                disabled={pag.filtru_afisare != null && !pag.filtru_afisare(raspunsuri)}
+                disabled={pag.ascunde?.(raspunsuri)}
                 onclick={() => {
                     pagina = i;
                     localStorage.setItem("pagina", pagina.toString());
@@ -328,46 +327,40 @@
         {/if}
 
         {#each intrebari as pag, i}
-            {#if pag.filtru_afisare == null || pag.filtru_afisare(raspunsuri)}
+            {#if !pag.ascunde?.(raspunsuri)}
                 <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
                     {#each pag.cimpuri as cimp, nr}
-                        <div class="scroll-mt-32" bind:this={cimpuri[cimp.nume]}>
-                        {#if dev}
-                            <div class="text-surface-muted text-mono text-xs">
-                                id: {cimp.nume} ({nr + 1})
+                        {#if !cimp.ascunde?.(raspunsuri)}
+                            <div class="scroll-mt-32" bind:this={cimpuri[cimp.nume]}>
+                                {#if dev}
+                                    <div class="text-surface-muted text-mono text-xs">
+                                        id: {cimp.nume} ({nr + 1})
+                                    </div>
+                                {/if}
+
+                                {#if cimp.tip === "email" || cimp.tip === "text"}
+                                    <CimpText
+                                        {...cimp}
+                                        tip={cimp.tip}
+                                        eroare={eroare[cimp.nume]}
+                                        onblur={() => false && aplica_validare(cimp)}
+                                        bind:value={raspunsuri[cimp.nume]}
+                                    />
+                                {:else if cimp.tip.startsWith("selecție")}
+                                    <Selectie
+                                        {cimp}
+                                        {raspunsuri}
+                                        bind:eroare={eroare[cimp.nume]}
+                                        onblur={() => false && aplica_validare(cimp)}
+                                        bind:value={raspunsuri[cimp.nume]}
+                                    />
+                                {:else}
+                                    <div class="text-italic text-danger-strong">
+                                        Tip cîmp `{cimp.tip}` necunoscut
+                                    </div>
+                                {/if}
                             </div>
                         {/if}
-
-                        {#if cimp.filtru_afisare == null || cimp.filtru_afisare(raspunsuri)}
-                            {#if cimp.tip === "email" || cimp.tip === "text"}
-                                <CimpText
-                                    {...cimp}
-                                    tip={cimp.tip}
-                                    eroare={eroare[cimp.nume]}
-                                    onblur={() => false && aplica_validare(cimp)}
-                                    bind:value={raspunsuri[cimp.nume]}
-                                />
-                            {:else if cimp.tip.startsWith("selecție")}
-                                <Selectie
-                                    {cimp}
-                                    {raspunsuri}
-                                    bind:eroare={eroare[cimp.nume]}
-                                    onblur={() => false && aplica_validare(cimp)}
-                                    bind:value={raspunsuri[cimp.nume]}
-                                />
-                            {:else}
-                                <div class="text-italic text-danger-strong">
-                                    Tip cîmp `{cimp.tip}` necunoscut
-                                </div>
-                            {/if}
-
-                            {#if false && eroare[cimp.nume] != null}
-                                <div class="text-sm text-danger">
-                                    {eroare[cimp.nume]?.msg}
-                                </div>
-                            {/if}
-                        {/if}
-                        </div>
                     {/each}
                 </div>
             {/if}

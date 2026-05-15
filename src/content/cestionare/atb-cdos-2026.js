@@ -1,4 +1,4 @@
-/** @import { AfiseazaCimp, Cimp } from "@content/cestionare/types.js" */
+/** @import { AscundeCimp, Cimp } from "@content/cestionare/types.js" */
 import { uniq } from "$lib/ds_helpers.js";
 import lista from "./lista_facultati_unitbv_2026.js";
 
@@ -6,7 +6,7 @@ import lista from "./lista_facultati_unitbv_2026.js";
  * @typedef {object} OptiuniDanu
  * @property {string | null} [desc=null]
  * @property {boolean} [obligatoriu=true]
- * @property {AfiseazaCimp | null} [filtru_afisare=null]
+ * @property {AscundeCimp | null} [ascunde=null]
  * @property {() => ({ optiuni: string[]; eroare: string? })} [optiuni=() => ({ optiuni: ["da", "nu", "nu știu"], eroare: null })]
  */
 
@@ -24,7 +24,7 @@ function _radio(nume, titlu, valori_implicite, optiuni_obj = {}) {
     const {
         desc = null,
         obligatoriu = true,
-        filtru_afisare = null,
+        ascunde = null,
         optiuni = () => ({ optiuni: valori_implicite, eroare: null }),
     } = optiuni_obj;
 
@@ -33,7 +33,7 @@ function _radio(nume, titlu, valori_implicite, optiuni_obj = {}) {
         titlu,
         desc,
         obligatoriu,
-        filtru_afisare,
+        ascunde,
         tip: "selecție-radio",
         optiuni,
     };
@@ -59,7 +59,7 @@ function grad(nume, titlu, optiuni_obj = {}) {
      const {
          desc = null,
          obligatoriu = true,
-         filtru_afisare = null,
+         ascunde = null,
          optiuni = () => ({ optiuni: ["da, în toate cazurile", "da, în majoritatea cazurilor","da, uneori","nu","nu știu"], eroare: null }),
      } = optiuni_obj;
 
@@ -68,7 +68,7 @@ function grad(nume, titlu, optiuni_obj = {}) {
          titlu,
          desc,
          obligatoriu,
-         filtru_afisare,
+         ascunde,
          tip: "selecție-radio",
          optiuni,
      };
@@ -506,7 +506,7 @@ export default {
         {
             // afișăm numai dacă studentul răspunde că a făcut practica de specialitate în prima secțiune
             titlu: "Practica de Specialitate",
-            filtru_afisare: (rspi) => rspi["practica-de-specialitate"] === "da",
+            ascunde: (rspi) => rspi["practica-de-specialitate"] !== "da",
             descriere:
                 "Această secțiune analizează calitatea stagiilor de practică",
             cimpuri: [
@@ -543,7 +543,7 @@ export default {
         {
             // afișăm numai în cazul dacă studentul a răspuns că a participat în cadrul taberelor studențești
             titlu: "Tabere Studențești",
-            filtru_afisare: (rspi) => rspi["participare-tabere"] === "da",
+            ascunde: (rspi) => rspi["participare-tabere"] !== "da",
             descriere:
                 "Această secțiune evaluează accesul studenților la programele de tabere",
             cimpuri: [
@@ -576,7 +576,7 @@ export default {
         {
             // afișăm numai dacă studentul răspunde că se încadrează în categoria studențîlor cu dizabilități în prima secțiune
             titlu: "Studenți cu Dizabilități",
-            filtru_afisare: (rspi) => rspi["student-cu-dizabilități"] === "da",
+            ascunde: (rspi) => rspi["student-cu-dizabilități"] !== "da",
             descriere:
                 "Urmărim evaluarea gradului de accesibilitate și a condițiilor specifice oferite studenților cu nevoi speciale pentru a asigura un proces educațional incluziv și echitabil.",
             cimpuri: [
@@ -596,7 +596,7 @@ export default {
                     "dizab_practic_spri",
                     "Ai putut beneficia de sprijin pentru identificare și derularea practicii de specialitate? [art. 6 (3) b)]",
                     {
-                        filtru_afisare: (rspi) =>
+                        ascunde: (rspi) =>
                             rspi["practica-de-specialitate"] === "da",
                     },
                 ),

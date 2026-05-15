@@ -1,4 +1,4 @@
-/** @import { AfiseazaCimp } from "@content/cestionare/types.js" */
+/** @import { AscundeCimp } from "@content/cestionare/types.js" */
 import { uniq } from "$lib/ds_helpers.js";
 import lista from "./lista_facultati_unitbv_2026.js";
 
@@ -6,7 +6,7 @@ import lista from "./lista_facultati_unitbv_2026.js";
  * @typedef {object} OptiuniDanu
  * @property {string | null} [desc=null]
  * @property {boolean} [obligatoriu=true]
- * @property {import("@content/cestionare/types.js").AfiseazaCimp | null} [filtru_afisare=null]
+ * @property {import("@content/cestionare/types.js").AscundeCimp | null} [ascunde=null]
  * @property {() => ({ optiuni: string[]; eroare: string? })} [optiuni=() => ({ optiuni: ["da", "nu", "nu știu"], eroare: null })]
  */
 
@@ -20,7 +20,7 @@ function danu(nume, titlu, optiuni_obj = {}) {
     const {
         desc = null,
         obligatoriu = true,
-        filtru_afisare = null,
+        ascunde = null,
         optiuni = () => ({ optiuni: ["da", "nu", "nu știu"], eroare: null }),
     } = optiuni_obj;
 
@@ -29,7 +29,7 @@ function danu(nume, titlu, optiuni_obj = {}) {
         titlu,
         desc,
         obligatoriu,
-        filtru_afisare,
+        ascunde,
         tip: "selecție-radio",
         optiuni,
     };
@@ -40,7 +40,7 @@ const paginia_dezabilitati =
     {
         titlu: "Dizabilități",
         descriere: "Studenți cu dizabilități",
-        filtru_afisare: (rspi) => rspi["forma"] === "ID",
+        ascunde: (rspi) => rspi["forma"] !== "ID",
         cimpuri: [
             {
                 titlu: "Ai dizabilități?",
@@ -63,8 +63,8 @@ const paginia_dezabilitati =
                 nume: "dizabilitati-discriminare",
                 desc: "Selectează toate opțiunile care se aplică ti ai caz.",
                 obligatoriu: true,
-                filtru_afisare: (rspi) => {
-                    return rspi.dizabilitati === "Da";
+                ascunde: (rspi) => {
+                    return rspi.dizabilitati !== "Da";
                 },
                 tip: "selecție-radio",
                 optiuni: () => {

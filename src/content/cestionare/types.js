@@ -86,3 +86,32 @@ export function normOptiune(opt) {
     }
     return opt;
 }
+
+/**
+ * Verifică dacă răspunsul este gol sau nu.
+ *
+ * @param {string?} value Numele cîmpului
+ * @returns {boolean}
+ */
+function raspunsGol(value) {
+    return value == null || value?.trim() === "";
+}
+
+export function aplicaValidare(value, valideaza) {
+    let err
+    if (raspunsGol(value)) {
+        err = !obligatoriu ? null :  {
+            type: "field-required",
+            msg : "Câmpul este obligatoriu",
+            pag: 0,
+        };
+    } else {
+        const msg = valideaza?.(value)
+        err = (msg == null) ? null : {
+            type: "field-invalid",
+            msg,
+            pag: 0,
+        };
+    }
+    return err
+}

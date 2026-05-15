@@ -4,7 +4,7 @@
     /** @import { Validator } from import('@content/cestionare/types')*/
 
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
-    import { normOptiune } from "@content/cestionare/types.js";
+    import { aplicaValidare, normOptiune } from "@content/cestionare/types.js";
 	import CadruCimp from "./CadruCimp.svelte";
 
     /**
@@ -33,9 +33,17 @@
         value = $bindable(),
     } = $props();
 
+    let facade = {
+        get value() { return value; },
+        set value(v) { 
+            eroare = aplicaValidare(v, valideaza)
+            value = v;
+        }
+    };
+
 </script>
 
-<CadruCimp bind:eroare {value} {valideaza} {intrebare} {desc} {obligatoriu}>
+<CadruCimp {eroare} {intrebare} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}
@@ -49,7 +57,7 @@
                             type="radio"
                             class="accent-primary"
                             name={nume}
-                            bind:group={value}
+                            bind:group={facade.value}
                             value={opt.text}
                             disabled={!opt.exista}
                             required={obligatoriu}

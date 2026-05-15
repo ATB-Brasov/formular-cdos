@@ -13,8 +13,10 @@
     import Intrare from "./Intrare.svelte";
     import { onMount } from "svelte";
 
+    const test = page.url.searchParams.get("test") === "true"
+
     const sondaj_cdos =
-        (page.url.searchParams.get("test") === "true"
+        (test
             ? await import("@content/cestionare/atb-cdos-2026_test.js")
             : await import("@content/cestionare/atb-cdos-2026.js")).default;
 
@@ -101,6 +103,7 @@
         if (form == null) return;
         if (form.pag != null) seteaza_pagina(form.pag, { whence: "$effect" });
 
+        $inspect(eroare)
 
         /** @type {SDict<string>} */ const newRaspunsuri = {};
         /** @type {SDict<Eroare>} */ const newEroare = {};
@@ -110,6 +113,7 @@
             }
         }
         for (const [k, v] of Object.entries(form?.erori ?? {})) {
+            console.dir(k, v)
             newEroare[k] = /** @type {Eroare} */ (v);
         }
 
@@ -184,7 +188,7 @@
     );
 </script>
 
-{#if page.url.searchParams.get("test") === "true"}
+{#if test}
     <div
         class="fixed bottom-6 left-6 rounded bg-primary-subtle border border-primary-border z-200 px-4 py-2 font-mono"
     >
@@ -245,6 +249,11 @@
         action="?/salveaza"
         class="mt-4 w-full mb-26"
     >
+
+        {#if test}
+            <input type="hidden" name="test" value="true">
+        {/if}
+
         {#each intrebari as pag, i}
             {#if pag.filtru_afisare == null || pag.filtru_afisare(raspunsuri)}
                 <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
@@ -270,7 +279,7 @@
                                     {cimp}
                                     {raspunsuri}
                                     bind:eroare={eroare[cimp.nume]}
-                                    onblur={() => aplica_validare(cimp)}
+                                    onblur={() => false && aplica_validare(cimp)}
                                     bind:value={raspunsuri[cimp.nume]}
                                 />
                             {:else}

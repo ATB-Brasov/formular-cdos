@@ -60,7 +60,8 @@
             eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
         } else {
             if (eroare["posta"]?.type !== "email-invalid") return;
-            delete eroare["posta"];
+            console.log("set posta to null!!")
+            eroare["posta"] = null;
         }
     });
 
@@ -90,7 +91,7 @@
     bind:this={formElement}
     use:enhance={async ({ formData, cancel }) => {
         isMining = true;
-        await solvePoW(email, 4)
+        await solvePoW(email, 3)
             .then((nonce) => {
                 formData.append("nonce", nonce.toString());
                 console.log("Solved PoW with nonce:", nonce);
@@ -121,14 +122,11 @@
             Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu
             răspunsurile colectate. Pentru mai multe informații, consultați <a href="/politica-confidentialitate" target="_blank" class="underline">politica de confidențialitate</a>.`}
         nume={"posta"}
+        bind:eroare={eroare["posta"]}
         placeholder={"exemplu@student.unitbv.ro"}
         obligatoriu={true}
         bind:value={email}
     />
-
-    {#if eroare["posta"] != null}
-        <span class="text-danger">{eroare["posta"].msg}</span>
-    {/if}
 
     {#if eroare["_form"] != null}
         <span class="text-danger">{eroare["_form"].msg}</span>

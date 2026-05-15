@@ -1,5 +1,6 @@
 <script>
     import CadruCimp from './CadruCimp.svelte';
+    import {aplicaValidare} from '@content/cestionare/types.js';
 
     /** @import {FocusEventHandler} from import('svelte/elements') */
     /** @import {Eroare} from import('$lib/common_types') */
@@ -40,9 +41,7 @@
     {intrebare}
     {desc}
     {obligatoriu}
-    {valideaza}
-    {value}
-    bind:eroare
+    {eroare}
 >
     <input
         id={nume}
@@ -57,6 +56,12 @@
         type={tip}
         name={nume}
         {onblur}
-        bind:value
+        bind:value={
+            () => value,
+            (v) => {
+                eroare = aplicaValidare(v, valideaza)
+                value = v
+            }
+        }
     />
 </CadruCimp>

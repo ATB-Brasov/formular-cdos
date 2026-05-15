@@ -46,8 +46,8 @@ export async function load({ cookies }) {
 export const actions = {
     posta: async ({ request, cookies }) => {
         const data = await request.formData();
-        let email = data.get("posta");
         let nonce = data.get("nonce");
+        let email = data.get("posta");
         if (email == null) {
             return fail(400, {
                 erori: {
@@ -90,7 +90,7 @@ export const actions = {
             });
         }
         nonce = nonce.toString();
-        if (!verifyPoW(email, nonce)) {
+        if (!verifyPoW(email, nonce, 3)) {
             return fail(400, {
                 erori: {
                     posta: {
@@ -178,13 +178,20 @@ export const actions = {
         const dataDict = Object.fromEntries(
             data.entries().map(([nume, valoare]) => [nume, valoare.toString()]),
         );
+
+        let sondaj = sondaj_cdos;
+
+        if (dataDict.test === "true") {
+            sondaj = (await import("@content/cestionare/atb-cdos-2026_test.js")).default
+        }
+
         /** @type { {[nume: string]: import("$lib/common_types.js").Eroare} } */
         const erori = {}; // Poate un Map?
 
         /** @type {[string, string][]} */
         const raspunsuri = [];
 
-        const pagini = sondaj_cdos.pagini;
+        const pagini = sondaj.pagini;
         let min_err_pag = pagini.length;
         for (let pag_nr = 0; pag_nr < pagini.length; ++pag_nr) {
             const pag = pagini[pag_nr];

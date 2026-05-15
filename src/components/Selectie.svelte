@@ -66,6 +66,7 @@
         <SelectieCautare
             {...props_comuni}
             {optiuni}
+            bind:eroare
             bind:value
         />
     {:else if cimp.tip === "selecție-radio"}

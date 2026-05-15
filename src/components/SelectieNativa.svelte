@@ -4,7 +4,7 @@
     /** @import { Validator } from import('@content/cestionare/types')*/
 
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
-    import { normOptiune } from "@content/cestionare/types.js";
+    import { aplicaValidare, normOptiune } from "@content/cestionare/types.js";
     import CadruCimp from "./CadruCimp.svelte";
 
     /**
@@ -34,7 +34,7 @@
     } = $props();
 </script>
 
-<CadruCimp {valideaza} bind:eroare {value} {intrebare} {desc} {obligatoriu}>
+<CadruCimp {eroare} {intrebare} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}
@@ -50,7 +50,13 @@
             required={obligatoriu}
             {onblur}
             name={nume}
-            bind:value
+            bind:value={
+                () => value,
+                (v) => {
+                    eroare = aplicaValidare(v, valideaza);
+                    value = v;
+                }
+            }
         >
             <option value="">Alege Opțiune</option>
             {#each optiuni.optiuni.map(normOptiune) as opt}

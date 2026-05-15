@@ -56,7 +56,7 @@
     /** @import {Eroare} from import('$lib/common_types') */
     /** @import { Validator } from import('@content/cestionare/types')*/
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
-    import { normOptiune } from "@content/cestionare/types.js";
+    import { aplicaValidare, normOptiune } from "@content/cestionare/types.js";
 
     /**
      * @typedef {Object} Props
@@ -112,6 +112,7 @@
 
     /** @param {string} opt */
     function selecteaza(opt) {
+        eroare = aplicaValidare(opt, valideaza)
         value = opt;
         cautare = ""; // search box is always empty after a pick
         deschis = false;
@@ -253,7 +254,7 @@
 -->
 <input type="hidden" name={nume} {value} />
 
-<CadruCimp bind:eroare {value} {valideaza} {onFocusOut} {intrebare} {desc} {obligatoriu}>
+<CadruCimp {eroare} {onFocusOut} {intrebare} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}

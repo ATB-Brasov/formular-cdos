@@ -11,8 +11,6 @@
      * @property {import('svelte').Snippet} children
      * @property {FocusEventHandler} [onFocusOut]
      * @property {Eroare} eroare
-     * @property {Validator | null} [valideaza=null]
-     * @property {string} value
      */
 
      /** @type {Props} */
@@ -20,40 +18,11 @@
         desc = null,
         obligatoriu = false,
         intrebare,
-        value,
-        eroare = $bindable(),
-        valideaza = null,
+        eroare,
         children,
         onFocusOut
     } = $props();
 
-
-    /**
-     * Verifică dacă răspunsul este gol sau nu.
-     *
-     * @param {string?} value Numele cîmpului
-     * @returns {boolean}
-     */
-    function raspunsGol(value) {
-        return value == null || value?.trim() === "";
-    }
-
-    $effect(() => {
-        if (raspunsGol(value)) {
-            eroare = !obligatoriu ? null :  {
-                type: "field-required",
-                msg : "Câmpul este obligatoriu",
-                pag: 0,
-            };
-        } else {
-            const msg = valideaza?.(value)
-            eroare = (msg == null) ? null : {
-                type: "field-invalid",
-                msg,
-                pag: 0,
-            };
-        }
-    })
 </script>
 
 <fieldset onfocusout={onFocusOut} class="flex flex-col">

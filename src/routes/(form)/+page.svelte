@@ -37,6 +37,7 @@
         if (options?.whence != null) console.log(options.whence);
         pagina = pag;
         localStorage.setItem("pagina", pagina.toString());
+        setTimeout(notifyParentOfHeightChange, 0);
     }
 
     /** @param {"urmator" | "precedent"} directie */
@@ -78,7 +79,22 @@
 
     /** @type {SDict<HTMLElement>} */ let cimpuri = $state( {})
 
+    function notifyParentOfHeightChange() {
+        if (forIframe) {
+            const height = forIframe.offsetHeight;
+            window.parent.postMessage(
+                {
+                    type: 'iframe-resize',
+                    height: height
+                },
+                '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
+            );
+        }
+    }
+
     onMount(() => {
+        notifyParentOfHeightChange();
+        window.addEventListener('resize', notifyParentOfHeightChange);
         const raspunsuriSalvate = localStorage.getItem("raspunsuri");
         if (raspunsuriSalvate) {
             try {
@@ -204,6 +220,8 @@
     );
 
     let formElement = /** @type {HTMLFormElement?} */ $state();
+    let forIframe = /** @type {HTMLElement?} */ $state();
+
     function handleSubmit() {
         Object.entries(eroare).forEach(([k, _]) => eroare[k] = null)
         const cimps = intrebari.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1)
@@ -241,6 +259,8 @@
     </div>
 {/if}
 
+<div bind:this={forIframe}>
+
 <h1 class="text-4xl font-bold mb-4">{sondaj_cdos.titlu}</h1>
 
 {#if pagina === -1}
@@ -250,7 +270,7 @@
         {sondaj_cdos.descriere}
     </div>
 
-    <Intrare bind:eroare bind:pagina />
+    <Intrare bind:this={formElement} bind:eroare bind:pagina />
 {:else}
     <div class="flex flex-wrap gap-2 mb-8">
         {#each intrebari as pag, i}
@@ -375,3 +395,5 @@
     </form>
 
 {/if}
+
+</div>

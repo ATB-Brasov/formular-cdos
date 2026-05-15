@@ -72,6 +72,7 @@
     {:else if cimp.tip === "selecție-radio"}
         <SelectieRadio
             {...props_comuni}
+            horizontal={cimp.horizontal}
             {optiuni}
             bind:eroare
             bind:value

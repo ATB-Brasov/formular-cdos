@@ -52,6 +52,7 @@
  * @property {TipCimp} tip
  * @property {string} nume
  * @property {string} titlu
+ * @property {boolean} [horizontal]
  * @property {string?} [desc]
  * @property {AscundeCimp?} [ascunde]
  * @property {boolean} [obligatoriu]

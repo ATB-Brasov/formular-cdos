@@ -177,15 +177,6 @@
 
     const ULTIMA_PAGINA = intrebari.length - 1;
     const pagina_activa = $derived(intrebari[pagina]);
-    const btn_urmator_activ = $derived(
-        !pagina_activa.cimpuri.some(
-            (c) =>
-                raspunsGol(c.nume) &&
-                (!c.ascunde?.(raspunsuri)) &&
-                c.obligatoriu,
-        ) &&
-            !Object.keys(eroare).some((k) => eroare[k]?.pag === pagina),
-    );
 
     /**
      * @param {Cimp} cimp
@@ -386,7 +377,6 @@
                         <Buton
                             class="min-w-22"
                             type="button"
-                            disabled={false && !btn_urmator_activ}
                             onclick={ultima ? handleSubmit : () => scimbaPagina("urmator")}
                         >
                             {ultima ? "Trimite" : "Următor"}

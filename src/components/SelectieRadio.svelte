@@ -5,12 +5,13 @@
 
     /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
     import { aplicaValidare, normOptiune } from "@content/cestionare/types.js";
-	import CadruCimp from "./CadruCimp.svelte";
+    import CadruCimp from "./CadruCimp.svelte";
 
     /**
      * @typedef {Object} Props
      * @property {string} nume
      * @property {string} intrebare
+     * @property {boolean} [horizontal = false]
      * @property {string?} [desc = null]
      * @property {RezultatOptiuni} optiuni
      * @property {string} value
@@ -27,6 +28,7 @@
         onblur,
         intrebare,
         desc = null,
+        horizontal = false,
         optiuni,
         valideaza,
         eroare = $bindable(),
@@ -34,13 +36,14 @@
     } = $props();
 
     let facade = {
-        get value() { return value; },
-        set value(v) { 
-            eroare = aplicaValidare(v, obligatoriu, valideaza)
+        get value() {
+            return value;
+        },
+        set value(v) {
+            eroare = aplicaValidare(v, obligatoriu, valideaza);
             value = v;
-        }
+        },
     };
-
 </script>
 
 <CadruCimp {eroare} {intrebare} {desc} {obligatoriu}>
@@ -49,13 +52,21 @@
             {optiuni.eroare}
         </p>
     {:else}
-        <div class="p-2 rounded flex flex-col" {onblur}>
+        <div class={["flex", horizontal ? "flex-row gap-4" : "flex-col gap-0.5"]} {onblur}>
             {#each optiuni.optiuni.map(normOptiune) as opt}
-                <span title={opt.msg ?? ""}>
-                    <label class:opacity-50={!opt.exista}>
+                <div 
+                    class={[
+                        "border transition transition-colors duration-300 rounded rounded-lg",
+                        horizontal && "flex-grow",
+                        value === opt.text ? 
+                            "bg-primary-subtle border-primary-border hover:bg-primary-border"
+                        : "border-transparent bg-transparent hover:bg-surface hover:border-surface-border"
+                    ]}
+                >
+                    <label class="block p-2 w-full" class:opacity-50={!opt.exista}>
                         <input
                             type="radio"
-                            class="accent-primary"
+                            class="accent-primary mr-2"
                             name={nume}
                             bind:group={facade.value}
                             value={opt.text}
@@ -64,7 +75,7 @@
                         >
                         {opt.text}
                     </label>
-                </span>
+                </div>
             {/each}
         </div>
     {/if}

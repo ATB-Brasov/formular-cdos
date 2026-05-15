@@ -197,6 +197,7 @@ export default {
                     tip: "selecție-radio",
                     nume: "anul",
                     titlu: "Anul de studiu",
+                    horizontal: true,
                     obligatoriu: true,
                     optiuni: (rspi) => {
                         const ani = lista.facultati

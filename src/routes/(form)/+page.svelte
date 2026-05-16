@@ -12,6 +12,7 @@
 
     import Intrare from "./Intrare.svelte";
     import { onMount } from "svelte";
+    import { raspunsGol } from "@content/cestionare/types.js";
 
     const test = page.url.searchParams.get("test") === "true"
 
@@ -39,42 +40,40 @@
 
     /** @param {"urmator" | "precedent"} directie */
     function scimbaPagina(directie) {
-        Object.entries(eroare).forEach(([k, _]) => eroare[k] = null)
-        intrebari[pagina].cimpuri.forEach(c => aplica_validare(c))
-        const err = Object.entries(eroare).filter(([_, v]) => v != null)
-        if (err.length > 0) {
-            const e = err.at(0)
-            e && cimpuri[e[0]].scrollIntoView()
-            return
+        for (const k in eroare)
+            eroare[k] = null
+        for (const c of intrebari[pagina].cimpuri) 
+            aplica_validare(c)
+        for (const k in eroare) {
+            if (eroare[k] != null) { 
+                cimpuri[k].scrollIntoView();
+                return;
+            }
         }
 
         let tmp = pagina;
         while (true) {
-            switch (directie) {
-                case "urmator":
-                    tmp += 1;
-                    break;
-                case "precedent":
-                    tmp -= 1;
-                    if (tmp === -1) {
-                        seteaza_pagina(tmp, {
-                            whence: "scimbaPagina::case precedent",
-                        });
-                        return;
-                    }
-                    break;
-                default:
-                    return;
+            if (directie === "urmator") {
+                tmp++;
+            } else if (directie === "precedent") {
+                tmp--;
+            } else {
+                console.error(`Direcție necunoscută ${directie}`)
+                return;
+            }
+            if (tmp === -1) {
+                seteaza_pagina(tmp, {whence: "scimbaPagina::precedent"});
+                return;
             }
             if (tmp < 0 || tmp > ULTIMA_PAGINA) return;
             if (!intrebari[tmp].ascunde?.(raspunsuri)) break;
         }
-        seteaza_pagina(tmp, { whence: "scimbaPagina::final" });
+        seteaza_pagina(tmp, {whence: "scimbaPagina::final"});
     }
 
-    /** @type {SDict<HTMLElement>} */ let cimpuri = $state( {})
-    /**@type{ResizeObserver}*/ let observer
-    /**@type{HTMLElement?}*/   let forIframe
+    /**@type{SDict<HTMLElement>}*/ let cimpuri = $state( {})
+    /**@type{ResizeObserver}*/     let observer
+    /**@type{HTMLElement?}*/       let forIframe
 
     function notifyParentOfHeightChange() {
         if (forIframe) {
@@ -125,8 +124,6 @@
         if (form == null) return;
         if (form.pag != null) seteaza_pagina(form.pag, { whence: "$effect" });
 
-        $inspect(eroare)
-
         /** @type {SDict<string>} */ const newRaspunsuri = {};
         /** @type {SDict<Eroare>} */ const newEroare = {};
         for (const [k, v] of Object.entries(form)) {
@@ -158,22 +155,10 @@
     });
 
     $effect(() => {
-        if (Object.keys(raspunsuri).length > 0) {
-            localStorage.setItem("raspunsuri", JSON.stringify(raspunsuri));
-        }
+        localStorage.setItem("raspunsuri", JSON.stringify(raspunsuri));
     });
 
     let intrebari = sondaj_cdos.pagini.map((p, idx) => ({...p, idx}));
-
-    /**
-     * Verifică dacă răspunsul este gol sau nu.
-     *
-     * @param {string} nume Numele cîmpului
-     * @returns {boolean}
-     */
-    function raspunsGol(nume) {
-        return raspunsuri[nume] == null || raspunsuri[nume]?.trim() === "";
-    }
 
     const ULTIMA_PAGINA = intrebari.length - 1;
     const pagina_activa = $derived(intrebari[pagina]);
@@ -185,36 +170,25 @@
     function aplica_validare(cimp, pag=pagina) {
         eroare[cimp.nume] = null;
 
-        const rasp = raspunsuri[cimp.nume];
-        let errorMsg = null;
-        let errorType = null;
+        const rasp = raspunsuri[cimp.nume] ?? "";
+        let msg = null;
+        let type = null;
 
-        if (raspunsGol(cimp.nume)) {
-            if (
-                intrebari[pag].ascunde?.(raspunsuri)
-                || cimp.ascunde?.(raspunsuri)
-                || !cimp.obligatoriu
-            ) {
-                return // Câmpul nu este obligatoriu, nu-l mai verificăm
-            }
-
-            errorType = "field-required";
-            errorMsg = "Cîmpul este obligatoriu";
-        } else if (cimp.valideaza != null) {
-            const err = cimp.valideaza(rasp?.toString() ?? ""); // Ensure rasp is a string for validation
+        if (raspunsGol(rasp)) {
+            const ascunde_pag  = intrebari[pag].ascunde?.(raspunsuri)
+            const ascunde_cimp = cimp.ascunde?.(raspunsuri)
+            if (ascunde_pag || ascunde_cimp || !cimp.obligatoriu) return
+            type = "field-required";
+            msg = "Cîmpul este obligatoriu";
+        } else {
+            const err = cimp.valideaza?.(rasp);
             if (err != null) {
-                errorType = "field-invalid";
-                errorMsg = err;
+                type = "field-invalid";
+                msg = err;
             }
         }
 
-        if (errorMsg && errorType) {
-            eroare[cimp.nume] = {
-                type: errorType,
-                msg: errorMsg,
-                pag,
-            };
-        }
+        if (msg && type) eroare[cimp.nume] = { type, msg, pag };
     }
 
     const pagini_vizibile = $derived(
@@ -224,7 +198,7 @@
     let formElement = /** @type {HTMLFormElement?} */ $state();
 
     function handleSubmit() {
-        Object.entries(eroare).forEach(([k, _]) => eroare[k] = null)
+        for (const k in eroare) eroare[k] = null
         const cimps = intrebari.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1)
         cimps.forEach(c => aplica_validare(c, c.pag))
         const err = Object.entries(eroare).filter(([_, v]) => v != null)
@@ -234,17 +208,15 @@
             if (erA == null || erB == null) return 0
             return erA.pag - erB.pag
         })
-        console.log(err.map(e => e[1]?.pag))
 
         if (err.length > 0) {
-            const e = err[0]
-            if (e[1] != null) {
-                seteaza_pagina(e[1].pag, {whence: "/::handleSubmit"})
-                cimpuri[e[0]].scrollIntoView()
-            }
-            return
+            const [k, v] = err[0]
+            if (v == null) return
+            seteaza_pagina(v.pag, {whence: "/::handleSubmit"})
+            setTimeout(() => cimpuri[k].scrollIntoView(), 0)
+        } else {
+            setTimeout(() => formElement?.requestSubmit(), 0);
         }
-        setTimeout(() => { formElement?.requestSubmit(); }, 0);
     }
 </script>
 

@@ -94,7 +94,7 @@ export function normOptiune(opt) {
  * @param {string?} value Numele cîmpului
  * @returns {boolean}
  */
-function raspunsGol(value) {
+export function raspunsGol(value) {
     return value == null || value?.trim() === "";
 }
 

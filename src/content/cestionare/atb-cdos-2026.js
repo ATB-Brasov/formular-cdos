@@ -93,7 +93,13 @@ export default {
             ? "Folosește adresa instituțională de student `@student.unitbv.ro`"
             : null,
     descriere:
-        "Sondaj pentru evaluarea respectării Codului de Drepturi și Obligații a Studenților din Universitatea Transilvania din Brașov.",
+        `<p>Acest sondaj a fost creat pentru a evalua nivelul de respectare a <a href="https://unitbv.ro/documente/despre-unitbv/regulamente-hotarari/regulamentele-universitatii/studenti/Codul_studentului_26.06.2024.pdf">Codului Drepturilor și Obligațiilor Studențești</a> în cadrul <a href="https://unitbv.ro">Universității Transilvania Brașov (UniTBv)</a>.<br></p>
+
+<p>Prin completarea acestuia ne vei ajuta să depistăm care sunt problemele întâmpinate în UniTBv, ca ulterior să le putem semnala și remedia.</p>
+
+<p>Completarea acestui formular este complet anonimă.</p>
+
+<p>Află mai multe despre „Raportarea CDOS” aici: <a href="https://atbbrasov.ro/rapoarte/raport-conformare-cdos-2025/">Raport CDOS 2025</a></p>`,
     pagini: [
         {
             titlu: "Date Academice",
@@ -226,16 +232,12 @@ export default {
                         };
                     },
                 },
-                // Mai adăugăm următoarele întrebări:
-                // "Te încadrezi în categoria studenților cu dizabilități?" (implicit nu)
-                // "Ai desfășurat practica de specialitate?" (implicit da)
-                // "Ai participat în cadrul taberelor studențești?" (implicit nu)
             ],
         },
         {
             titlu: "Cazuri speciale",
             descriere:
-                "Această secțiune vizează respectarea principiilor de bază privind nediscriminarea, stabilitatea contractului de studii și gratuitatea serviciilor administrative oferite de Universitate.",
+                "Vom folosi aceste răspunsuri pentru a filtra doar întrebările relevante pentru tine.",
             cimpuri: [
                 da_nustiu(
                     "participare-tabere",
@@ -421,7 +423,7 @@ export default {
                 ),
                 da_nustiu(
                     "taxe_publ_termen_3",
-                    "Au fost taxele publicate cu cel puțin 3 luni înainte de începerea anului universitar? [art. 8 (2)]",
+                    "Taxele au fost publicate cu cel puțin 3 luni înainte de începerea anului universitar? [art. 8 (2)]",
                 ),
                 da_nustiu(
                     "taxe_suplim_nejust",

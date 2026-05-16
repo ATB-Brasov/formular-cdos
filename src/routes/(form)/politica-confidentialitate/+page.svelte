@@ -2,7 +2,7 @@
     // This component displays a simple privacy policy.
 </script>
 
-<div class="font-sans leading-relaxed mx-5 my-5 p-5 bg-surface">
+<div class="font-sans leading-relaxed mx-5 my-5 p-5">
     <div class="mb-4">
         <a href="/" class="text-blue-600 hover:underline">Înapoi la formular</a>
     </div>

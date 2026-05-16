@@ -35,3 +35,13 @@
     --color-warning-dark: var(--color-amber-400);
     --color-warning-hover: var(--color-amber-700);
 }
+
+
+a {
+    color: var(--color-primary-text);
+    text-decoration: underline;
+
+    &:hover {
+        color: var(--color-yellow-600);
+    }
+}

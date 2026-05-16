@@ -69,6 +69,7 @@
             if (!intrebari[tmp].ascunde?.(raspunsuri)) break;
         }
         seteaza_pagina(tmp, {whence: "scimbaPagina::final"});
+        setTimeout(() => window.scrollTo(0, 0))
     }
 
     /**@type{SDict<HTMLElement>}*/ let cimpuri = $state( {})
@@ -238,9 +239,10 @@
 
 {#if pagina === -1}
     <div
-        class="w-full rounded-xl border border-surface-border bg-surface mt-4 mb-8 p-3"
+        id="descriere"
+        class="w-full rounded-xl flex flex-col gap-y-2 border border-surface-border bg-surface mt-4 mb-8 p-3"
     >
-        {sondaj_cdos.descriere}
+        {@html sondaj_cdos.descriere}
     </div>
 
     <Intrare bind:this={formElement} bind:eroare bind:pagina />

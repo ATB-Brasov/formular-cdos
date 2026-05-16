@@ -118,9 +118,9 @@
         tip={"email"}
         titlu={"Adresa poștei instituționale"}
         desc={`
-            Adresa de e-mail va fi folosită pentru a detecta completare repetată a formularului.
-            Adresele vor fi păstrate în formă criptată și <b class="font-bold">nu vor fi</b> asociate cu
-            răspunsurile colectate. Pentru mai multe informații, consultați <a href="/politica-confidentialitate" target="_blank" class="underline">politica de confidențialitate</a>.`}
+            Adresa e-mail <strong>nu va fi</strong> asociată cu răspunsurile
+            colectate. Ele vor fi stocate separat pentru a verifica utilizarea
+            repetată a aceleeași adrese. Pentru mai multe informații, consultați <a href="/politica-confidentialitate">politica de confidențialitate</a>.`}
         nume={"posta"}
         bind:eroare={eroare["posta"]}
         placeholder={"exemplu@student.unitbv.ro"}

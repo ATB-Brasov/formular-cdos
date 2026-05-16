@@ -60,7 +60,7 @@
                         horizontal && "flex-grow",
                         value === opt.text ? 
                             "bg-primary-subtle border-primary-border hover:bg-primary-border"
-                        : "border-transparent bg-transparent hover:bg-surface hover:border-surface-border"
+                        : "border-transparent bg-transparent focus-within:bg-surface focus-within:border-surface-border hover:bg-surface hover:border-surface-border"
                     ]}
                 >
                     <label class="block p-2 w-full" class:opacity-50={!opt.exista}>

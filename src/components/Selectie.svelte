@@ -52,7 +52,7 @@
 
 {#if optiuni == null}
     <i class="text-italic text-danger-strong">
-        Nu a fost definită funcția `optiuni` pentru cîmpul `{cimp.nume}`
+        Nu a fost definită funcția `optiuni` pentru câmpul `{cimp.nume}`
     </i>
 {:else}
     {#if cimp.tip === "selecție-nativa"}
@@ -79,7 +79,7 @@
         />
     {:else}
         <i class="text-italic text-danger-strong">
-            Tip cîmp `{cimp.tip}` necunoscut pentru Selectie
+            Tip câmp `{cimp.tip}` necunoscut pentru Selectie
         </i>
     {/if}
 {/if}

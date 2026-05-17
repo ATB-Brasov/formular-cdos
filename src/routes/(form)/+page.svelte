@@ -180,7 +180,7 @@
             const ascunde_cimp = cimp.ascunde?.(raspunsuri)
             if (ascunde_pag || ascunde_cimp || !cimp.obligatoriu) return
             type = "field-required";
-            msg = "Cîmpul este obligatoriu";
+            msg = "Câmpul este obligatoriu";
         } else {
             const err = cimp.valideaza?.(rasp);
             if (err != null) {
@@ -321,7 +321,7 @@
                                     />
                                 {:else}
                                     <div class="text-italic text-danger-strong">
-                                        Tip cîmp `{cimp.tip}` necunoscut
+                                        Tip câmp `{cimp.tip}` necunoscut
                                     </div>
                                 {/if}
                             </div>

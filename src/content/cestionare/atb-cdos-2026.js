@@ -128,7 +128,7 @@ export default {
                 {
                     tip: "selecție-radio",
                     nume: "forma",
-                    titlu: "Forma de Învățămînt",
+                    titlu: "Forma de Învățământ",
                     obligatoriu: true,
                     optiuni: (rspi) => {
                         const filtered = lista.facultati
@@ -150,7 +150,7 @@ export default {
                         return {
                             optiuni,
                             eroare: optiuni.length === 0
-                                ? "Nu au fost găsite forme de învățămînt pentru selecția curentă."
+                                ? "Nu au fost găsite forme de învățământ pentru selecția curentă."
                                 : null,
                         };
                     },
@@ -158,7 +158,7 @@ export default {
                 {
                     tip: "selecție-radio",
                     nume: "programul",
-                    titlu: "Programul de Învățămînt",
+                    titlu: "Programul de Învățământ",
                     obligatoriu: true,
                     optiuni: (rspi) => {
                         if (!rspi["facultatea"]) {
@@ -178,7 +178,7 @@ export default {
                             return {
                                 optiuni: [],
                                 eroare:
-                                    "Selectează mai întâi forma de învățămînt.",
+                                    "Selectează mai întâi forma de învățământ.",
                             };
                         }
                         const optiuni = lista.facultati

@@ -53,7 +53,7 @@ export const actions = {
                 erori: {
                     posta: {
                         type: "email-required",
-                        msg: "Cîmpul este obligatoriu",
+                        msg: "Câmpul este obligatoriu",
                         pag: -1,
                     },
                 },
@@ -205,7 +205,7 @@ export const actions = {
                     if (!cimp.ascunde?.(dataDict) && cimp.obligatoriu) {
                         erori[cimp.nume] = {
                             type: "field-required",
-                            msg: "Cîmpul este obligatoriu",
+                            msg: "Câmpul este obligatoriu",
                             pag: pag_nr,
                         };
                         min_err_pag = Math.min(min_err_pag, pag_nr);

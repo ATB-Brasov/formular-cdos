@@ -63,7 +63,6 @@
             eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
         } else {
             if (eroare["posta"]?.type !== "email-invalid") return;
-            console.log("set posta to null!!")
             eroare["posta"] = null;
         }
     });
@@ -84,6 +83,8 @@
             return;
         }
 
+        eroare["posta"] = null
+        eroare["gdpr-consent"] = null
         isMining = true;
         setTimeout(() => { formElement?.requestSubmit(); }, 0);
     }
@@ -106,6 +107,7 @@
             });
 
         return async ({ result, update }) => {
+            console.log("result: ", result)
             if (result.type === "success") {
                 pagina = 0;
                 localStorage.setItem("pagina", "0")

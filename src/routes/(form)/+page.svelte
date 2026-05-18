@@ -197,6 +197,7 @@
             if (e[1].pag >= 0)
                 cimpuri[e[0]].scrollIntoView()
         }
+        form = null
     });
 
     $effect(() => {

@@ -100,13 +100,13 @@ function detalii(nume) {
 /**@type{import("@content/cestionare/types.js").Cestionar}*/
 export default {
     id: "atb-cdos-2026",
-    titlu: "Sondaj CDOS 2026",
+    titlu: "Chestionar CDOS 2026",
     validare_posta: (posta) =>
         (!posta.endsWith("@student.unitbv.ro"))
             ? "Folosește adresa instituțională de student `@student.unitbv.ro`"
             : null,
     descriere:
-        `<p>Acest sondaj a fost creat pentru a evalua nivelul de respectare a <a target="_blank" href="https://unitbv.ro/documente/despre-unitbv/regulamente-hotarari/regulamentele-universitatii/studenti/Codul_studentului_26.06.2024.pdf">Codului Drepturilor și Obligațiilor Studențești</a> în cadrul <a target="_blank" href="https://unitbv.ro">Universității Transilvania Brașov (UniTBv)</a>.<br></p>
+        `<p>Acest chestionar a fost creat pentru a evalua nivelul de respectare a <a target="_blank" href="https://unitbv.ro/documente/despre-unitbv/regulamente-hotarari/regulamentele-universitatii/studenti/Codul_studentului_26.06.2024.pdf">Codului Drepturilor și Obligațiilor Studențești</a> în cadrul <a target="_blank" href="https://unitbv.ro">Universității Transilvania Brașov (UniTBv)</a>.<br></p>
 
 <p>Prin completarea acestuia ne vei ajuta să depistăm care sunt problemele întâmpinate în UniTBv, ca ulterior să le putem semnala și remedia.</p>
 
@@ -620,7 +620,7 @@ export default {
                     "Ai putut beneficia de sprijin pentru identificare și derularea practicii de specialitate? [art. 6 (3) b)]",
                     {
                         ascunde: (rspi) =>
-                            rspi["practica-de-specialitate"] === "da",
+                            rspi["practica-de-specialitate"] !== "da",
                     },
                 ),
                 detalii("detalii-dizabilitati"),

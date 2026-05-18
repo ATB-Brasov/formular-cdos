@@ -83,13 +83,13 @@ const paginia_dezabilitati =
 /**@type{import("@content/cestionare/types.js").Cestionar}*/
 export default {
     id: "atb-cdos-2026",
-    titlu: "Sondaj CDOS 2026",
+    titlu: "Chestionar CDOS 2026",
     validare_posta: (posta) =>
         (!posta.endsWith("@student.unitbv.ro"))
             ? "Folosește adresa instituțională de student `@student.unitbv.ro`"
             : null,
     descriere:
-        "Sondaj pentru evaluarea respectării Codului de Drepturi și Obligații a Studenților din Universitatea Transilvania din Brașov.",
+        "Chestionar pentru evaluarea respectării Codului de Drepturi și Obligații a Studenților din Universitatea Transilvania din Brașov.",
     pagini: [
         {
             titlu: "Date Academice",

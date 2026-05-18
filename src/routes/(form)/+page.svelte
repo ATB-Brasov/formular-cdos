@@ -28,6 +28,10 @@
     let { data, form } = $props();
 
     let pagina = $state(data.session?.email ? 0 : -1);
+    $effect(() => {
+        pagina;
+        notifyParentPageChange()
+    })
     /** @type {SDict<Eroare|null>} */ let eroare = $state({});
     /** @type {SDict<string>} */ let raspunsuri = $state({});
 
@@ -39,7 +43,6 @@
         if (options?.whence != null) console.log(options.whence);
         pagina = pag;
         localStorage.setItem("pagina", pagina.toString());
-        notifyParentPageChange()
     }
 
     /**
@@ -422,10 +425,3 @@
 {/if}
 
 </div>
-
-{#if !is_iframe}
-    <footer class="text-surface-dim flex flex-col items-center mt-8 mb-22 gap-2">
-        <div class="text-center">Dacă întâmpinați probleme cu formularul sau considerați că conține informații greșite lăsați o sesizare <a href="https://opnform.com/forms/formular-de-sesizari-0nuyk3">aici.</a></div>
-        <div>&copy; ATB Brașov 2026</div>
-    </footer>
-{/if}

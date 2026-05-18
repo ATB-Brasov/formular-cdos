@@ -11,7 +11,7 @@
         Politică de Confidențialitate
     </h2>
     <p class="mb-6 text-sm text-gray-500">
-        Data ultimei actualizări: 19.03.2024
+        Data ultimei actualizări: 18.05.2024
     </p>
 
     <p class="mb-4">
@@ -29,7 +29,7 @@
     </p>
     <p class="mb-4">
         Colectăm adresa dumneavoastră de e-mail în scopul prevenirii
-        completărilor duplicate în formulare sau sondaje. Această informație nu
+        completărilor duplicate în chestionar. Această informație nu
         va fi partajată cu terți fără consimțământul dumneavoastră explicit.
     </p>
 
@@ -39,7 +39,7 @@
     <p class="mb-4">
         Asigurăm securitatea datelor dumneavoastră prin implementarea unor
         măsuri tehnice și organizatorice adecvate. Datele personale sunt
-        protejate prin criptare, iar răspunsurile la sondaje sunt anonimizate
+        protejate prin criptare, iar răspunsurile la cestionar sunt anonimizate
         pentru a garanta confidențialitatea.
     </p>
 
@@ -51,6 +51,3 @@
         oricând. Orice modificări vor fi publicate pe această pagină.
     </p>
 </div>
-
-<style>
-</style>

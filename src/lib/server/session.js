@@ -88,7 +88,7 @@ export async function createSession(formId, email = null) {
  * Create a new session for an email
  * @param {string} sessionId - User email
  * @param {string} email - User email
- * @returns {Promise<void>} Session ID
+ * @returns {Promise<SessionData|null>} Session ID
  * TODO: Return an error if no session was found
  */
 export async function updateSessionEmail(sessionId, email) {
@@ -109,7 +109,10 @@ export async function updateSessionEmail(sessionId, email) {
         await kv.set([...SESSION_PREFIX, sessionId], sessionData, {
             expireIn: SESSION_DURATION,
         });
+
+        return sessionData
     }
+    return null
 }
 
 /**

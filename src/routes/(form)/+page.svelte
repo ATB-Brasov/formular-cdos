@@ -126,6 +126,8 @@
             );
         }
     }
+    
+    /**@type{string?}*/ let email = $state(null)
 
     onMount(() => {
         if (is_iframe) notifyParentOfHeightChange();
@@ -147,6 +149,7 @@
                 );
             }
         }
+        email = localStorage.getItem("posta")
 
         if (is_iframe) {
             observer = new ResizeObserver((entries) => {
@@ -203,6 +206,8 @@
 
     const ULTIMA_PAGINA = intrebari.length - 1;
     const pagina_activa = $derived(intrebari[pagina]);
+    console.log(pagina)
+    console.log(pagina_activa)
 
     /**
      * @param {Cimp} cimp
@@ -330,6 +335,10 @@
 
         {#if test}
             <input type="hidden" name="test" value="true">
+        {/if}
+
+        {#if email != null}
+            <input type="hidden" name="posta" value={email}>
         {/if}
 
         {#each intrebari as pag, i}

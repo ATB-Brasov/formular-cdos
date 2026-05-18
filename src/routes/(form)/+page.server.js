@@ -140,7 +140,7 @@ export const actions = {
                 },
             });
         }
-        const session = await getSession(sessionId);
+        let session = await getSession(sessionId);
         if (session == null) {
             return fail(400, {
                 erori: {
@@ -152,16 +152,36 @@ export const actions = {
                 },
             });
         }
+
+        const data = await request.formData();
+        const dataDict = Object.fromEntries(
+            data.entries().map(([nume, valoare]) => [nume, valoare.toString()]),
+        );
+
         if (session.email == null) {
-            return fail(400, {
-                erori: {
-                    _form: {
-                        type: "email-required",
-                        msg: "Poșta electronică a sesiunii nu a fost setată",
-                        pag: -1,
+            if (dataDict.posta == null) {
+                return fail(400, {
+                    erori: {
+                        _form: {
+                            type: "email-required",
+                            msg: "Poșta electronică a sesiunii nu a fost setată",
+                            pag: -1,
+                        },
                     },
-                },
-            });
+                });
+            }
+            session = await updateSessionEmail(sessionId, dataDict.posta);
+            if (session == null || session.email == null) {
+                return fail(400, {
+                    erori: {
+                        _form: {
+                            type: "session-invalid",
+                            msg: "Sesiune nevalidă",
+                            pag: -1,
+                        },
+                    },
+                });
+            }
         }
         const msg_validare = (sondaj_cdos.validare_posta != null)
             ? sondaj_cdos.validare_posta(session.email)
@@ -173,11 +193,6 @@ export const actions = {
                 },
             });
         }
-
-        const data = await request.formData();
-        const dataDict = Object.fromEntries(
-            data.entries().map(([nume, valoare]) => [nume, valoare.toString()]),
-        );
 
         let sondaj = sondaj_cdos;
 

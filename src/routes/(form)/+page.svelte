@@ -39,24 +39,40 @@
         if (options?.whence != null) console.log(options.whence);
         pagina = pag;
         localStorage.setItem("pagina", pagina.toString());
+        notifyParentPageChange()
+    }
+
+    /**
+     * @param {HTMLElement} cimp 
+    */
+    function scrollToField(cimp) {
+        const top = cimp.offsetTop - window.innerHeight/2 + cimp.offsetHeight/2
+        window.scrollTo({top, behavior: "smooth"})
+        notifyParentScrollTo(
+            cimp.getBoundingClientRect().top,
+            cimp.getBoundingClientRect().height,
+        )
+        cimp.dataset.animate = "true"
+        setTimeout(() => delete cimp.dataset.animate, 700)
+
     }
 
     /** @param {"urmator" | "precedent"} directie */
     function scimbaPagina(directie) {
-        for (const k in eroare)
-            eroare[k] = null
-        for (const c of intrebari[pagina].cimpuri) 
-            aplica_validare(c)
-        for (const k in eroare) {
-            if (eroare[k] != null) { 
-                cimpuri[k].scrollIntoView();
-                return;
-            }
-        }
-
         let tmp = pagina;
         while (true) {
             if (directie === "urmator") {
+                for (const k in eroare)
+                    eroare[k] = null
+                for (const c of intrebari[pagina].cimpuri) 
+                    aplica_validare(c)
+                for (const k in eroare) {
+                    if (eroare[k] != null) { 
+                        scrollToField(cimpuri[k])
+                        return;
+                    }
+                }
+
                 tmp++;
             } else if (directie === "precedent") {
                 tmp--;
@@ -72,12 +88,31 @@
             if (!intrebari[tmp].ascunde?.(raspunsuri)) break;
         }
         seteaza_pagina(tmp, {whence: "scimbaPagina::final"});
-        setTimeout(() => window.scrollTo(0, 0))
+        !is_iframe && setTimeout(() => window.scrollTo({top: 0, behavior: "smooth"}))
     }
 
     /**@type{SDict<HTMLElement>}*/ let cimpuri = $state( {})
     /**@type{ResizeObserver}*/     let observer
     /**@type{HTMLElement?}*/       let forIframe
+
+    function notifyParentScrollTo(/**@type{number}*/rectTop, /**@type{number}*/rectHeight) {
+        if (forIframe) {
+            window.parent.postMessage(
+                { type: 'scroll-to', rectTop, rectHeight},
+                '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
+            );
+        }
+    }
+
+    function notifyParentPageChange() {
+        if (forIframe) {
+            window.parent.postMessage(
+                { type: 'page-change' },
+                '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
+            );
+        }
+    }
+
 
     function notifyParentOfHeightChange() {
         if (forIframe) {
@@ -217,16 +252,16 @@
 
         if (err.length > 0) {
             const [k, v] = err[0]
-            if (v == null) return
+            if (v == null) return // Pentru a satisface LSP-ul, ca filtrez null-ul mai sus
             seteaza_pagina(v.pag, {whence: "/::handleSubmit"})
-            setTimeout(() => cimpuri[k].scrollIntoView(), 0)
+            setTimeout(() => scrollToField(cimpuri[k]), 0)
         } else {
             setTimeout(() => formElement?.requestSubmit(), 0);
         }
     }
 </script>
 
-{#if test}
+{#if dev}
     <div
         class="fixed bottom-6 left-6 rounded bg-primary-subtle border border-primary-border z-200 px-4 py-2 font-mono"
     >
@@ -302,7 +337,14 @@
                 <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
                     {#each pag.cimpuri as cimp, nr}
                         {#if !cimp.ascunde?.(raspunsuri)}
-                            <div class="scroll-mt-32" bind:this={cimpuri[cimp.nume]}>
+                            <div id={`cimp-${cimp.nume}`} 
+                                    class="
+                                        p-2 rounded-xl 
+                                        border border-transparent
+                                        data-animate:border-red-200
+                                        data-animate:bg-red-100
+                                        transition-colors ease-in duration-400"
+                                    bind:this={cimpuri[cimp.nume]}>
                                 {#if dev}
                                     <div class="text-surface-muted text-mono text-xs">
                                         id: {cimp.nume} ({nr + 1})

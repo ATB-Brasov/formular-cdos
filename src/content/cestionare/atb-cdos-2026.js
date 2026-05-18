@@ -84,6 +84,19 @@ function grad_p(nume, titlu, optiuni_obj = {}) {
     ], optiuni_obj);
 }
 
+
+/**
+ * @param {string} nume
+ * @returns {Cimp}
+ */
+function detalii(nume) {
+    return {
+        tip: "text",
+        nume,
+        titlu: "Adaugă detalii:",
+    }
+}
+
 /**@type{import("@content/cestionare/types.js").Cestionar}*/
 export default {
     id: "atb-cdos-2026",
@@ -93,13 +106,13 @@ export default {
             ? "Folosește adresa instituțională de student `@student.unitbv.ro`"
             : null,
     descriere:
-        `<p>Acest sondaj a fost creat pentru a evalua nivelul de respectare a <a href="https://unitbv.ro/documente/despre-unitbv/regulamente-hotarari/regulamentele-universitatii/studenti/Codul_studentului_26.06.2024.pdf">Codului Drepturilor și Obligațiilor Studențești</a> în cadrul <a href="https://unitbv.ro">Universității Transilvania Brașov (UniTBv)</a>.<br></p>
+        `<p>Acest sondaj a fost creat pentru a evalua nivelul de respectare a <a target="_blank" href="https://unitbv.ro/documente/despre-unitbv/regulamente-hotarari/regulamentele-universitatii/studenti/Codul_studentului_26.06.2024.pdf">Codului Drepturilor și Obligațiilor Studențești</a> în cadrul <a target="_blank" href="https://unitbv.ro">Universității Transilvania Brașov (UniTBv)</a>.<br></p>
 
 <p>Prin completarea acestuia ne vei ajuta să depistăm care sunt problemele întâmpinate în UniTBv, ca ulterior să le putem semnala și remedia.</p>
 
 <p>Completarea acestui formular este complet anonimă.</p>
 
-<p>Află mai multe despre „Raportarea CDOS” aici: <a href="https://atbbrasov.ro/rapoarte/raport-conformare-cdos-2025/">Raport CDOS 2025</a></p>`,
+<p>Află mai multe despre „Raportarea CDOS” aici: <a target="_blank" href="https://atbbrasov.ro/rapoarte/raport-conformare-cdos-2025/">Raport CDOS 2025</a></p>`,
     pagini: [
         {
             titlu: "Date Academice",
@@ -322,6 +335,7 @@ export default {
                             "Studenții înmatriculați la forma de învățământ cu frecvență beneficiază de facilități de transport conform prevederilor legale.",
                     },
                 ),
+                detalii("detalii-generale"),
             ],
         },
 
@@ -406,6 +420,7 @@ export default {
                     "acad_tutore_indrum",
                     "Ai beneficiat de un tutore sau îndrumător de an? [art. 7 i)]",
                 ),
+                detalii("detalii-calitate_eduational"),
             ],
         },
         {
@@ -429,6 +444,7 @@ export default {
                     "taxe_suplim_nejust",
                     "Ți s-au perceput taxe suplimentare nejustificate (ex: pentru reclasificare între locuri cu taxă/buget)? [art.8]",
                 ),
+                detalii("detalii-taxe"),
             ],
         },
         {
@@ -452,6 +468,7 @@ export default {
                     "repr_disem_statis",
                     "Rezultatele statistice ale evaluării reprezentanților ți-au fost diseminate prin canalele oficiale?",
                 ),
+                detalii("detalii-representare"),
             ],
         },
         {
@@ -504,6 +521,7 @@ export default {
                         },
                     },
                 ),
+                detalii("detalii-drepturi_sociale"),
             ],
         },
         {
@@ -541,6 +559,7 @@ export default {
                     "prac_recuno_indiv",
                     "Ti-a fost recunoscută practica efectuată individual după evaluarea îndeplinirii obiectivelor? [art. 9 (1) g)]",
                 ),
+                detalii("detalii-practica"),
             ],
         },
         {
@@ -574,6 +593,7 @@ export default {
                             "Creditele ECVET (Sistemul European de Credite pentru Învățare și Formare) și ECTS (sistemul european de transfer și acumulare a creditelor) sunt sisteme de calificare a volumului de învățare și a volumului de lucru asociat. ECTS se concentrează pe ciclurile academice (licență, master, doctorat), iar ECVET se aplică în contextul formării profesionale pe parcursul vieții.",
                     },
                 ),
+                detalii("detalii-tabere"),
             ],
         },
         {
@@ -603,6 +623,7 @@ export default {
                             rspi["practica-de-specialitate"] === "da",
                     },
                 ),
+                detalii("detalii-dizabilitati"),
             ],
         },
     ],

@@ -56,7 +56,10 @@
                         const cimp = cimpuri[k]
                         const top = cimp.offsetTop - window.innerHeight/2 + cimp.offsetHeight/2
                         window.scrollTo({top, behavior: "smooth"})
-                        notifyParentScrollTo(cimp.id)
+                        notifyParentScrollTo(
+                            cimp.getBoundingClientRect().top,
+                            cimp.getBoundingClientRect().height,
+                        )
                         cimp.dataset.animate = "true"
                         setTimeout(() => delete cimp.dataset.animate, 700)
                         return;
@@ -85,10 +88,10 @@
     /**@type{ResizeObserver}*/     let observer
     /**@type{HTMLElement?}*/       let forIframe
 
-    function notifyParentScrollTo(/**@type{string?}*/fieldId = null) {
-        if (forIframe && fieldId) {
+    function notifyParentScrollTo(/**@type{number}*/rectTop, /**@type{number}*/rectHeight) {
+        if (forIframe) {
             window.parent.postMessage(
-                { type: 'scroll-to', fieldId},
+                { type: 'scroll-to', rectTop, rectHeight},
                 '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
             );
         }

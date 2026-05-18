@@ -8,7 +8,9 @@
         localStorage.clear();
 
         const is_iframe = page.url.searchParams.get("iframe") === "true"
+        console.dir(element)
         if (is_iframe && element != null) {
+            console.log("trimite la părinte dimensiunile proprii")
             const height = element.offsetHeight;
             window.parent.postMessage(
                 { type: 'iframe-resize', height: height },

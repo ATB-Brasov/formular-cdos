@@ -14,7 +14,10 @@
     import { onMount } from "svelte";
     import { raspunsGol } from "@content/cestionare/types.js";
 
+    import logo from "$lib/assets/logo_ATB_120x120.webp";
+
     const test = page.url.searchParams.get("test") === "true"
+    const is_iframe = page.url.searchParams.get("iframe") === "true"
 
     const sondaj_cdos =
         (test
@@ -90,7 +93,7 @@
     }
 
     onMount(() => {
-        notifyParentOfHeightChange();
+        if (is_iframe) notifyParentOfHeightChange();
         const raspunsuriSalvate = localStorage.getItem("raspunsuri");
         if (raspunsuriSalvate) {
             try {
@@ -110,15 +113,17 @@
             }
         }
 
-        observer = new ResizeObserver((entries) => {
-            for (let entry of entries) {
-                if (entry.target.id === "formWrapper") {
-                    setTimeout(notifyParentOfHeightChange, 0);
+        if (is_iframe) {
+            observer = new ResizeObserver((entries) => {
+                for (let entry of entries) {
+                    if (entry.target.id === "formWrapper") {
+                        setTimeout(notifyParentOfHeightChange, 0);
+                    }
                 }
-            }
-        });
-        setTimeout(() => forIframe && observer.observe(forIframe), 0)
-        return () => { observer?.disconnect() };
+            });
+            setTimeout(() => forIframe && observer.observe(forIframe), 0)
+            return () => { observer?.disconnect() };
+        }
     });
 
     $effect(() => {
@@ -233,6 +238,12 @@
     </div>
 {/if}
 
+
+{#if !is_iframe}
+    <header class="px-4 flex justify-center w-full"><a href="https://atbbrasov.ro/"><img class="h-20" src={logo} alt=""></a></header>
+{/if}
+
+
 <div id="formWrapper" bind:this={forIframe}>
 
 <h1 class="text-4xl font-bold mt-8 mb-4">{sondaj_cdos.titlu}</h1>
@@ -283,7 +294,8 @@
         method="POST"
         use:enhance
         action="?/salveaza"
-        class="mt-4 w-full mb-26"
+        class="mt-4 w-full"
+        class:mb-26={is_iframe}
         bind:this={formElement}
     >
 
@@ -365,3 +377,10 @@
 {/if}
 
 </div>
+
+{#if !is_iframe}
+    <footer class="text-surface-dim flex flex-col items-center mt-8 mb-22 gap-2">
+        <div class="text-center">Dacă întâmpinați probleme cu formularul sau considerați că conține informații greșite lăsați o sesizare <a href="https://opnform.com/forms/formular-de-sesizari-0nuyk3">aici.</a></div>
+        <div>&copy; ATB Brașov 2026</div>
+    </footer>
+{/if}

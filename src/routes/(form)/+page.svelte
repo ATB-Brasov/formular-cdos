@@ -14,8 +14,6 @@
     import { onMount } from "svelte";
     import { raspunsGol } from "@content/cestionare/types.js";
 
-    import logo from "$lib/assets/logo_ATB_120x120.webp";
-
     const test = page.url.searchParams.get("test") === "true"
     const is_iframe = page.url.searchParams.get("iframe") === "true"
 

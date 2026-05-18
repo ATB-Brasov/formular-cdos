@@ -1,6 +1,7 @@
 <script>
     /** @import { SDict, Eroare } from "$lib/common_types.js" */
 
+    import { page } from "$app/state";
     import { enhance } from "$app/forms";
     import { solvePoW } from "$lib/miner.js";
     import Buton from "@components/Buton.svelte";
@@ -8,6 +9,8 @@
 
     import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js"; // TODO: Încărcare dinamică
     import { onMount } from "svelte";
+
+    const is_iframe = page.url.searchParams.get("iframe") === "true"
 
     /**
      * @typedef {Object} Props
@@ -89,6 +92,7 @@
 <form
     method="POST"
     bind:this={formElement}
+    class:mb-26={is_iframe}
     use:enhance={async ({ formData, cancel }) => {
         isMining = true;
         await solvePoW(email, 3)

@@ -1,8 +1,30 @@
 <script>
-    // This component displays a simple privacy policy.
+    import { onMount } from "svelte";
+	import { browser } from "$app/environment";
+
+    /**@type{HTMLElement?}*/ let element = $state(null)
+
+    onMount(() => {
+        let is_iframe = false;
+        if (browser) {
+            try {
+                is_iframe = window?.top !== window?.self;
+            } catch (e) {
+                is_iframe = true; // Likely in a cross-origin iframe
+            }
+        }
+        if (is_iframe && element != null) {
+            console.log("trimite la părinte dimensiunile proprii")
+            const height = element.offsetHeight;
+            window.parent.postMessage(
+                { type: 'iframe-resize', height: height },
+                '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
+            );
+        }
+    });
 </script>
 
-<div class="font-sans leading-relaxed mx-5 my-5 p-5">
+<div bind:this={element} class="font-sans leading-relaxed mx-5 my-5 p-5">
     <div class="mb-4">
         <a href="/" class="text-blue-600 hover:underline">Înapoi la formular</a>
     </div>

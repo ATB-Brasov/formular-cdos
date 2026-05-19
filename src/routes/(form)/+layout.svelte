@@ -1,13 +1,21 @@
 <script>
     import logo from "$lib/assets/logo_ATB_120x120.webp";
 
-    import { page } from "$app/state";
-    const is_iframe = page.url.searchParams.get("iframe") === "true"
+    import { browser } from '$app/environment';
+
+    let is_iframe = $state(false);
+    if (browser) {
+        try {
+            is_iframe = window?.top !== window?.self;
+        } catch (e) {
+            is_iframe = true; // Likely in a cross-origin iframe
+        }
+    }
 
     let { children } = $props();
 </script>
 
-<main 
+<main
     class={[
         !is_iframe && "bg-olive-50/30 dark:bg-olive-900 text-olive-900 dark:text-olive-50",
     ]}

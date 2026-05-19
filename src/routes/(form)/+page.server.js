@@ -22,6 +22,7 @@ async function newSession(cookies) {
     cookies.set("sessionid", sessionid, {
         path: "/",
         httpOnly: true,
+        partitioned: true,
         secure: !dev,
         sameSite: dev ? "lax" : "none",
         maxAge: 60 * 60, // 1 hour

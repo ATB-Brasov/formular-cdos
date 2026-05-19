@@ -4,7 +4,7 @@
 
     import { enhance } from "$app/forms";
     import { page } from "$app/state";
-    import { dev } from "$app/environment";
+    import { browser, dev } from "$app/environment";
 
     import Buton from "@components/Buton.svelte";
     import Selectie from "@components/Selectie.svelte";
@@ -15,7 +15,8 @@
     import { raspunsGol } from "@content/cestionare/types.js";
 
     const test = page.url.searchParams.get("test") === "true"
-    const is_iframe = page.url.searchParams.get("iframe") === "true"
+    let is_iframe = $state(false)
+
 
     const sondaj_cdos =
         (test
@@ -25,7 +26,7 @@
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
 
-    let pagina = $state(data.session?.email ? 0 : -1);
+    let pagina = $state((() => data.session?.email)() ? 0 : -1);
     $effect(() => {
         pagina;
         notifyParentPageChange()
@@ -44,7 +45,7 @@
     }
 
     /**
-     * @param {HTMLElement} cimp 
+     * @param {HTMLElement} cimp
     */
     function scrollToField(cimp) {
         const top = cimp.offsetTop - window.innerHeight/2 + cimp.offsetHeight/2
@@ -65,10 +66,10 @@
             if (directie === "urmator") {
                 for (const k in eroare)
                     eroare[k] = null
-                for (const c of intrebari[pagina].cimpuri) 
+                for (const c of intrebari[pagina].cimpuri)
                     aplica_validare(c)
                 for (const k in eroare) {
-                    if (eroare[k] != null) { 
+                    if (eroare[k] != null) {
                         scrollToField(cimpuri[k])
                         return;
                     }
@@ -127,10 +128,18 @@
             );
         }
     }
-    
+
     /**@type{string?}*/ let email = $state(null)
 
     onMount(() => {
+        if (browser) {
+            try {
+                is_iframe = window?.top !== window?.self;
+            } catch (e) {
+                is_iframe = true; // Likely in a cross-origin iframe
+            }
+        }
+
         if (is_iframe) notifyParentOfHeightChange();
         const raspunsuriSalvate = localStorage.getItem("raspunsuri");
         if (raspunsuriSalvate) {
@@ -208,8 +217,6 @@
 
     const ULTIMA_PAGINA = intrebari.length - 1;
     const pagina_activa = $derived(intrebari[pagina]);
-    console.log(pagina)
-    console.log(pagina_activa)
 
     /**
      * @param {Cimp} cimp
@@ -348,9 +355,9 @@
                 <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
                     {#each pag.cimpuri as cimp, nr}
                         {#if !cimp.ascunde?.(raspunsuri)}
-                            <div id={`cimp-${cimp.nume}`} 
+                            <div id={`cimp-${cimp.nume}`}
                                     class="
-                                        p-2 rounded-xl 
+                                        p-2 rounded-xl
                                         border border-transparent
                                         data-animate:border-red-200
                                         data-animate:bg-red-100

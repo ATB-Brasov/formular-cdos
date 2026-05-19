@@ -1,14 +1,21 @@
 <script>
-    import { page } from "$app/state";
+	import { browser } from "$app/environment";
     import { onMount } from "svelte";
 
-    /**@type{HTMLElement?}*/ let element = $state(null)
 
+/**@type{HTMLElement?}*/ let element = $state(null)
     onMount(() => {
         localStorage.clear();
 
-        const is_iframe = page.url.searchParams.get("iframe") === "true"
-        console.dir(element)
+        let is_iframe = false;
+        if (browser) {
+            try {
+                is_iframe = window?.top !== window?.self;
+            } catch (e) {
+                is_iframe = true; // Likely in a cross-origin iframe
+            }
+        }
+
         if (is_iframe && element != null) {
             console.log("trimite la părinte dimensiunile proprii")
             const height = element.offsetHeight;

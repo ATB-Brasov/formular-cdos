@@ -24,7 +24,7 @@
     });
 </script>
 
-<div bind:this={element} class="font-sans leading-relaxed mx-5 my-5 p-5">
+<div bind:this={element} class="font-sans leading-relaxed mt-6">
     <div class="mb-4">
         <a href="/" class="text-blue-600 hover:underline">Înapoi la formular</a>
     </div>
@@ -33,7 +33,7 @@
         Politică de Confidențialitate
     </h2>
     <p class="mb-6 text-sm text-gray-500">
-        Data ultimei actualizări: 18.05.2024
+        Data ultimei actualizări: 21.05.2024
     </p>
 
     <p class="mb-4">
@@ -50,7 +50,8 @@
         salva sesiunea curentă.
     </p>
     <p class="mb-4">
-        Colectăm adresa dumneavoastră de e-mail în scopul prevenirii
+        Colectăm adresa dumneavoastră de e-mail pentru a ne asigura că sunteți
+        sutent al Univeristății Transilvania din Brașov și în scopul prevenirii
         completărilor duplicate în chestionar. Această informație nu
         va fi partajată cu terți fără consimțământul dumneavoastră explicit.
     </p>
@@ -61,8 +62,9 @@
     <p class="mb-4">
         Asigurăm securitatea datelor dumneavoastră prin implementarea unor
         măsuri tehnice și organizatorice adecvate. Datele personale sunt
-        protejate prin criptare, iar răspunsurile la cestionar sunt anonimizate
-        pentru a garanta confidențialitatea.
+        protejate prin criptare și sunt stocate separat de răspunsurile la
+        cestionar, astfel răspunsurile sunt anonimizate pentru a garanta
+        confidențialitatea.
     </p>
 
     <h3 class="text-2xl font-semibold text-gray-700 mt-6 mb-3">

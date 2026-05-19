@@ -60,7 +60,8 @@ function grad(nume, titlu, optiuni_obj = {}) {
          desc = null,
          obligatoriu = true,
          ascunde = null,
-         optiuni = () => ({ optiuni: ["da, în toate cazurile", "da, în majoritatea cazurilor","da, uneori","nu","nu știu"], eroare: null }),
+         optiuni = () => ({ optiuni: [
+            "mereu", "des","rar","niciodată","nu știu"], eroare: null }),
      } = optiuni_obj;
 
      return {
@@ -77,10 +78,7 @@ function grad(nume, titlu, optiuni_obj = {}) {
 /** @type {RadioConstructor} */
 function grad_p(nume, titlu, optiuni_obj = {}) {
     return _radio(nume, titlu, [
-        "da, mereu",
-        "da, des",
-        "uneori",
-        "nu",
+        "mereu", "des", "rar", "niciodată",
     ], optiuni_obj);
 }
 
@@ -134,7 +132,7 @@ export default {
                     titlu: "Ciclu de Studii",
                     obligatoriu: true,
                     optiuni: () => ({
-                        optiuni: ["LICENȚĂ", "MASTER"],
+                        optiuni: ["Licență", "Master"],
                         eroare: null,
                     }),
                 },
@@ -250,7 +248,7 @@ export default {
         {
             titlu: "Cazuri speciale",
             descriere:
-                "Vom folosi aceste răspunsuri pentru a filtra doar întrebările relevante pentru tine.",
+                "Vom folosi răspunsurile la aceste întrebări pentru a-ți afișa doar întrebările relevante, pe cât este posibil.",
             cimpuri: [
                 da_nustiu(
                     "participare-tabere",
@@ -293,47 +291,31 @@ export default {
         {
             titlu: "Reguli Generale și Drepturi Contractuale",
             descriere:
-                "Această secțiune vizează respectarea principiilor de bază privind nediscriminarea, stabilitatea contractului de studii și gratuitatea serviciilor administrative oferite de Universitate.",
+                "Această secțiune vizează respectarea principiilor de bază.",
             cimpuri: [
-                da_nustiu(
+                grad_p(
                     "gen_nediscrim_did",
                     "Ai simțit discriminare sau tratamente inechitabile din partea cadrelor didactice? [art. 1]",
-                    {
-                        optiuni: () => {
-                            return {
-                                optiuni: ["da, deseori", "da, rareori", "nu"],
-                                eroare: null,
-                            };
-                        },
-                    },
+                ),
+                da_nu_caz(
+                    "gen_acces_org_std",
+                    "Ți-a fost restricționat accesul la structuri sau organizații studențești? [art. 4 (1)]",
+                ),
+                da_nu_caz(
+                    "soc_termen_concurs",
+                    "S-a respectat termenul de cel puțin 5 zile lucrătoare pentru înscrierea la concursurile organizate? [art. 12 (1) g)]",
                 ),
                 da_nustiu(
                     "gen_mod_contract_s",
-                    "Contractele de studii au fost modificate în timpul anului? [art. 3 (3)] [LÎS 199/2023 art. 34 (1)]",
+                    "Contractul de studii a fost modificate în timpul anului? [art. 3 (3)] [LÎS 199/2023 art. 34 (1)]",
                     {
                         desc:
                             "Contractul de studii încheiat între Universitate și student nu poate fi modificat pe parcursul anului universitar. Un an universitar începe de pe 1 octombrie până pe 29 septembrie conform Legii Învățământului Superior. Contractul conține obiectul contractului, drepturile și obligațiile părților, cuantumul taxei de școlarizare și modalitatea de plata, după caz, răspunderea părților și termenul de valabilitate a contractului.",
                     },
                 ),
                 da_nu_caz(
-                    "gen_acces_org_std",
-                    "Ți-a fost restricționat accesul la structuri sau organizații studențești? [art. 4 (1)]",
-                ),
-                da_nu(
-                    "gen_gratuit_acte_s",
-                    "Ai fost taxat pentru eliberarea actelor de studii? [art. 11 (2)]",
-                    {
-                        desc:
-                            "Toate actele de studii eliberate de Unitbv, precum și cele care atestă statutul de student, precum adeverințele, carnetele sau legitimațiile, se eliberează în mod gratuit. În cazul eliberării duplicatelor actelor de studii se poate percepe o taxă.",
-                    },
-                ),
-                da_nu_caz(
-                    "gen_transp_faci_st",
-                    "Ți-au fost restricționate facilitățile de transport de care dispui conform prevederilor legale? [art. 11 (3)]",
-                    {
-                        desc:
-                            "Studenții înmatriculați la forma de învățământ cu frecvență beneficiază de facilități de transport conform prevederilor legale.",
-                    },
+                    "soc_raspuns_scris",
+                    "Ai primit răspuns scris (fizic sau electronic) la cererile semnate și depuse către universitate? [art. 12 (1) f)]",
                 ),
                 detalii("detalii-generale"),
             ],
@@ -342,11 +324,19 @@ export default {
         {
             titlu: "Calitatea Procesului Educațional",
             descriere:
-                "Această secțiune analizează drepturile academice fundamentale",
+                "Această secțiune are ca scop evaluarea respectarea drepturilor în cadrul procesului didactic și calitatea propriu zisă a procesului didactic.",
             cimpuri: [
+                da_nu(
+                    "acad_limit_ore_zi_8",
+                    "Programul tău zilnic de cursuri respectă limita de maximum 8 ore? [art. 7 (4)]",
+                ),
+                da_nustiu(
+                    "acad_tutore_indrum",
+                    "Ai beneficiat de un tutore sau îndrumător de an? [art. 7 i)]",
+                ),
                 grad(
                     "acad_info_fisa_dis",
-                    "Ai primit în primele 2 săptămâni de semestru informații complete despre fiecare disciplină (conținut, evaluare, bibliografie, cerințe)? [art. 7 (1) g)]",
+                    "Profesorii au prezentat fișa disciplinei în primele 2 săptămâni de semestru: [art. 7 (1) g)]",
                     {
                         desc:
                             "Fișa disciplinei este un document care trebuie prezentată de profesor la începutul semestrului, și conține toate informațiile relevante despre desfășurarea cursului (date despre program, date despre disciplină, timp total estimat, competențe, evaluare, etc.)",
@@ -354,35 +344,11 @@ export default {
                 ),
                 grad(
                     "acad_suport_curs_g",
-                    "Ai acces gratuit la suport de curs și materiale didactice pentru disciplinele tale? [art. 7 (1) e)]",
+                    "Suportul de curs și materiale didactice sunt accesibile gratuit: [art. 7 (1) e)]",
                     {
                         desc:
                             "Suportul de curs explică conținutul unui curs universitar. Conține teoria predată, exemple, uneori exerciții și bibliografie",
                     },
-                ),
-                da_nustiu(
-                    "acad_mobil_erasmu_s",
-                    "Ți s-au prezentat oportunitățile de mobilitate (Erasmus etc.) și ai avut acces la consiliere gratuită pentru acestea? [art. 7 (1) b)]",
-                ),
-                da_nustiu(
-                    "acad_eval_prof_ano",
-                    "Ai posibilitatea reală de a evalua anonim cadrele didactice și cursurile urmate? [art. 7 (1) j)]",
-                ),
-                grad_p(
-                    "acad_feedback_prof",
-                    "Ai primit mereu un feedback de la profesor, când l-ai cerut? [art. 7 (1) p)]",
-                ),
-                grad(
-                    "acad_eval_obiectiv",
-                    "Consideri că ai fost evaluat(ă) obiectiv? [art. 7 (1) q)]",
-                    {
-                        desc:
-                            "O evaluare obiectivă presupune respectarea baremului de corectare anunțat la începutul semestrului în fișa disciplinei, lipsa subiectivismului și aplicarea acelorași criterii pentru toți studenții examinați.",
-                    },
-                ),
-                grad(
-                    "acad_rezult_exam_t",
-                    "Ți-au fost comunicate rezultatele examenelor în decurs de 2–3 zile? (mai mult de 24h) [art. 7 (1) q)]",
                 ),
                 da_nustiu(
                     "acad_acces_sit_sco",
@@ -392,35 +358,54 @@ export default {
                             "Prin documente universitare relevante se înțelege: deciziile luate în cadrul structurilor universitare, regulamente sau rapoarte ",
                     },
                 ),
-                grad(
-                    "acad_consult_progr",
-                    "Ai fost consultat(ă) în stabilirea datelor de examinare? [art. 7 (1) u)]",
+                da_nustiu(
+                    "acad_mobil_erasmu_s",
+                    "Ți s-au prezentat oportunitățile de mobilități academice (Erasmus etc.)? [art. 7 (1) b)]",
                 ),
                 da_nustiu(
-                    "acad_consiliere_gr",
-                    "Beneficiezi de servicii gratuite de consiliere (academic, psihologic, profesional)? [art. 7 (1) m)]",
+                    "acad_eval_prof_ano",
+                    "Ai posibilitatea reală de a evalua anonim cadrele didactice și cursurile urmate? [art. 7 (1) j)]",
                 ),
                 grad_p(
-                    "acad_limit_ore_zi_8",
-                    "Programul tău zilnic de cursuri respectă limita de maximum 8 ore [art. 7 (4)]",
-                ),
-                grad(
-                    "acad_modific_evalu",
-                    "Modalitatea de evaluare a fost schimbată fără acordul tău? [art. 7 g)]",
-                ),
-                da_nu_caz(
-                    "acad_contesta_note",
-                    "Ți s-a restricționat dreptul de a contesta notele primite? [art. 7 r)]",
+                    "acad_feedback_prof",
+                    "Cât de des ai primit feedback de la profesor când l-ai cerut: [art. 7 (1) p)]",
                 ),
                 // danu(
                 //     "acad_ore_suprapuse",
                 //     "Ai avut ore suprapuse ca să fii nevoit să lipsești de la un un curs pentru a participa la altul? (care articol??)",
                 // ),
-                da_nustiu(
-                    "acad_tutore_indrum",
-                    "Ai beneficiat de un tutore sau îndrumător de an? [art. 7 i)]",
-                ),
                 detalii("detalii-calitate_eduational"),
+            ],
+        },
+        {
+            titlu: "Calitatea Procesului de Examinare",
+            descriere:
+                "Se evaluează respectarea drepturilor privind evaluarea cunoștințelor obținute în cadrul procesului didactic, și buna desfășurare a procesului de evaluare.",
+            cimpuri: [
+                grad(
+                    "acad_consult_progr",
+                    "La stabilirea datelor (calendarului) de examinare ai fost consultat(ă): [art. 7 (1) u)]",
+                ),
+                grad(
+                    "acad_modific_evalu",
+                    "Modalitatea de evaluare a fost schimbată fără acordul tău: [art. 7 g)]",
+                ),
+                grad(
+                    "acad_eval_obiectiv",
+                    "Ai fost evaluat(ă) obiectiv: [art. 7 (1) q)]",
+                    {
+                        desc:
+                            "O evaluare obiectivă presupune respectarea baremului de corectare anunțat la începutul semestrului în fișa disciplinei, lipsa subiectivismului și aplicarea acelorași criterii pentru toți studenții examinați.",
+                    },
+                ),
+                grad(
+                    "acad_rezult_exam_t",
+                    "Rezultatele examenelor ți-au fost comunicate în decurs de 2–3 zile (mai mult de 24h):  [art. 7 (1) q)]",
+                ),
+                da_nu_caz(
+                    "acad_contesta_note",
+                    "Ți s-a restricționat dreptul de a contesta notele primite? [art. 7 r)]",
+                ),
             ],
         },
         {
@@ -439,6 +424,14 @@ export default {
                 da_nustiu(
                     "taxe_publ_termen_3",
                     "Taxele au fost publicate cu cel puțin 3 luni înainte de începerea anului universitar? [art. 8 (2)]",
+                ),
+                da_nustiu(
+                    "gen_gratuit_acte_s",
+                    "Ți s-au perceput taxe pentru eliberarea actelor de studii? [art. 11 (2)]",
+                    {
+                        desc:
+                            "Toate actele de studii eliberate de Unitbv, precum și cele care atestă statutul de student, precum adeverințele, carnetele sau legitimațiile, se eliberează în mod gratuit. În cazul eliberării duplicatelor actelor de studii se poate percepe o taxă.",
+                    },
                 ),
                 da_nustiu(
                     "taxe_suplim_nejust",
@@ -481,6 +474,10 @@ export default {
                     "Ai avut acces gratuit la asistență medicală, stomatologică și psihologică în cabinetele universității? [art. 12 (1) a)]",
                 ),
                 da_nu_caz(
+                    "acad_consiliere_gr",
+                    "Ai avut acces gratuite la servicii de consiliere (academic, psihologic, profesional)? [art. 7 (1) m)]",
+                ),
+                da_nu_caz(
                     "soc_acces_spatii_u",
                     "Ai avut acces gratuit în spațiile universitare pentru organizarea de proiecte studențești (în afara orarului)? [art. 12 (1) d)]",
                 ),
@@ -488,38 +485,17 @@ export default {
                     "soc_baze_sport_gr",
                     "Ai avut acces gratuit la bazele sportive ale universității în afara orarului didactic? [art. 12 (1) j)]",
                 ),
-                da_nustiu(
-                    "soc_termen_concurs",
-                    "S-a respectat termenul de cel puțin 5 zile lucrătoare pentru înscrierea la concursurile organizate? [art. 12 (1) g)]",
-                    {
-                        desc:
-                            "Exemplu concurs: De făcut! Afco, Crosul Universitar...",
-                    },
-                ),
-                da_nu_caz(
-                    "soc_raspuns_scris",
-                    "Ai primit răspuns scris (fizic sau electronic) la cererile semnate și depuse către universitate? [art. 12 (1) f)]",
-                ),
                 da_nu_caz(
                     "soc_gratuit_cazare",
                     "Ți s-a respectat dreptul la gratuitate la cazare în cămine (pentru categorii defavorizate)? [art. 12 (4)]*",
                 ),
+                da_nu_caz(
+                    "gen_transp_faci_st",
+                    "Ți s-au respectat facilitățile de transport de care dispui conform prevederilor legale? [art. 11 (3)]",
+                ),
                 grad_p(
                     "soc_mediu_sigur_st",
-                    "Consideri că universitatea îți oferă un mediu de învățare sigur și sănătos? [art. 12 (1) i)]",
-                    {
-                        optiuni: () => {
-                            return {
-                                optiuni: [
-                                    "da",
-                                    "în marea parte",
-                                    "mai puțin",
-                                    "nu",
-                                ],
-                                eroare: null,
-                            };
-                        },
-                    },
+                    "Universitatea îți oferă un mediu de învățare sigur și sănătos: [art. 12 (1) i)]",
                 ),
                 detalii("detalii-drepturi_sociale"),
             ],
@@ -609,7 +585,7 @@ export default {
                 ),
                 grad_p(
                     "dizab_conditii_ade",
-                    "Consideri că ți s-au asigurat condiții adecvate pentru desfășurarea studiilor cu dizabilități? [art. 6 (1)]",
+                    "Ți s-au asigurat condiții adecvate pentru desfășurarea studiilor: [art. 6 (1)]",
                     {
                         desc:
                             "Studenții cu dizabilități fizice au dreptul la acces adaptat în spațiile universitare, la asigurarea unui interpret mimico-gestual, precum și la condiții adecvate pentru desfășurarea a activităților academice, cum ar fi materiale educaționale și suport de curs personalizate în funcție de dizabilitate, adaptarea metodelor de evaluare în acord cu dizabilitatea, însoțitor în timpul susținerii examenului, etc.",

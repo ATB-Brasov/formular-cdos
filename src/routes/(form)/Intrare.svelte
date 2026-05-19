@@ -123,7 +123,7 @@
     <CimpText
         tip={"email"}
         titlu={"Adresa poștei instituționale"}
-        desc={`
+        disclaimer={`
             Adresa e-mail <strong>nu va fi</strong> asociată cu răspunsurile
             colectate. Ele vor fi stocate separat pentru a verifica utilizarea
             repetată a aceleeași adrese. Pentru mai multe informații, consultați <a href="/politica-confidentialitate">politica de confidențialitate</a>.`}

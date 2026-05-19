@@ -37,7 +37,9 @@
     {#if desc != null}
         <details class="mb-1">
             <summary>Vezi mai multe detalii&hellip;</summary>
-            <span>{@html desc}</span>
+            <p class="border-l-3 border-surface-dark pl-2.5 mt-1 text-surface-dark text-sm mb-3">
+                {@html desc}
+            </p>
         </details>
     {/if}
 

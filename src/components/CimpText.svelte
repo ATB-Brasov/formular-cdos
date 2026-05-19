@@ -11,6 +11,7 @@
      * @property {'text'|'email'} tip
      * @property {string} nume
      * @property {string | null} [desc=null]
+     * @property {string | null} [disclaimer=null]
      * @property {string} titlu
      * @property {boolean} [obligatoriu=false]
      * @property {string | null} [placeholder=null]
@@ -26,7 +27,7 @@
         titlu: intrebare,
         desc = null,
         obligatoriu = false,
-
+        disclaimer = null,
         tip,
         placeholder = null,
         onblur,
@@ -39,10 +40,13 @@
 
 <CadruCimp
     {intrebare}
-    {desc}
     {obligatoriu}
+    {desc}
     {eroare}
 >
+    <p class="border-l-3 border-surface-dark pl-2.5 mt-1 text-surface-dark text-sm mb-3">
+        {@html disclaimer}
+    </p>
     <input
         id={nume}
         {placeholder}

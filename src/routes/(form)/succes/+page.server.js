@@ -5,7 +5,7 @@ export async function load({ cookies }) {
     cookies.delete('sessionid', {
         path: '/',
         httpOnly: true,
-        partitioned: true,
+        partitioned: !dev,
         secure: !dev,
         sameSite: dev ? "lax" : "none",
     });

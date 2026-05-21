@@ -89,8 +89,8 @@ function grad_p(nume, titlu, optiuni_obj = {}) {
  */
 function detalii(nume) {
     return {
-        titlu: "Adaugă detalii:",
         tip: "textarea", nume,
+        titlu: "Descrie problemele înâmpinate:",
     }
 }
 
@@ -379,7 +379,7 @@ export default {
         {
             titlu: "Calitatea Procesului de Examinare",
             descriere:
-                "Se evaluează respectarea drepturilor privind evaluarea cunoștințelor obținute în cadrul procesului didactic, și buna desfășurare a procesului de evaluare.",
+                "Se evaluează respectarea drepturilor privind examinarea cunoștințelor obținute în cadrul procesului didactic, și buna desfășurare a procesului dat.",
             cimpuri: [
                 grad(
                     "acad_consult_progr",
@@ -405,6 +405,7 @@ export default {
                     "acad_contesta_note",
                     "Ți s-a restricționat dreptul de a contesta notele primite? [art. 7 r)]",
                 ),
+                detalii("detalii-examinare"),
             ],
         },
         {

@@ -9,6 +9,7 @@
     import Buton from "@components/Buton.svelte";
     import Selectie from "@components/Selectie.svelte";
     import CimpText from "@components/CimpText.svelte";
+    import CimpTextArea from "@components/CimpTextArea.svelte";
 
     import Intrare from "./Intrare.svelte";
     import { onMount } from "svelte";
@@ -371,6 +372,14 @@
 
                                 {#if cimp.tip === "email" || cimp.tip === "text"}
                                     <CimpText
+                                        {...cimp}
+                                        tip={cimp.tip}
+                                        eroare={eroare[cimp.nume]}
+                                        onblur={() => false && aplica_validare(cimp)}
+                                        bind:value={raspunsuri[cimp.nume]}
+                                    />
+                                {:else if cimp.tip === "textarea"}
+                                    <CimpTextArea
                                         {...cimp}
                                         tip={cimp.tip}
                                         eroare={eroare[cimp.nume]}

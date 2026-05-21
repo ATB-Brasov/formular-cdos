@@ -44,7 +44,7 @@
  */
 
 /**
- * @typedef {'email'|'selecție-nativa'|'selecție-cautare'|'text'|'selecție-radio'} TipCimp
+ * @typedef {'email'|'selecție-nativa'|'selecție-cautare'|'text'|'textarea'|'selecție-radio'} TipCimp
  */
 
 /**

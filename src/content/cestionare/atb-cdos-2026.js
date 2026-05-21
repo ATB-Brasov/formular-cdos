@@ -89,9 +89,8 @@ function grad_p(nume, titlu, optiuni_obj = {}) {
  */
 function detalii(nume) {
     return {
-        tip: "text",
-        nume,
         titlu: "Adaugă detalii:",
+        tip: "textarea", nume,
     }
 }
 

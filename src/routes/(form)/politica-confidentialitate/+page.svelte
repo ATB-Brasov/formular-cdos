@@ -33,7 +33,7 @@
         Politică de Confidențialitate
     </h2>
     <p class="mb-6 text-sm text-gray-500">
-        Data ultimei actualizări: 21.05.2024
+        Data ultimei actualizări: 21.05.2026
     </p>
 
     <p class="mb-4">

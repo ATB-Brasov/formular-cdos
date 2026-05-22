@@ -103,13 +103,13 @@ export default {
             ? "Folosește adresa instituțională de student `@student.unitbv.ro`"
             : null,
     descriere:
-        `<p>Acest chestionar a fost creat pentru a evalua nivelul de respectare a <a target="_blank" href="https://unitbv.ro/documente/despre-unitbv/regulamente-hotarari/regulamentele-universitatii/studenti/Codul_studentului_26.06.2024.pdf">Codului Drepturilor și Obligațiilor Studențești</a> în cadrul <a target="_blank" href="https://unitbv.ro">Universității Transilvania Brașov (UniTBv)</a>.<br></p>
+        `<p>Cât de bine sunt respectate drepturile studenților în UniTBv? Acest chestionar a fost creat pentru a aduna experiențe și perspective reale ale studenților din cadrul <a target="_blank" href="https://unitbv.ro">Universității Transilvania Brașov</a>.</p>
 
-<p>Prin completarea acestuia ne vei ajuta să depistăm care sunt problemele întâmpinate în UniTBv, ca ulterior să le putem semnala și remedia.</p>
+<p>Dacă ai întâlnit situații care consideri că ar trebui semnalate sau aspecte care pot fi îmbunătățite, formularul acesta este spațiul în care îți poți exprima opinia. Răspunsurile contribuie la identificarea problemelor reale din mediul universitar și la evidențierea nevoilor studenților.</p>
 
-<p>Completarea acestui formular este complet anonimă.</p>
+<p>Completarea este anonimă, iar adresa instituțională nu va fi asociată răspunsurilor oferite.</p>
 
-<p>Află mai multe despre „Raportarea CDOS” aici: <a target="_blank" href="https://atbbrasov.ro/rapoarte/raport-conformare-cdos-2025/">Raport CDOS 2025</a></p>`,
+<p>Mai multe informații despre raportarea <a target="_blank" href="https://unitbv.ro/documente/despre-unitbv/regulamente-hotarari/regulamentele-universitatii/studenti/Codul_studentului_26.06.2024.pdf">CDOS</a> pot fi găsite în <a target="_blank" href="https://atbbrasov.ro/rapoarte/raport-conformare-cdos-2025/">Raport CDOS 2025</a>.</p>`,
     pagini: [
         {
             titlu: "Date Academice",

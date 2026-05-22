@@ -68,6 +68,11 @@
     });
 
     function handleSubmit() {
+        if (email.trim() === "") {
+            eroare["posta"] = { type: "email-invalid", msg: "Adresa de poștei electronice este obligatorie", pag: -1 };
+            return;
+        }
+
         const msg = sondaj_cdos.validare_posta?.(email);
         if (msg != null) {
             eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
@@ -153,7 +158,7 @@
             >politica de confidențialitate</a>.
         </label>
         {#if eroare["gdpr-consent"] != null}
-            <span class="text-danger">{eroare["gdpr-consent"].msg}</span>
+            <p class="text-danger text-sm mt-1">{eroare["gdpr-consent"].msg}</p>
         {/if}
     </div>
 </form>

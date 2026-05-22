@@ -47,7 +47,7 @@
 
 
     {#if eroare}
-        <div class="text-red-500">{eroare.msg}</div>
+        <div class="text-red-500 mt-1 text-sm">{eroare.msg}</div>
     {/if}
 
 </fieldset>

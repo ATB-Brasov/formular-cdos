@@ -112,7 +112,6 @@
             });
 
         return async ({ result, update }) => {
-            console.log("result: ", result)
             if (result.type === "success") {
                 pagina = 0;
                 localStorage.setItem("pagina", "0")

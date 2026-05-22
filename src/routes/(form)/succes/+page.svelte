@@ -17,7 +17,6 @@
         }
 
         if (is_iframe && element != null) {
-            console.log("trimite la părinte dimensiunile proprii")
             const height = element.offsetHeight;
             window.parent.postMessage(
                 { type: 'iframe-resize', height: height },

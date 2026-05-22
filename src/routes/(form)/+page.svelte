@@ -40,7 +40,7 @@
      * @param {{whence: string}} [options]
      */
     function seteaza_pagina(pag, options) {
-        if (options?.whence != null) console.log(options.whence);
+        if (dev && options?.whence != null) console.log(options.whence);
         pagina = pag;
         localStorage.setItem("pagina", pagina.toString());
     }

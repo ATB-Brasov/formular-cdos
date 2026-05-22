@@ -18,7 +18,6 @@ import {
  */
 async function newSession(cookies) {
     const sessionid = await createSession(sondaj_cdos.id);
-    console.log(`Sesiune nouă cu id: ${sessionid}`);
     cookies.set("sessionid", sessionid, {
         path: "/",
         httpOnly: true,
@@ -32,14 +31,11 @@ async function newSession(cookies) {
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ cookies }) {
-    console.log("server load");
     let sessionid = cookies.get("sessionid");
-    console.log(`sessionid = ${sessionid}`);
     if (sessionid == null) {
         sessionid = await newSession(cookies);
     }
     let session = await getSession(sessionid);
-    console.dir(session);
     return { session };
 }
 
@@ -77,8 +73,6 @@ export const actions = {
             });
         }
 
-        console.log("data.email: ", email);
-
         if (nonce == null) {
             return fail(400, {
                 erori: {
@@ -104,7 +98,6 @@ export const actions = {
         }
 
         const answered_email = await getAnsweredEmail(sondaj_cdos.id, email);
-        console.log("getAnsweredEmail => ", answered_email);
         if (answered_email != null) {
             return fail(400, {
                 erori: {
@@ -119,10 +112,8 @@ export const actions = {
 
         const sessionid = cookies.get("sessionid");
         if (sessionid == null) {
-            console.log("Crează sesiune nouă");
             await newSession(cookies);
         } else {
-            console.log(`Actualizează sesiunea ${sessionid}`);
             await updateSessionEmail(sessionid, email);
         }
         return { success: true };

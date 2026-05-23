@@ -54,11 +54,11 @@
     {:else}
         <div class={["flex", horizontal ? "flex-row gap-4" : "flex-col gap-0.5"]} {onblur}>
             {#each optiuni.optiuni.map(normOptiune) as opt}
-                <div 
+                <div
                     class={[
-                        "border transition transition-colors duration-300 rounded rounded-lg",
-                        horizontal && "flex-grow",
-                        value === opt.text ? 
+                        "border transition-colors duration-300 rounded-lg",
+                        horizontal && "grow",
+                        value === opt.text ?
                             "bg-primary-subtle border-primary-border hover:bg-primary-border"
                         : "border-transparent bg-transparent focus-within:bg-surface focus-within:border-surface-border hover:bg-surface hover:border-surface-border"
                     ]}

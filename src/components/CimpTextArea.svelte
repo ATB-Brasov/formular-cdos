@@ -8,7 +8,7 @@
 
     /**
      * @typedef {Object} Props
-     * @property {'text'|'email'} tip
+     * @property {'textarea'} tip
      * @property {string} nume
      * @property {string | null} [desc=null]
      * @property {string | null} [disclaimer=null]

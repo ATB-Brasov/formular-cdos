@@ -13,7 +13,7 @@ export async function load({ cookies }) {
             return { eroare: "Sesiunea a expirat!" };
         }
     }
-    let iterator = await getListOfAnswers(sondaj_cdos.id);
+    let iterator = await getListOfAnswers(sondaj_cdos.id, null);
     const answers = [];
     for await (const entry of iterator) {
         answers.push(entry);

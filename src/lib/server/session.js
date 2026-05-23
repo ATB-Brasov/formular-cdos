@@ -196,13 +196,14 @@ export async function getAnsweredEmail(formId, email) {
 
 /**
  * @param {string} formId
+ * @param {number|null} [limit=10]
  * @returns {Promise<Deno.KvListIterator<AnswersData>>}
  */
-export async function getListOfAnswers(formId) {
+export async function getListOfAnswers(formId, limit = 10) {
     const kv = await getKv();
     /** @type {Deno.KvListIterator<AnswersData>} */
     const result = kv.list({ prefix: [...ANSWERS_PREFIX, formId] }, {
-        limit: 10,
+        limit: limit ?? undefined,
     });
     return result;
 }

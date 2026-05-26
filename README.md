@@ -1,42 +1,39 @@
-# sv
+# Chestionar CDOS — ATB
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Aplicație web SvelteKit pentru completarea anonimă a chestionarelor de evaluare, destinată inițial colectării răspunsurilor pentru chestionarul de evaluare a cadrelor didactice de la **Universitatea Transilvania din Brașov**.
 
-## Creating a project
+**Stare actuală:** Proiectul este hardcodat pentru organizația și chestionarul menționate mai sus. Datele de configurare (întrebări, opțiuni, facultăți, reguli de validare) sunt definite direct în codul sursă (`src/content/cestionare/`). Pentru a utiliza această aplicație în alt context, este necesară modificarea manuală a acestor fișiere.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Tehnologii
 
-```sh
-# create a new project
-npx sv create my-app
-```
+- [SvelteKit](https://svelte.dev/) — framework web front-end & back-end
+- [Deno](https://deno.com/) — runtime (cu suport KV integrat)
+- [Tailwind CSS](https://tailwindcss.com/) — stilizare
+- [Argon2](https://github.com/ranisalt/node-argon2) — hashing parole și e-mailuri
 
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-deno run npm:sv@0.15.1 create --template minimal --types jsdoc --add tailwindcss="plugins:none" --install deno ATB_Formulare
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Dezvoltare
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# Pornește serverul de dezvoltare
+deno task dev
 ```
 
-## Building
-
-To create a production version of your app:
+## Producție
 
 ```sh
-npm run build
+deno task build
+deno task preview
 ```
 
-You can preview the production build with `npm run preview`.
+Sunt necesare următoarele variabile de mediu:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+| Variabilă | Descriere |
+|---|---|
+| `HASH_SECRET` | Secret pentru hashingul adreselor de e-mail |
+| `HASH_SALT` | Salt pentru hashingul adreselor de e-mail |
+| `HASH_CONTROL` | Hash Argon2 al parolei pentru panoul de administrare |
+| `EXPORT_API_TOKEN` | Token pentru exportul programatic al răspunsurilor |
+
+## Licență
+
+[AGPL-3.0](./LICENSE)

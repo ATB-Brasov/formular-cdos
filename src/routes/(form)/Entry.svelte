@@ -36,46 +36,31 @@
     });
 
     $effect(() => {
-        if (!consent) {
-            errors["gdpr-consent"] = {
-                type: "required",
-                msg: "Trebuie să acceptați politica de confidențialitate",
-                pag: -1,
-            };
-            localStorage.setItem("gdpr-consent", "false")
-        } else {
-            delete errors["gdpr-consent"];
-            localStorage.setItem("gdpr-consent", "true")
-        }
+        localStorage.setItem("gdpr-consent", consent ? "true" : "false");
     });
 
     $effect(() => {
-        if (email === "") {
-            errors["posta"] = {
-                type: "email-invalid",
-                msg: "Adresa de poștei electronice este obligatorie",
-                pag: -1,
-            };
-            return;
-        }
-        const msg = survey.validare_posta?.(email);
-        if (msg != null) {
-            errors["posta"] = { type: "email-invalid", msg, pag: -1 };
-        } else {
-            if (errors["posta"]?.type !== "email-invalid") return;
-            errors["posta"] = null;
+        if (consent && errors["gdpr-consent"] != null) {
+            errors["gdpr-consent"] = null;
         }
     });
+
+    /** @param {string} id */
+    function focusField(id) {
+        setTimeout(() => document.getElementById(id)?.focus(), 0);
+    }
 
     function handleSubmit() {
         if (email.trim() === "") {
             errors["posta"] = { type: "email-invalid", msg: "Adresa de poștei electronice este obligatorie", pag: -1 };
+            focusField("posta");
             return;
         }
 
         const msg = survey.validare_posta?.(email);
         if (msg != null) {
             errors["posta"] = { type: "email-invalid", msg, pag: -1 };
+            focusField("posta");
             return;
         }
 
@@ -85,6 +70,7 @@
                 msg: "Trebuie să acceptați politica de confidențialitate",
                 pag: -1,
             };
+            focusField("gdpr-consent");
             return;
         }
 
@@ -141,7 +127,9 @@
         <span class="text-danger">{errors["_form"].msg}</span>
     {/if}
 
-    <div class="flex flex-col">
+    <div
+        class="flex flex-col rounded-xl border p-3 transition-colors {errors['gdpr-consent'] != null ? 'border-danger bg-red-50' : 'border-transparent'}"
+    >
         <label for="gdpr-consent" class="sm:leading-0 sm:pb-0.5">
         <input
             bind:checked={consent}

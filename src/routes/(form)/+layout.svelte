@@ -24,7 +24,7 @@
 
     <div class="m-auto sm:py-10 px-4 w-full sm:w-[60ch]" >
         {#if !isIframe}
-            <header class="px-4 flex justify-center w-full"><a href="https://atbbrasov.ro/"><img class="h-20" src={logo} alt=""></a></header>
+            <header class="px-4 flex justify-center w-full"><a href="https://atbbrasov.ro/" tabindex="-1"><img class="h-20" src={logo} alt=""></a></header>
         {/if}
 
         {@render children()}

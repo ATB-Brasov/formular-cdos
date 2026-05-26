@@ -34,7 +34,7 @@
         const items = optiuni.optiuni.map((v) =>
             typeof v === "string" ? v : v.exista ? v.text : null
         )
-        if (!items.includes(value)) {
+        if (value !== "" && !items.includes(value)) {
             value = "";
         }
     });

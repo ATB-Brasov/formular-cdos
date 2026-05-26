@@ -117,7 +117,6 @@
         search = ""; // search box is always empty after a pick
         open = false;
         activeIndex = -1;
-        inputEl?.blur();
     }
 
     function clear() {
@@ -368,6 +367,7 @@
                 >{value}</span>
                 <Button
                     variant="ghost"
+                    tabindex="-1"
                     aria-label="Șterge selecția"
                     class="ml-auto"
                     onclick={clear}

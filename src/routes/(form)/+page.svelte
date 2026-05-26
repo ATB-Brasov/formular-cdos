@@ -62,7 +62,8 @@
         )
         el.dataset.animate = "true"
         setTimeout(() => delete el.dataset.animate, 700)
-
+        const focusable = /** @type {HTMLElement|null} */ (el.querySelector('input, select, textarea'));
+        focusable?.focus();
     }
 
     /** @param {"urmator" | "precedent"} direction */
@@ -97,10 +98,12 @@
             if (!sections[tmp].ascunde?.(answers)) break;
         }
         setSectionIndex(tmp, {whence: "navigateSection::final"});
-        !isIframe && setTimeout(() => window.scrollTo({top: 0, behavior: "smooth"}))
+        setTimeout(() => sectionHeadingRef?.focus(), 0);
+        setTimeout(() => window.scrollTo({top: 0, behavior: "smooth"}), 0)
     }
 
     /**@type{SDict<HTMLElement>}*/ let fieldRefs = $state({})
+    /**@type{HTMLElement?}*/ let sectionHeadingRef = $state(null)
     /**@type{ResizeObserver}*/     let observer
     /**@type{HTMLElement?}*/       let iframeEl
 
@@ -309,6 +312,7 @@
     <div class="flex flex-wrap gap-2 mb-8">
         {#each sections as section, i}
             <button
+                tabindex="-1"
                 aria-label="Secțiunea {i + 1}"
                 disabled={section.ascunde?.(answers)}
                 onclick={() => {
@@ -329,7 +333,7 @@
         {/each}
     </div>
 
-    <h2 class="text-2xl font-bold">{activeSection.titlu}</h2>
+    <h2 bind:this={sectionHeadingRef} tabindex="-1" class="text-2xl font-bold outline-none">{activeSection.titlu}</h2>
     {#if activeSection.descriere}
         <div
             class="w-full rounded-xl border border-surface-border bg-surface mt-4 p-3"

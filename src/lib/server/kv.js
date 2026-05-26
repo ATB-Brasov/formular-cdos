@@ -1,4 +1,7 @@
 // Assisted-By: Gemini 3 Flash
+import { runMigrations } from "./migration.js";
+import { refreshEmailVersionstamps } from "./session.js";
+
 /** @typedef {Deno.Kv} Kv */
 
 /** @type {Kv | null} */
@@ -40,6 +43,15 @@ async function initKv() {
             console.info("Connecting Deno KV cloud");
             kvInstance = await Deno.openKv();
         }
+
+        // Run DB-level startup tasks after connection is established
+        try {
+            await runMigrations();
+            await refreshEmailVersionstamps();
+        } catch (err) {
+            console.error("KV startup tasks failed:", err);
+        }
+
         return kvInstance;
     } catch (error) {
         console.error("Failed to initialize Deno KV:", error);

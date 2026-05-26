@@ -38,7 +38,10 @@ export async function load({ cookies, url }) {
         const prev = await getPreviousAnswers(survey.id, editAnswerId);
         return {
             editData: prev
-                ? { answerId: editAnswerId, answers: Object.fromEntries(prev.answers) }
+                ? {
+                    answerId: editAnswerId,
+                    answers: Object.fromEntries(prev.answers),
+                }
                 : null,
         };
     }
@@ -218,7 +221,11 @@ export const actions = {
             if (validationMsg != null) {
                 return fail(400, {
                     errors: {
-                        posta: { type: "email-invalid", msg: validationMsg, pag: 0 },
+                        posta: {
+                            type: "email-invalid",
+                            msg: validationMsg,
+                            pag: 0,
+                        },
                     },
                 });
             }
@@ -240,7 +247,9 @@ export const actions = {
         let activeSurvey = survey;
 
         if (dataDict.test === "true") {
-            activeSurvey = (await import("@content/cestionare/atb-cdos-2026_test.js")).default
+            activeSurvey =
+                (await import("@content/cestionare/atb-cdos-2026_test.js"))
+                    .default;
         }
 
         /** @type { {[name: string]: import("$lib/common_types.js").FieldError} } */
@@ -295,7 +304,12 @@ export const actions = {
         if (isEdit) {
             await overwriteAnswers(survey.id, answerId, new Map(answers));
         } else {
-            await saveAnswers(/** @type {string} */ (email), survey.id, answerId, new Map(answers));
+            await saveAnswers(
+                /** @type {string} */ (email),
+                survey.id,
+                answerId,
+                new Map(answers),
+            );
             const sessionId = cookies.get("sessionid");
             if (sessionId) {
                 await deleteSession(sessionId);
@@ -303,7 +317,9 @@ export const actions = {
             }
         }
 
-        const redirectEmail = email ? `&email=${encodeURIComponent(email)}` : '';
+        const redirectEmail = email
+            ? `&email=${encodeURIComponent(email)}`
+            : "";
         redirect(303, `/succes?answerId=${answerId}${redirectEmail}`);
     },
 };

@@ -1,6 +1,6 @@
 <script>
-    import FieldFrame from './FieldFrame.svelte';
-    import {applyValidation} from '@content/cestionare/types.js';
+    import FieldFrame from "./FieldFrame.svelte";
+    import { applyValidation } from "@content/cestionare/types.js";
 
     /** @import {FocusEventHandler} from import('svelte/elements') */
     /** @import {FieldError} from import('$lib/common_types') */
@@ -35,16 +35,17 @@
         errors = $bindable(),
         value = $bindable(),
     } = $props();
-
 </script>
 
-    <FieldFrame
-        {question}
-        {obligatoriu}
-        {desc}
-        errors={errors}
+<FieldFrame
+    {question}
+    {obligatoriu}
+    {desc}
+    {errors}
+>
+    <p
+        class="border-l-3 border-surface-dark pl-2.5 mt-1 text-surface-dark text-sm mb-3"
     >
-    <p class="border-l-3 border-surface-dark pl-2.5 mt-1 text-surface-dark text-sm mb-3">
         {@html disclaimer}
     </p>
     <input
@@ -60,12 +61,9 @@
         type={tip}
         name={nume}
         {onblur}
-        bind:value={
-            () => value,
-            (v) => {
-                errors = applyValidation(v, obligatoriu, valideaza)
-                value = v
-            }
-        }
-/>
-    </FieldFrame>
+        bind:value={() => value, (v) => {
+            errors = applyValidation(v, obligatoriu, valideaza);
+            value = v;
+        }}
+    />
+</FieldFrame>

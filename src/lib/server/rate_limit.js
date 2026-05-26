@@ -19,14 +19,17 @@ export async function checkRateLimit(ip) {
     const now = Date.now();
 
     if (entry.value) {
-        const { attempts, resetAt } = /** @type {{attempts: number, resetAt: number}} */ (entry.value);
+        const { attempts, resetAt } =
+            /** @type {{attempts: number, resetAt: number}} */ (entry.value);
 
         if (now < resetAt) {
             if (attempts >= MAX_ATTEMPTS) {
                 const remaining = Math.ceil((resetAt - now) / 1000);
                 return { allow: false, retryAfter: `${remaining} secunde` };
             }
-            await kv.set(key, { attempts: attempts + 1, resetAt }, { expireIn: WINDOW_MS / 1000 });
+            await kv.set(key, { attempts: attempts + 1, resetAt }, {
+                expireIn: WINDOW_MS / 1000,
+            });
             return { allow: true };
         }
     }

@@ -1,8 +1,18 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { getAdminSession, getDailyCounts, getListOfAnswers } from "$lib/server/db.js";
+import {
+    getAdminSession,
+    getDailyCounts,
+    getListOfAnswers,
+} from "$lib/server/db.js";
 import survey from "@content/cestionare/atb-cdos-2026.js";
 
-const ACADEMIC_FIELDS = new Set(["facultatea", "ciclu", "forma", "programul", "anul"]);
+const ACADEMIC_FIELDS = new Set([
+    "facultatea",
+    "ciclu",
+    "forma",
+    "programul",
+    "anul",
+]);
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ cookies }) {
@@ -18,9 +28,10 @@ export async function load({ cookies }) {
     let iterator = await getListOfAnswers(survey.id, null);
     const answers = [];
     for await (const entry of iterator) {
-        const val = /** @type {{answerId: string, answers: Map<string,string>}} */ (
-            entry.value
-        );
+        const val =
+            /** @type {{answerId: string, answers: Map<string,string>}} */ (
+                entry.value
+            );
         const academicAnswers = new Map();
         if (val.answers instanceof Map) {
             for (const [key, value] of val.answers) {

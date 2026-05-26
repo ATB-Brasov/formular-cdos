@@ -116,9 +116,9 @@ export async function updateSessionEmail(sessionId, email) {
             expireIn: SESSION_DURATION,
         });
 
-        return sessionData
+        return sessionData;
     }
-    return null
+    return null;
 }
 
 /**

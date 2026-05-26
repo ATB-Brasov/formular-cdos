@@ -4,7 +4,10 @@
     /** @import { Validator } from import('@content/cestionare/types')*/
 
     /** @import { OptionsResult } from "@content/cestionare/types.js" */
-    import { applyValidation, normalizeOption } from "@content/cestionare/types.js";
+    import {
+        applyValidation,
+        normalizeOption,
+    } from "@content/cestionare/types.js";
     import FieldFrame from "./FieldFrame.svelte";
 
     /**
@@ -46,24 +49,30 @@
     };
 </script>
 
-    <FieldFrame errors={errors} {question} {desc} {obligatoriu}>
+<FieldFrame {errors} {question} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}
         </p>
     {:else}
-        <div class={["flex", horizontal ? "flex-row gap-4" : "flex-col gap-0.5"]} {onblur}>
+        <div
+            class={["flex", horizontal ? "flex-row gap-4" : "flex-col gap-0.5"]}
+            {onblur}
+        >
             {#each optiuni.optiuni.map(normalizeOption) as opt}
                 <div
                     class={[
                         "border transition-colors duration-300 rounded-lg",
                         horizontal && "grow",
-                        value === opt.text ?
-                            "bg-primary-subtle border-primary-border hover:bg-primary-border"
-                        : "border-transparent bg-transparent focus-within:bg-surface focus-within:border-surface-border hover:bg-surface hover:border-surface-border"
+                        value === opt.text
+                            ? "bg-primary-subtle border-primary-border hover:bg-primary-border"
+                            : "border-transparent bg-transparent focus-within:bg-surface focus-within:border-surface-border hover:bg-surface hover:border-surface-border",
                     ]}
                 >
-                    <label class="block p-2 w-full" class:opacity-50={!opt.exista}>
+                    <label
+                        class="block p-2 w-full"
+                        class:opacity-50={!opt.exista}
+                    >
                         <input
                             type="radio"
                             class="accent-primary mr-2"
@@ -79,4 +88,4 @@
             {/each}
         </div>
     {/if}
-    </FieldFrame>
+</FieldFrame>

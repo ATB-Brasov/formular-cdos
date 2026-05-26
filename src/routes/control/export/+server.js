@@ -7,7 +7,9 @@ const ANSWERS_PREFIX = ["answers"];
 export async function POST({ request }) {
     const token = Deno.env.get("EXPORT_API_TOKEN");
     if (!token) {
-        return json({ error: "EXPORT_API_TOKEN not configured" }, { status: 500 });
+        return json({ error: "EXPORT_API_TOKEN not configured" }, {
+            status: 500,
+        });
     }
 
     const auth = request.headers.get("authorization");

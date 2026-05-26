@@ -56,7 +56,10 @@
     /** @import {FieldError} from import('$lib/common_types') */
     /** @import { Validator } from import('@content/cestionare/types')*/
     /** @import { OptionsResult } from "@content/cestionare/types.js" */
-    import { applyValidation, normalizeOption } from "@content/cestionare/types.js";
+    import {
+        applyValidation,
+        normalizeOption,
+    } from "@content/cestionare/types.js";
 
     /**
      * @typedef {Object} Props
@@ -112,7 +115,7 @@
 
     /** @param {string} opt */
     function select(opt) {
-        errors = applyValidation(opt, obligatoriu, valideaza)
+        errors = applyValidation(opt, obligatoriu, valideaza);
         value = opt;
         search = ""; // search box is always empty after a pick
         open = false;
@@ -253,7 +256,7 @@
 -->
 <input type="hidden" name={nume} {value} />
 
-<FieldFrame errors={errors} {onFocusOut} {question} {desc} {obligatoriu}>
+<FieldFrame {errors} {onFocusOut} {question} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}

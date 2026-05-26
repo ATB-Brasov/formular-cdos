@@ -91,20 +91,20 @@ export function emptyAnswer(value) {
  * @returns
  */
 export function applyValidation(value, obligatoriu, valideaza) {
-    let err
+    let err;
     if (emptyAnswer(value)) {
-        err = !obligatoriu ? null :  {
+        err = !obligatoriu ? null : {
             type: "field-required",
-            msg : "Câmpul este obligatoriu",
+            msg: "Câmpul este obligatoriu",
             pag: 0,
         };
     } else {
-        const msg = valideaza?.(value)
+        const msg = valideaza?.(value);
         err = (msg == null) ? null : {
             type: "field-invalid",
             msg,
             pag: 0,
         };
     }
-    return err
+    return err;
 }

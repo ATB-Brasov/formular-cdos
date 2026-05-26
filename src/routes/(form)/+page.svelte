@@ -19,8 +19,8 @@
     import { solvePoW } from "$lib/miner.js";
 
     const POST_ORIGIN = PUBLIC_ORIGIN || "*";
-    const test = page.url.searchParams.get("test") === "true"
-    let isIframe = $state(false)
+    const test = page.url.searchParams.get("test") === "true";
+    let isIframe = $state(false);
 
     const survey =
         (test
@@ -35,8 +35,8 @@
     let sectionIndex = $state(_editData ? 0 : _session?.email ? 0 : -1);
     $effect(() => {
         sectionIndex;
-        notifyParentPageChange()
-    })
+        notifyParentPageChange();
+    });
     /** @type {SDict<FieldError|null>} */ let errors = $state({});
     /** @type {SDict<string>} */ let answers = $state(_editData?.answers ?? {});
 
@@ -52,17 +52,19 @@
 
     /**
      * @param {HTMLElement} el
-    */
+     */
     function scrollToField(el) {
-        const top = el.offsetTop - window.innerHeight/2 + el.offsetHeight/2
-        window.scrollTo({top, behavior: "smooth"})
+        const top = el.offsetTop - window.innerHeight / 2 + el.offsetHeight / 2;
+        window.scrollTo({ top, behavior: "smooth" });
         notifyParentScrollTo(
             el.getBoundingClientRect().top,
             el.getBoundingClientRect().height,
-        )
-        el.dataset.animate = "true"
-        setTimeout(() => delete el.dataset.animate, 700)
-        const focusable = /** @type {HTMLElement|null} */ (el.querySelector('input, select, textarea'));
+        );
+        el.dataset.animate = "true";
+        setTimeout(() => delete el.dataset.animate, 700);
+        const focusable = /** @type {HTMLElement|null} */ (el.querySelector(
+            "input, select, textarea",
+        ));
         focusable?.focus();
     }
 
@@ -71,13 +73,15 @@
         let tmp = sectionIndex;
         while (true) {
             if (direction === "urmator") {
-                for (const k in errors)
-                    errors[k] = null
-                for (const f of sections[sectionIndex].cimpuri)
-                    applyFieldValidation(f)
+                for (const k in errors) {
+                    errors[k] = null;
+                }
+                for (const f of sections[sectionIndex].cimpuri) {
+                    applyFieldValidation(f);
+                }
                 for (const k in errors) {
                     if (errors[k] != null) {
-                        scrollToField(fieldRefs[k])
+                        scrollToField(fieldRefs[k]);
                         return;
                     }
                 }
@@ -86,31 +90,34 @@
             } else if (direction === "precedent") {
                 tmp--;
             } else {
-                console.error(`Unknown direction ${direction}`)
+                console.error(`Unknown direction ${direction}`);
                 return;
             }
             if (tmp === -1) {
                 if (_editData) return;
-                setSectionIndex(tmp, {whence: "navigateSection::precedent"});
+                setSectionIndex(tmp, { whence: "navigateSection::precedent" });
                 return;
             }
             if (tmp < 0 || tmp > LAST_SECTION) return;
             if (!sections[tmp].ascunde?.(answers)) break;
         }
-        setSectionIndex(tmp, {whence: "navigateSection::final"});
+        setSectionIndex(tmp, { whence: "navigateSection::final" });
         setTimeout(() => sectionHeadingRef?.focus(), 0);
-        setTimeout(() => window.scrollTo({top: 0, behavior: "smooth"}), 0)
+        setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
     }
 
-    /**@type{SDict<HTMLElement>}*/ let fieldRefs = $state({})
-    /**@type{HTMLElement?}*/ let sectionHeadingRef = $state(null)
-    /**@type{ResizeObserver}*/     let observer
-    /**@type{HTMLElement?}*/       let iframeEl
+    /**@type{SDict<HTMLElement>}*/ let fieldRefs = $state({});
+    /**@type{HTMLElement?}*/ let sectionHeadingRef = $state(null);
+    /**@type{ResizeObserver}*/ let observer;
+    /**@type{HTMLElement?}*/ let iframeEl;
 
-    function notifyParentScrollTo(/**@type{number}*/rectTop, /**@type{number}*/rectHeight) {
+    function notifyParentScrollTo(
+        /**@type{number}*/ rectTop,
+        /**@type{number}*/ rectHeight,
+    ) {
         if (iframeEl) {
             window.parent.postMessage(
-                { type: 'scroll-to', rectTop, rectHeight},
+                { type: "scroll-to", rectTop, rectHeight },
                 POST_ORIGIN,
             );
         }
@@ -119,7 +126,7 @@
     function notifyParentPageChange() {
         if (iframeEl) {
             window.parent.postMessage(
-                { type: 'page-change' },
+                { type: "page-change" },
                 POST_ORIGIN,
             );
         }
@@ -130,8 +137,8 @@
             const height = iframeEl.offsetHeight;
             window.parent.postMessage(
                 {
-                    type: 'iframe-resize',
-                    height: height
+                    type: "iframe-resize",
+                    height: height,
                 },
                 POST_ORIGIN,
             );
@@ -176,8 +183,10 @@
                     }
                 }
             });
-            setTimeout(() => iframeEl && observer.observe(iframeEl), 0)
-            return () => { observer?.disconnect() };
+            setTimeout(() => iframeEl && observer.observe(iframeEl), 0);
+            return () => {
+                observer?.disconnect();
+            };
         }
     });
 
@@ -200,27 +209,28 @@
             .sort((a, b) => {
                 const erA = a[1];
                 const erB = b[1];
-                if (erA == null || erB == null) return 0
-                return erA.pag - erB.pag
-            })
+                if (erA == null || erB == null) return 0;
+                return erA.pag - erB.pag;
+            });
         if (errEntries.length > 0) {
             for (const [k, v] of errEntries) {
                 newErrors[k] = /** @type {FieldError} */ (v);
             }
             errors = newErrors;
             const e = errEntries[0];
-            setSectionIndex(e[1].pag, {whence: "$effect::errEntries"})
-            if (e[1].pag >= 0)
-                fieldRefs[e[0]].scrollIntoView()
+            setSectionIndex(e[1].pag, { whence: "$effect::errEntries" });
+            if (e[1].pag >= 0) {
+                fieldRefs[e[0]].scrollIntoView();
+            }
         }
-        form = null
+        form = null;
     });
 
     $effect(() => {
         localStorage.setItem("raspunsuri", JSON.stringify(answers));
     });
 
-    let sections = survey.pagini.map((p, idx) => ({...p, idx}));
+    let sections = survey.pagini.map((p, idx) => ({ ...p, idx }));
 
     const LAST_SECTION = sections.length - 1;
     const activeSection = $derived(sections[sectionIndex]);
@@ -229,7 +239,7 @@
      * @param {Field} field
      * @param {number} [sectionIdx=sectionIndex]
      */
-    function applyFieldValidation(field, sectionIdx=sectionIndex) {
+    function applyFieldValidation(field, sectionIdx = sectionIndex) {
         errors[field.nume] = null;
 
         const val = answers[field.nume] ?? "";
@@ -237,9 +247,9 @@
         let type = null;
 
         if (emptyAnswer(val)) {
-            const hideSection  = sections[sectionIdx].ascunde?.(answers)
-            const hideField = field.ascunde?.(answers)
-            if (hideSection || hideField || !field.obligatoriu) return
+            const hideSection = sections[sectionIdx].ascunde?.(answers);
+            const hideField = field.ascunde?.(answers);
+            if (hideSection || hideField || !field.obligatoriu) return;
             type = "field-required";
             msg = "Câmpul este obligatoriu";
         } else {
@@ -261,22 +271,24 @@
     let isMining = $state(false);
 
     function handleSubmit() {
-        for (const k in errors) errors[k] = null
-        const allFields = sections.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1)
-        allFields.forEach(c => applyFieldValidation(c, c.pag))
-        const err = Object.entries(errors).filter(([_, v]) => v != null)
+        for (const k in errors) errors[k] = null;
+        const allFields = sections.map((p) =>
+            p.cimpuri.map((c) => ({ ...c, pag: p.idx }))
+        ).flat(1);
+        allFields.forEach((c) => applyFieldValidation(c, c.pag));
+        const err = Object.entries(errors).filter(([_, v]) => v != null);
         err.sort((a, b) => {
             const erA = a[1];
             const erB = b[1];
-            if (erA == null || erB == null) return 0
-            return erA.pag - erB.pag
-        })
+            if (erA == null || erB == null) return 0;
+            return erA.pag - erB.pag;
+        });
 
         if (err.length > 0) {
-            const [k, v] = err[0]
-            if (v == null) return
-            setSectionIndex(v.pag, {whence: "/::handleSubmit"})
-            setTimeout(() => scrollToField(fieldRefs[k]), 0)
+            const [k, v] = err[0];
+            if (v == null) return;
+            setSectionIndex(v.pag, { whence: "/::handleSubmit" });
+            setTimeout(() => scrollToField(fieldRefs[k]), 0);
         } else {
             formElement?.requestSubmit();
         }
@@ -296,187 +308,205 @@
 {/if}
 
 <div id="formWrapper" bind:this={iframeEl}>
+    <h1 class="text-4xl font-bold mt-8 mb-4">{survey.titlu}</h1>
 
-<h1 class="text-4xl font-bold mt-8 mb-4">{survey.titlu}</h1>
-
-{#if sectionIndex === -1}
-    <div
-        id="descriere"
-        class="w-full rounded-xl flex flex-col gap-y-2 border border-surface-border bg-surface mt-4 mb-8 p-3"
-    >
-        {@html survey.descriere}
-    </div>
-
-    <Entry bind:this={formElement} bind:errors bind:sectionIndex />
-{:else}
-    <div class="flex flex-wrap gap-2 mb-8">
-        {#each sections as section, i}
-            <button
-                tabindex="-1"
-                aria-label="Secțiunea {i + 1}"
-                disabled={section.ascunde?.(answers)}
-                onclick={() => {
-                    sectionIndex = i;
-                    localStorage.setItem("pagina", sectionIndex.toString());
-                }}
-                class={[
-                    "px-1 py-0.5 rounded-full grow disabled:bg-surface-disabled transition-colors duration-200",
-                    i === sectionIndex
-                        ? "bg-primary"
-                        : "bg-surface-border hover:bg-surface-secondary",
-                    i < sectionIndex && Object.values(errors).some((e) => e?.pag === i)
-                        ? "border-2 border-danger-strong bg-danger-strong"
-                        : "opacity-75",
-                ]}
-            >
-            </button>
-        {/each}
-    </div>
-
-    <h2 bind:this={sectionHeadingRef} tabindex="-1" class="text-2xl font-bold outline-none">{activeSection.titlu}</h2>
-    {#if activeSection.descriere}
+    {#if sectionIndex === -1}
         <div
-            class="w-full rounded-xl border border-surface-border bg-surface mt-4 p-3"
+            id="descriere"
+            class="w-full rounded-xl flex flex-col gap-y-2 border border-surface-border bg-surface mt-4 mb-8 p-3"
         >
-            {activeSection.descriere}
+            {@html survey.descriere}
         </div>
-    {/if}
 
-    <form
-        method="POST"
-        use:enhance={async ({ formData, cancel }) => {
-            if (!data.editData) {
-                const email = localStorage.getItem("posta");
-                if (email) {
-                    formData.set("posta", email);
-                    isMining = true;
-                    try {
-                        const nonce = await solvePoW(email, 4);
-                        formData.append("nonce", nonce.toString());
-                    } catch {
-                        cancel();
-                        return;
-                    } finally {
-                        isMining = false;
+        <Entry bind:this={formElement} bind:errors bind:sectionIndex />
+    {:else}
+        <div class="flex flex-wrap gap-2 mb-8">
+            {#each sections as section, i}
+                <button
+                    tabindex="-1"
+                    aria-label="Secțiunea {i + 1}"
+                    disabled={section.ascunde?.(answers)}
+                    onclick={() => {
+                        sectionIndex = i;
+                        localStorage.setItem("pagina", sectionIndex.toString());
+                    }}
+                    class={[
+                        "px-1 py-0.5 rounded-full grow disabled:bg-surface-disabled transition-colors duration-200",
+                        i === sectionIndex
+                            ? "bg-primary"
+                            : "bg-surface-border hover:bg-surface-secondary",
+                        i < sectionIndex && Object.values(errors).some((e) => e?.pag === i)
+                            ? "border-2 border-danger-strong bg-danger-strong"
+                            : "opacity-75",
+                    ]}
+                >
+                </button>
+            {/each}
+        </div>
+
+        <h2
+            bind:this={sectionHeadingRef}
+            tabindex="-1"
+            class="text-2xl font-bold outline-none"
+        >
+            {activeSection.titlu}
+        </h2>
+        {#if activeSection.descriere}
+            <div
+                class="w-full rounded-xl border border-surface-border bg-surface mt-4 p-3"
+            >
+                {activeSection.descriere}
+            </div>
+        {/if}
+
+        <form
+            method="POST"
+            use:enhance={async ({ formData, cancel }) => {
+                if (!data.editData) {
+                    const email = localStorage.getItem("posta");
+                    if (email) {
+                        formData.set("posta", email);
+                        isMining = true;
+                        try {
+                            const nonce = await solvePoW(email, 4);
+                            formData.append("nonce", nonce.toString());
+                        } catch {
+                            cancel();
+                            return;
+                        } finally {
+                            isMining = false;
+                        }
                     }
                 }
-            }
-            return async ({ result, update }) => { await update(); };
-        }}
-        action="?/submit"
-        class="mt-4 w-full"
-        class:mb-26={isIframe}
-        bind:this={formElement}
-    >
+                return async ({ result, update }) => {
+                    await update();
+                };
+            }}
+            action="?/submit"
+            class="mt-4 w-full"
+            class:mb-26={isIframe}
+            bind:this={formElement}
+        >
+            {#if test}
+                <input type="hidden" name="test" value="true">
+            {/if}
 
-        {#if test}
-            <input type="hidden" name="test" value="true">
-        {/if}
+            {#if data.editData}
+                <input type="hidden" name="edit" value="true">
+                <input
+                    type="hidden"
+                    name="answerId"
+                    value={data.editData.answerId}
+                >
+            {/if}
 
-        {#if data.editData}
-            <input type="hidden" name="edit" value="true">
-            <input type="hidden" name="answerId" value={data.editData.answerId}>
-        {/if}
-
-        {#each sections as section, i}
-            {#if !section.ascunde?.(answers)}
-                <div class={["flex flex-col gap-6 ", i !== sectionIndex && "hidden"]}>
-                    {#each section.cimpuri as field, nr}
-                        {#if !field.ascunde?.(answers)}
-                            <div id={`field-${field.nume}`}
+            {#each sections as section, i}
+                {#if !section.ascunde?.(answers)}
+                    <div
+                        class={["flex flex-col gap-6 ", i !== sectionIndex && "hidden"]}
+                    >
+                        {#each section.cimpuri as field, nr}
+                            {#if !field.ascunde?.(answers)}
+                                <div
+                                    id={`field-${field.nume}`}
                                     class="
                                         p-2 rounded-xl
                                         border border-transparent
                                         data-animate:border-red-200
                                         data-animate:bg-red-100
-                                        transition-colors ease-in duration-400"
-                                    bind:this={fieldRefs[field.nume]}>
-                                {#if dev}
-                                    <div class="text-surface-muted text-mono text-xs">
-                                        id: {field.nume} ({nr + 1})
-                                    </div>
-                                {/if}
+                                        transition-colors ease-in duration-400
+                                    "
+                                    bind:this={fieldRefs[field.nume]}
+                                >
+                                    {#if dev}
+                                        <div
+                                            class="text-surface-muted text-mono text-xs"
+                                        >
+                                            id: {field.nume} ({nr + 1})
+                                        </div>
+                                    {/if}
 
-                                {#if field.tip === "email" || field.tip === "text"}
-                                    <TextField
-                                        {...field}
-                                        tip={field.tip}
-                                        errors={errors[field.nume]}
-                                        onblur={() => false && applyFieldValidation(field)}
-                                        bind:value={answers[field.nume]}
-                                    />
-                                {:else if field.tip === "textarea"}
-                                    <TextAreaField
-                                        {...field}
-                                        tip={field.tip}
-                                        errors={errors[field.nume]}
-                                        onblur={() => false && applyFieldValidation(field)}
-                                        bind:value={answers[field.nume]}
-                                    />
-                                {:else if field.tip.startsWith("selecție")}
-                                    <Selection
-                                        field={field}
-                                        allAnswers={answers}
-                                        bind:errors={errors[field.nume]}
-                                        onblur={() => false && applyFieldValidation(field)}
-                                        bind:value={answers[field.nume]}
-                                    />
-                                {:else}
-                                    <div class="text-italic text-danger-strong">
-                                        Unknown field type `{field.tip}`
-                                    </div>
-                                {/if}
-                            </div>
-                        {/if}
-                    {/each}
-                </div>
-            {/if}
-        {/each}
-
-        <div
-            class="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[60ch]"
-        >
-            <div
-                class="m-4 rounded-xl border border-surface-border bg-surface p-3"
-            >
-                <div class="flex justify-between gap-4">
-                    <div>
-                        {#if _editData}
-                            <Button
-                                variant="danger"
-                                onclick={() => goto("/sterge-date?answerId=" + encodeURIComponent(_editData.answerId))}
-                            >
-                                Șterge
-                            </Button>
-                        {/if}
+                                    {#if field.tip === "email" || field.tip === "text"}
+                                        <TextField
+                                            {...field}
+                                            tip={field.tip}
+                                            errors={errors[field.nume]}
+                                            onblur={() => false && applyFieldValidation(field)}
+                                            bind:value={answers[field.nume]}
+                                        />
+                                    {:else if field.tip === "textarea"}
+                                        <TextAreaField
+                                            {...field}
+                                            tip={field.tip}
+                                            errors={errors[field.nume]}
+                                            onblur={() => false && applyFieldValidation(field)}
+                                            bind:value={answers[field.nume]}
+                                        />
+                                    {:else if field.tip.startsWith("selecție")}
+                                        <Selection
+                                            {field}
+                                            allAnswers={answers}
+                                            bind:errors={errors[field.nume]}
+                                            onblur={() => false && applyFieldValidation(field)}
+                                            bind:value={answers[field.nume]}
+                                        />
+                                    {:else}
+                                        <div
+                                            class="text-italic text-danger-strong"
+                                        >
+                                            Unknown field type `{field.tip}`
+                                        </div>
+                                    {/if}
+                                </div>
+                            {/if}
+                        {/each}
                     </div>
-                    <div class="flex gap-4">
-                        <Button
-                            class={sectionIndex === -1 || (_editData && sectionIndex === 0) ? "invisible" : ""}
-                            onclick={() => navigateSection("precedent")}
-                        >
-                            Anterior
-                        </Button>
+                {/if}
+            {/each}
 
-                        {@render button()}
-                        {#snippet button()}
-                            {@const ultima = sections[sectionIndex].idx === visibleSections.at(-1)?.idx}
+            <div
+                class="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[60ch]"
+            >
+                <div
+                    class="m-4 rounded-xl border border-surface-border bg-surface p-3"
+                >
+                    <div class="flex justify-between gap-4">
+                        <div>
+                            {#if _editData}
+                                <Button
+                                    variant="danger"
+                                    onclick={() => goto("/sterge-date?answerId=" + encodeURIComponent(_editData.answerId))}
+                                >
+                                    Șterge
+                                </Button>
+                            {/if}
+                        </div>
+                        <div class="flex gap-4">
                             <Button
-                                class="min-w-22"
-                                type="button"
-                                disabled={isMining}
-                                onclick={ultima ? handleSubmit : () => navigateSection("urmator")}
+                                class={sectionIndex === -1 || (_editData && sectionIndex === 0) ? "invisible" : ""}
+                                onclick={() => navigateSection("precedent")}
                             >
-                                {isMining ? "Se verifică..." : ultima ? "Trimite" : "Următor"}
+                                Anterior
                             </Button>
-                        {/snippet}
+
+                            {@render button()}
+                            {#snippet button()}
+                                {@const ultima = sections[sectionIndex].idx === visibleSections.at(-1)?.idx}
+                                <Button
+                                    class="min-w-22"
+                                    type="button"
+                                    disabled={isMining}
+                                    onclick={ultima ? handleSubmit : () => navigateSection("urmator")}
+                                >
+                                    {
+                                        isMining ? "Se verifică..." : ultima ? "Trimite" : "Următor"
+                                    }
+                                </Button>
+                            {/snippet}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-    </form>
-
-{/if}
-
+        </form>
+    {/if}
 </div>

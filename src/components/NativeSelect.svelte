@@ -4,7 +4,10 @@
     /** @import { Validator } from import('@content/cestionare/types')*/
 
     /** @import { OptionsResult } from "@content/cestionare/types.js" */
-    import { applyValidation, normalizeOption } from "@content/cestionare/types.js";
+    import {
+        applyValidation,
+        normalizeOption,
+    } from "@content/cestionare/types.js";
     import FieldFrame from "./FieldFrame.svelte";
 
     /**
@@ -34,7 +37,7 @@
     } = $props();
 </script>
 
-    <FieldFrame errors={errors} {question} {desc} {obligatoriu}>
+<FieldFrame {errors} {question} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}
@@ -50,13 +53,10 @@
             required={obligatoriu}
             {onblur}
             name={nume}
-            bind:value={
-                () => value,
-                (v) => {
-                    errors = applyValidation(v, obligatoriu, valideaza);
-                    value = v;
-                }
-            }
+            bind:value={() => value, (v) => {
+                errors = applyValidation(v, obligatoriu, valideaza);
+                value = v;
+            }}
         >
             <option value="">Alege Opțiune</option>
             {#each optiuni.optiuni.map(normalizeOption) as opt}
@@ -70,4 +70,4 @@
             {/each}
         </select>
     {/if}
-    </FieldFrame>
+</FieldFrame>

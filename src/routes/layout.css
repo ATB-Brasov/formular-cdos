@@ -26,7 +26,6 @@
     --color-surface-darker: var(--color-olive-800);
     --color-surface-hover: var(--color-olive-100);
 
-
     /* Semantic states */
     --color-danger: var(--color-red-500);
     --color-danger-strong: var(--color-red-600);
@@ -35,7 +34,6 @@
     --color-warning-dark: var(--color-amber-400);
     --color-warning-hover: var(--color-amber-700);
 }
-
 
 a {
     color: var(--color-primary-text);

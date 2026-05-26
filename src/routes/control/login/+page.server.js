@@ -29,7 +29,9 @@ export const actions = {
         const ip = getClientAddress();
         const { allow, retryAfter } = await checkRateLimit(ip);
         if (!allow) {
-            return fail(429, { msg: `Prea multe încercări. Încearcă din nou peste ${retryAfter}.` });
+            return fail(429, {
+                msg: `Prea multe încercări. Încearcă din nou peste ${retryAfter}.`,
+            });
         }
 
         const data = await request.formData();

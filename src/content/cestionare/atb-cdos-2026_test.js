@@ -36,49 +36,48 @@ function danu(nume, titlu, optiuni_obj = {}) {
 }
 
 /** @type {import("@content/cestionare/types.js").Section} */
-const paginia_dezabilitati =
-    {
-        titlu: "Dizabilități",
-        descriere: "Studenți cu dizabilități",
-        ascunde: (rspi) => rspi["forma"] !== "ID",
-        cimpuri: [
-            {
-                titlu: "Ai dizabilități?",
-                nume: "dizabilitati",
-                desc: "Selectează toate opțiunile care se aplică ti ai caz.",
-                obligatoriu: true,
-                tip: "selecție-radio",
-                optiuni: () => {
-                    return {
-                        optiuni: [
-                            { text: "Da", exista: true },
-                            { text: "Nu", exista: true },
-                        ],
-                        eroare: null,
-                    };
-                },
+const paginia_dezabilitati = {
+    titlu: "Dizabilități",
+    descriere: "Studenți cu dizabilități",
+    ascunde: (rspi) => rspi["forma"] !== "ID",
+    cimpuri: [
+        {
+            titlu: "Ai dizabilități?",
+            nume: "dizabilitati",
+            desc: "Selectează toate opțiunile care se aplică ti ai caz.",
+            obligatoriu: true,
+            tip: "selecție-radio",
+            optiuni: () => {
+                return {
+                    optiuni: [
+                        { text: "Da", exista: true },
+                        { text: "Nu", exista: true },
+                    ],
+                    eroare: null,
+                };
             },
-            {
-                titlu: "Ai întîmpinat discriminare din cauza dezabilităților?",
-                nume: "dizabilitati-discriminare",
-                desc: "Selectează toate opțiunile care se aplică ti ai caz.",
-                obligatoriu: true,
-                ascunde: (rspi) => {
-                    return rspi.dizabilitati !== "Da";
-                },
-                tip: "selecție-radio",
-                optiuni: () => {
-                    return {
-                        optiuni: [
-                            { text: "Da", exista: true },
-                            { text: "Nu", exista: true },
-                        ],
-                        eroare: null,
-                    };
-                },
+        },
+        {
+            titlu: "Ai întîmpinat discriminare din cauza dezabilităților?",
+            nume: "dizabilitati-discriminare",
+            desc: "Selectează toate opțiunile care se aplică ti ai caz.",
+            obligatoriu: true,
+            ascunde: (rspi) => {
+                return rspi.dizabilitati !== "Da";
             },
-        ],
-    }
+            tip: "selecție-radio",
+            optiuni: () => {
+                return {
+                    optiuni: [
+                        { text: "Da", exista: true },
+                        { text: "Nu", exista: true },
+                    ],
+                    eroare: null,
+                };
+            },
+        },
+    ],
+};
 
 /**@type{import("@content/cestionare/types.js").Questionnaire}*/
 export default {
@@ -95,7 +94,13 @@ export default {
             titlu: "Date Academice",
             descriere: "",
             cimpuri: [
-                {tip: "text", nume: "nume", titlu: "Nume", valideaza: (v) =>  v === "a" ? null : "Lasă gol, e doar pentru test"},
+                {
+                    tip: "text",
+                    nume: "nume",
+                    titlu: "Nume",
+                    valideaza: (v) =>
+                        v === "a" ? null : "Lasă gol, e doar pentru test",
+                },
                 {
                     tip: "selecție-cautare",
                     nume: "facultatea",
@@ -111,7 +116,10 @@ export default {
                     nume: "ciclu",
                     titlu: "Ciclu de Studii",
                     obligatoriu: true,
-                    optiuni: (rspi) => ({optiuni: ["LICENȚĂ", "MASTER"], eroare: null}),
+                    optiuni: (rspi) => ({
+                        optiuni: ["LICENȚĂ", "MASTER"],
+                        eroare: null,
+                    }),
                 },
                 {
                     tip: "selecție-radio",
@@ -130,9 +138,17 @@ export default {
                         const optiuni = lista.facultati
                             .map((o) => o.frm)
                             .filter(uniq)
-                            .map(text => ({ text, exista: filtered.includes(text) }));
+                            .map((text) => ({
+                                text,
+                                exista: filtered.includes(text),
+                            }));
 
-                        return { optiuni, eroare: optiuni.length === 0 ? "Nu au fost găsite forme de învățămînt pentru selecția curentă." : null };
+                        return {
+                            optiuni,
+                            eroare: optiuni.length === 0
+                                ? "Nu au fost găsite forme de învățămînt pentru selecția curentă."
+                                : null,
+                        };
                     },
                 },
                 {
@@ -141,9 +157,26 @@ export default {
                     titlu: "Programul de Învățămînt",
                     obligatoriu: true,
                     optiuni: (rspi) => {
-                        if (!rspi["facultatea"]) return { optiuni: [], eroare: "Selectează mai întâi facultatea." };
-                        if (!rspi["ciclu"]) return { optiuni: [], eroare: "Selectează mai întâi ciclul de studii." };
-                        if (!rspi["forma"]) return { optiuni: [], eroare: "Selectează mai întâi forma de învățămînt." };
+                        if (!rspi["facultatea"]) {
+                            return {
+                                optiuni: [],
+                                eroare: "Selectează mai întâi facultatea.",
+                            };
+                        }
+                        if (!rspi["ciclu"]) {
+                            return {
+                                optiuni: [],
+                                eroare:
+                                    "Selectează mai întâi ciclul de studii.",
+                            };
+                        }
+                        if (!rspi["forma"]) {
+                            return {
+                                optiuni: [],
+                                eroare:
+                                    "Selectează mai întâi forma de învățămînt.",
+                            };
+                        }
                         const optiuni = lista.facultati
                             .filter(
                                 (o) =>
@@ -153,8 +186,13 @@ export default {
                             )
                             .map((o) => o.prg)
                             .filter(uniq)
-                            .map(text => ({ text, exista: true }));
-                        return { optiuni, eroare: optiuni.length === 0 ? "Nu au fost găsite programe pentru selecția curentă." : null };
+                            .map((text) => ({ text, exista: true }));
+                        return {
+                            optiuni,
+                            eroare: optiuni.length === 0
+                                ? "Nu au fost găsite programe pentru selecția curentă."
+                                : null,
+                        };
                     },
                 },
             ],
@@ -170,7 +208,10 @@ export default {
                 danu(
                     "schim-contr-stud",
                     "Contractele de studii au fost modificate în timpul anului? [art. 3 (3)] [LÎS 199/2023 art. 34 (1)]",
-                    { desc: "Contractul de studii încheiat între Universitate și student nu poate fi modificat pe parcursul anului universitar. Un an universitar începe de pe 1 octombrie până pe 29 septembrie conform Legii Învățământului Superior. Contractul conține obiectul contractului, drepturile și obligațiile părților, cuantumul taxei de școlarizare și modalitatea de plata, după caz, răspunderea părților și termenul de valabilitate a contractului." },
+                    {
+                        desc:
+                            "Contractul de studii încheiat între Universitate și student nu poate fi modificat pe parcursul anului universitar. Un an universitar începe de pe 1 octombrie până pe 29 septembrie conform Legii Învățământului Superior. Contractul conține obiectul contractului, drepturile și obligațiile părților, cuantumul taxei de școlarizare și modalitatea de plata, după caz, răspunderea părților și termenul de valabilitate a contractului.",
+                    },
                 ),
             ],
         },

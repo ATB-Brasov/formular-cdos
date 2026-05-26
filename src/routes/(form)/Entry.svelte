@@ -10,7 +10,7 @@
     import survey from "@content/cestionare/atb-cdos-2026.js"; // TODO: dynamic loading
     import { onMount } from "svelte";
 
-    const isIframe = page.url.searchParams.get("iframe") === "true"
+    const isIframe = page.url.searchParams.get("iframe") === "true";
 
     /**
      * @typedef {Object} Props
@@ -52,7 +52,11 @@
 
     function handleSubmit() {
         if (email.trim() === "") {
-            errors["posta"] = { type: "email-invalid", msg: "Adresa de poștei electronice este obligatorie", pag: -1 };
+            errors["posta"] = {
+                type: "email-invalid",
+                msg: "Adresa de poștei electronice este obligatorie",
+                pag: -1,
+            };
             focusField("posta");
             return;
         }
@@ -74,10 +78,12 @@
             return;
         }
 
-        errors["posta"] = null
-        errors["gdpr-consent"] = null
+        errors["posta"] = null;
+        errors["gdpr-consent"] = null;
         isMining = true;
-        setTimeout(() => { formElement?.requestSubmit(); }, 0);
+        setTimeout(() => {
+            formElement?.requestSubmit();
+        }, 0);
     }
 </script>
 
@@ -100,8 +106,8 @@
         return async ({ result, update }) => {
             if (result.type === "success") {
                 sectionIndex = 0;
-                localStorage.setItem("pagina", "0")
-                localStorage.setItem("posta", email)
+                localStorage.setItem("pagina", "0");
+                localStorage.setItem("posta", email);
             }
             isMining = false;
             await update();
@@ -131,14 +137,14 @@
         class="flex flex-col rounded-xl border p-3 transition-colors {errors['gdpr-consent'] != null ? 'border-danger bg-red-50' : 'border-transparent'}"
     >
         <label for="gdpr-consent" class="sm:leading-0 sm:pb-0.5">
-        <input
-            bind:checked={consent}
-            type="checkbox"
-            id="gdpr-consent"
-            name="gdpr-consent"
-            required
-            class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
-        />
+            <input
+                bind:checked={consent}
+                type="checkbox"
+                id="gdpr-consent"
+                name="gdpr-consent"
+                required
+                class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
+            />
             Am citit și sunt de acord cu <a
                 href="/politica-confidentialitate"
                 class="underline"

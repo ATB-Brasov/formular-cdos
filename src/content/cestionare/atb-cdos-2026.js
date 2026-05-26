@@ -10,7 +10,7 @@ import lista from "./lista_facultati_unitbv_2026.js";
  * @property {() => ({ optiuni: string[]; eroare: string? })} [optiuni=() => ({ optiuni: ["da", "nu", "nu știu"], eroare: null })]
  */
 
- /** @typedef {(nume:string, titlu:string, optiuni_obj?: OptiuniDanu) => Field} RadioConstructor */
+/** @typedef {(nume:string, titlu:string, optiuni_obj?: OptiuniDanu) => Field} RadioConstructor */
 
 /**
  * Base function for creating radio selection fields.
@@ -56,32 +56,42 @@ function da_nu_caz(nume, titlu, optiuni_obj = {}) {
 
 /** @type {RadioConstructor} */
 function grad(nume, titlu, optiuni_obj = {}) {
-     const {
-         desc = null,
-         obligatoriu = true,
-         ascunde = null,
-         optiuni = () => ({ optiuni: [
-            "mereu", "des","rar","niciodată","nu știu"], eroare: null }),
-     } = optiuni_obj;
+    const {
+        desc = null,
+        obligatoriu = true,
+        ascunde = null,
+        optiuni = () => ({
+            optiuni: [
+                "mereu",
+                "des",
+                "rar",
+                "niciodată",
+                "nu știu",
+            ],
+            eroare: null,
+        }),
+    } = optiuni_obj;
 
-     return {
-         nume,
-         titlu,
-         desc,
-         obligatoriu,
-         ascunde,
-         tip: "selecție-radio",
-         optiuni,
-     };
+    return {
+        nume,
+        titlu,
+        desc,
+        obligatoriu,
+        ascunde,
+        tip: "selecție-radio",
+        optiuni,
+    };
 }
 
 /** @type {RadioConstructor} */
 function grad_p(nume, titlu, optiuni_obj = {}) {
     return _radio(nume, titlu, [
-        "mereu", "des", "rar", "niciodată",
+        "mereu",
+        "des",
+        "rar",
+        "niciodată",
     ], optiuni_obj);
 }
-
 
 /**
  * @param {string} nume
@@ -89,9 +99,10 @@ function grad_p(nume, titlu, optiuni_obj = {}) {
  */
 function detalii(nume) {
     return {
-        tip: "textarea", nume,
+        tip: "textarea",
+        nume,
         titlu: "Descrie problemele înâmpinate:",
-    }
+    };
 }
 
 /**@type{import("@content/cestionare/types.js").Questionnaire}*/
@@ -226,15 +237,19 @@ export default {
                             )
                             .map((o) => o.ani);
 
-                        let an = ani.at(0)
+                        let an = ani.at(0);
                         if (an == null) {
                             return {
                                 optiuni: [],
-                                eroare: "Eroare internă: nu au fost găsite ani de studiu pentru selecția curentă.",
+                                eroare:
+                                    "Eroare internă: nu au fost găsite ani de studiu pentru selecția curentă.",
                             };
                         }
 
-                        const optiuni = Array.from({ length: an }, (_, i) => i + 1).map(String)
+                        const optiuni = Array.from(
+                            { length: an },
+                            (_, i) => i + 1,
+                        ).map(String);
 
                         return {
                             optiuni,
@@ -285,7 +300,7 @@ export default {
                         },
                     },
                 ),
-            ]
+            ],
         },
         {
             titlu: "Reguli Generale și Drepturi Contractuale",

@@ -22,7 +22,8 @@
         ...rest
     } = $props();
 
-    const base = "rounded-md px-2 py-1 transition-transform transition-color duration-200 ease-in-out";
+    const base =
+        "rounded-md px-2 py-1 transition-transform transition-color duration-200 ease-in-out";
 
     const variants = {
         primary: `

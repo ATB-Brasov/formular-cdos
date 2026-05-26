@@ -13,20 +13,18 @@
      * @property {FieldError} errors
      */
 
-     /** @type {Props} */
+    /** @type {Props} */
     let {
         desc = null,
         obligatoriu = false,
         question,
         errors,
         children,
-        onFocusOut
+        onFocusOut,
     } = $props();
-
 </script>
 
 <fieldset onfocusout={onFocusOut} class="flex flex-col">
-
     <legend class="mb-1 text-lg font-bold">
         {question}{#if obligatoriu}&#8288;<span
                 class="px-0.5 leading-none font-bold text-danger"
@@ -37,7 +35,9 @@
     {#if desc != null}
         <details class="mb-1">
             <summary>Vezi mai multe detalii&hellip;</summary>
-            <p class="border-l-3 border-surface-dark pl-2.5 mt-1 text-surface-dark text-sm mb-3">
+            <p
+                class="border-l-3 border-surface-dark pl-2.5 mt-1 text-surface-dark text-sm mb-3"
+            >
                 {@html desc}
             </p>
         </details>
@@ -45,9 +45,7 @@
 
     {@render children?.()}
 
-
     {#if errors}
         <div class="text-red-500 mt-1 text-sm">{errors.msg}</div>
     {/if}
-
 </fieldset>

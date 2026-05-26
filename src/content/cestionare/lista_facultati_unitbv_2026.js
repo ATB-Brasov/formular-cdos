@@ -1079,8 +1079,20 @@ export default {
             frm: "Învățământ cu Frecvență",
             prg: "Psihopedagogia educației timpurii și a școlarității mici",
         },
-        { ani: 4, fac: "15 Drept", cic: "Licență", frm: "Învățământ cu Frecvență", prg: "Drept" },
-        { ani: 4, fac: "15 Drept", cic: "Licență", frm: "Învățământ cu Frecvență Redusă", prg: "Drept" },
+        {
+            ani: 4,
+            fac: "15 Drept",
+            cic: "Licență",
+            frm: "Învățământ cu Frecvență",
+            prg: "Drept",
+        },
+        {
+            ani: 4,
+            fac: "15 Drept",
+            cic: "Licență",
+            frm: "Învățământ cu Frecvență Redusă",
+            prg: "Drept",
+        },
         {
             ani: 2,
             fac: "15 Drept",

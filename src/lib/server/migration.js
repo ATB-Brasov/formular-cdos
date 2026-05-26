@@ -21,7 +21,10 @@ async function v1(kv) {
     for await (const entry of answerIter) {
         const val = /** @type {Record<string, unknown>|null} */ (entry.value);
         if (val && typeof val.submittedAt === "number") {
-            const dateStr = new Date(val.submittedAt).toISOString().slice(0, 10);
+            const dateStr = new Date(val.submittedAt).toISOString().slice(
+                0,
+                10,
+            );
             tally.set(dateStr, (tally.get(dateStr) || 0) + 1);
 
             const { submittedAt, ...clean } = val;
@@ -36,7 +39,9 @@ async function v1(kv) {
     // 1b. Write daily counts
     let countsWritten = 0;
     for (const [dateStr, count] of tally) {
-        await kv.set([...DAILY_COUNTS_PREFIX, "atb-cdos-2026", dateStr], { count });
+        await kv.set([...DAILY_COUNTS_PREFIX, "atb-cdos-2026", dateStr], {
+            count,
+        });
         countsWritten++;
     }
 
@@ -71,7 +76,9 @@ export async function runMigrations() {
         return;
     }
 
-    console.log(`Schema at v${appliedVersion}, target v${CURRENT_VERSION}. Running migrations...`);
+    console.log(
+        `Schema at v${appliedVersion}, target v${CURRENT_VERSION}. Running migrations...`,
+    );
 
     for (let v = appliedVersion; v < CURRENT_VERSION; v++) {
         console.log(`  Running migration v${v + 1}...`);

@@ -1,11 +1,11 @@
 <script>
     import { onMount } from "svelte";
-	import { browser } from "$app/environment";
+    import { browser } from "$app/environment";
     import { PUBLIC_ORIGIN } from "$env/static/public";
 
     const POST_ORIGIN = PUBLIC_ORIGIN || "*";
 
-    /**@type{HTMLElement?}*/ let element = $state(null)
+    /**@type{HTMLElement?}*/ let element = $state(null);
 
     onMount(() => {
         let isIframe = false;
@@ -19,7 +19,7 @@
         if (isIframe && element != null) {
             const height = element.offsetHeight;
             window.parent.postMessage(
-                { type: 'iframe-resize', height: height },
+                { type: "iframe-resize", height: height },
                 POST_ORIGIN,
             );
         }
@@ -54,8 +54,8 @@
     <p class="mb-4">
         Colectăm adresa dumneavoastră de e-mail pentru a ne asigura că sunteți
         sutent al Univeristății Transilvania din Brașov și în scopul prevenirii
-        completărilor duplicate în chestionar. Această informație nu
-        va fi partajată cu terți fără consimțământul dumneavoastră explicit.
+        completărilor duplicate în chestionar. Această informație nu va fi
+        partajată cu terți fără consimțământul dumneavoastră explicit.
     </p>
 
     <h3 class="text-2xl font-semibold text-gray-700 mt-6 mb-3">
@@ -76,8 +76,8 @@
         Ai dreptul de a solicita ștergerea datelor tale personale și a
         răspunsurilor asociate. Pentru a exercita acest drept, accesează
         <a href="/sterge-date">pagina de ștergere</a> a chestionarului și
-        folosește formularul, introducând atât adresa de e-mail
-        cât și ID-ul răspunsului primit după completare.
+        folosește formularul, introducând atât adresa de e-mail cât și ID-ul
+        răspunsului primit după completare.
     </p>
     <p class="mb-4">
         Ștergerea elimină atât înregistrarea email-ului cât și răspunsurile

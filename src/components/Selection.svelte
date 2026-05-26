@@ -28,12 +28,12 @@
         value = $bindable(),
     } = $props();
 
-    const optiuni = $derived(field.optiuni?.(allAnswers))
+    const optiuni = $derived(field.optiuni?.(allAnswers));
     $effect(() => {
-        if (optiuni == null) return
+        if (optiuni == null) return;
         const items = optiuni.optiuni.map((v) =>
             typeof v === "string" ? v : v.exista ? v.text : null
-        )
+        );
         if (value !== "" && !items.includes(value)) {
             value = "";
         }
@@ -48,7 +48,6 @@
         valideaza,
     });
 </script>
-
 
 {#if optiuni == null}
     <i class="text-italic text-danger-strong">

@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { dev } from "$app/environment";
-import { getAdminSession, getListOfAnswers } from "$lib/server/session.js";
+import { getAdminSession, getDailyCounts, getListOfAnswers } from "$lib/server/session.js";
 import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js";
 
 /** @type {import('./$types').PageServerLoad} */
@@ -18,5 +18,6 @@ export async function load({ cookies }) {
     for await (const entry of iterator) {
         answers.push(entry);
     }
-    return { answers };
+    const dailyCounts = await getDailyCounts(sondaj_cdos.id);
+    return { answers, dailyCounts };
 }

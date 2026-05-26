@@ -19,13 +19,10 @@
     let answersPerDay = $derived.by(() => {
         /**@type{Map<string, number>}*/
         const map = new Map();
-        if (data.answers) {
-            for (const kdata of data.answers) {
-                const submittedAt = kdata.value.submittedAt;
-                if (submittedAt) {
-                    const dateString = new Date(submittedAt).toLocaleDateString("ro-RO");
-                    map.set(dateString, (map.get(dateString) || 0) + 1);
-                }
+        if (data.dailyCounts) {
+            for (const { date, count } of data.dailyCounts) {
+                const [y, m, d] = date.split('-');
+                map.set(`${d}.${m}.${y}`, count);
             }
         }
         return map;
@@ -185,32 +182,26 @@
 
         <!-- Answers Table -->
         {#if data.answers != null && data.answers.length > 0}
-            {@const sortedAnswers = data.answers.sort((a, b) => new Date(b.value.submittedAt).valueOf() - new Date(a.value.submittedAt).valueOf())}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700 transition-shadow duration-300 hover:shadow-lg">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Submission Details</h2>
                 <div class="overflow-x-auto rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Submitted At</th>
                                 {#each cimps as cimp}
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{cimp.nume}</th>
                                 {/each}
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                            {#each sortedAnswers as kdata}
-                                {@const submittedAt = kdata.value.submittedAt}
+                            {#each data.answers as kdata}
                                 {@const answersMap = kdata.value.answers instanceof Map ? kdata.value.answers : new Map(kdata.value.answers)}
-                                {#if submittedAt}
-                                    <tr>
-                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{new Date(submittedAt).toLocaleString("ro")}</td>
-                                        {#each cimps as cimp}
-                                            {@const item = answersMap.get(cimp.nume)}
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{item ?? '-'}</td>
-                                        {/each}
-                                    </tr>
-                                {/if}
+                                <tr>
+                                    {#each cimps as cimp}
+                                        {@const item = answersMap.get(cimp.nume)}
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{item ?? '-'}</td>
+                                    {/each}
+                                </tr>
                             {/each}
                         </tbody>
                     </table>

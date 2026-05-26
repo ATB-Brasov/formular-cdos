@@ -1,4 +1,6 @@
 // Assisted-By: Gemini 3 Flash
+import "./cron.js";
+
 /** @typedef {Deno.Kv} Kv */
 
 /** @type {Kv | null} */

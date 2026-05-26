@@ -5,6 +5,7 @@ import { getKv } from "./kv.js";
 const SESSION_PREFIX = ["sessions"];
 const ANSWERS_PREFIX = ["answers"];
 const EMAILS_PREFIX = ["emails"];
+const DAILY_COUNTS_PREFIX = ["daily_counts"];
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
 
 /**
@@ -31,7 +32,12 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
  * @typedef {Object} AnswersData
  * @property {string} answerId
  * @property {Map<string,string>} answers
- * @property {number} submittedAt
+ */
+
+/**
+ * @typedef {Object} DailyCount
+ * @property {string} date
+ * @property {number} count
  */
 
 /**
@@ -236,8 +242,57 @@ export async function saveAnswers(email, formId, answerId, answers) {
     await kv.set([...ANSWERS_PREFIX, formId, answerId], {
         answerId,
         answers,
-        submittedAt: Date.now(),
     });
+    await saveDailyCount(kv, formId);
+}
+
+/**
+ * Increment today's daily answer count for a given form
+ * @param {Deno.Kv} kv
+ * @param {string} formId
+ */
+async function saveDailyCount(kv, formId) {
+    const today = new Date().toISOString().slice(0, 10);
+    const key = [...DAILY_COUNTS_PREFIX, formId, today];
+    /** @type {Deno.KvEntryMaybe<{count: number}>} */
+    const current = await kv.get(key);
+    const count = (current.value?.count ?? 0) + 1;
+    await kv.set(key, { count });
+}
+
+/**
+ * Get daily answer counts for a form
+ * @param {string} formId
+ * @returns {Promise<{date: string, count: number}[]>}
+ */
+export async function getDailyCounts(formId) {
+    const kv = await getKv();
+    const iterator = kv.list({ prefix: [...DAILY_COUNTS_PREFIX, formId] });
+    /** @type {{date: string, count: number}[]} */
+    const results = [];
+    for await (const entry of iterator) {
+        const val = /** @type {{count: number}} */ (entry.value);
+        results.push({
+            date: /** @type {string} */ (entry.key[2]),
+            count: val.count,
+        });
+    }
+    return results;
+}
+
+/**
+ * Rewrite every email hash entry to update its versionstamp,
+ * preventing time-based correlation with answer entries.
+ */
+export async function refreshEmailVersionstamps() {
+    const kv = await getKv();
+    const iterator = kv.list({ prefix: EMAILS_PREFIX });
+    let count = 0;
+    for await (const entry of iterator) {
+        await kv.set(entry.key, entry.value);
+        count++;
+    }
+    console.log(`Refreshed versionstamps for ${count} email entries`);
 }
 
 export async function hashEmail(/**@type{string}*/ email) {

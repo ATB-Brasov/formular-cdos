@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "unstable": ["fmt-component", "kv"],
+    "unstable": ["cron", "fmt-component", "kv"],
     "fmt": {
         "useTabs": false,
         "lineWidth": 80,
@@ -10,7 +10,7 @@
         "proseWrap": "preserve"
     },
     "tasks": {
-        "dev": "deno run -A --env-file npm:vite dev",
+        "dev": "deno run -A --unstable-cron --env-file npm:vite dev",
         "build": "deno run -A npm:vite build",
         "preview": "deno run -A --env-file npm:vite preview",
         "prepare": "deno run -A npm:@sveltejs/kit sync || echo ''",

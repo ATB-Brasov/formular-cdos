@@ -2,11 +2,13 @@
   "version": "5",
   "specifiers": {
     "npm:@deno/svelte-adapter@~0.1.1": "0.1.1_@sveltejs+kit@2.57.1__@sveltejs+vite-plugin-svelte@6.2.4___svelte@5.55.4___vite@7.3.2__svelte@5.55.4__typescript@6.0.3__vite@7.3.2_@sveltejs+vite-plugin-svelte@6.2.4__svelte@5.55.4__vite@7.3.2_svelte@5.55.4_typescript@6.0.3_vite@7.3.2",
+    "npm:@sveltejs/kit@*": "2.57.1_@sveltejs+vite-plugin-svelte@6.2.4__svelte@5.55.4__vite@7.3.2_svelte@5.55.4_typescript@6.0.3_vite@7.3.2",
     "npm:@sveltejs/kit@^2.50.2": "2.57.1_@sveltejs+vite-plugin-svelte@6.2.4__svelte@5.55.4__vite@7.3.2_svelte@5.55.4_typescript@6.0.3_vite@7.3.2",
     "npm:@sveltejs/vite-plugin-svelte@^6.2.4": "6.2.4_svelte@5.55.4_vite@7.3.2",
     "npm:@tailwindcss/vite@^4.1.18": "4.2.2_vite@7.3.2",
     "npm:@types/deno@^2.5.0": "2.5.0",
     "npm:argon2@0.44": "0.44.0",
+    "npm:svelte-check@*": "4.4.6_svelte@5.55.4_typescript@6.0.3",
     "npm:svelte-check@^4.3.6": "4.4.6_svelte@5.55.4_typescript@6.0.3",
     "npm:svelte@^5.51.0": "5.55.4",
     "npm:tailwindcss@^4.2.2": "4.2.2",

@@ -1,6 +1,6 @@
 <script>
     /**
-     * @typedef {'primary' | 'ghost'} ButtonVariant
+     * @typedef {'primary' | 'ghost' | 'danger'} ButtonVariant
      */
 
     /**
@@ -40,6 +40,12 @@
             focus:outline-none focus:ring-2 focus:ring-primary-faint focus:ring-opacity-75
             active:scale-95
             dark:hover:bg-primary-text dark:hover:text-primary-dim
+        `,
+        danger: `
+            bg-danger text-white
+            hover:bg-danger-hover
+            focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-75
+            active:scale-95
         `,
     };
 </script>

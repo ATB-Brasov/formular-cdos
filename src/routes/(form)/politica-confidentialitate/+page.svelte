@@ -32,7 +32,7 @@
         Politică de Confidențialitate
     </h2>
     <p class="mb-6 text-sm text-gray-500">
-        Data ultimei actualizări: 21.05.2026
+        Data ultimei actualizări: 26.05.2026
     </p>
 
     <p class="mb-4">
@@ -64,6 +64,21 @@
         protejate prin criptare și sunt stocate separat de răspunsurile la
         cestionar, astfel răspunsurile sunt anonimizate pentru a garanta
         confidențialitatea.
+    </p>
+
+    <h3 class="text-2xl font-semibold text-gray-700 mt-6 mb-3">
+        Dreptul de Ștergere a Datelor
+    </h3>
+    <p class="mb-4">
+        Ai dreptul de a solicita ștergerea datelor tale personale și a
+        răspunsurilor asociate. Pentru a exercita acest drept, accesează
+        <a href="/sterge-date">pagina de ștergere</a> a chestionarului și
+        folosește formularul, introducând atât adresa de e-mail
+        cât și ID-ul răspunsului primit după completare.
+    </p>
+    <p class="mb-4">
+        Ștergerea elimină atât înregistrarea email-ului cât și răspunsurile
+        asociate din baza de date. Această acțiune este ireversibilă.
     </p>
 
     <h3 class="text-2xl font-semibold text-gray-700 mt-6 mb-3">

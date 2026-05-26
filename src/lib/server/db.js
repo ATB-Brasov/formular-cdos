@@ -218,7 +218,7 @@ export async function getListOfAnswers(formId, limit = 10) {
  * Get previous answers by answer ID
  * @param {string} formId
  * @param {string} answerId
- * @returns {Promise<Map<string,string>|null>}
+ * @returns {Promise<AnswersData|null>}
  */
 export async function getPreviousAnswers(formId, answerId) {
     const kv = await getKv();
@@ -244,6 +244,18 @@ export async function saveAnswers(email, formId, answerId, answers) {
         answers,
     });
     await saveDailyCount(kv, formId);
+}
+
+/**
+ * Overwrite existing answers without touching email records or daily counts.
+ * @param {string} formId
+ * @param {string} answerId
+ * @param {Map<string,string>} answers
+ * @returns {Promise<void>}
+ */
+export async function overwriteAnswers(formId, answerId, answers) {
+    const kv = await getKv();
+    await kv.set([...ANSWERS_PREFIX, formId, answerId], { answerId, answers });
 }
 
 /**
@@ -284,6 +296,39 @@ export async function getDailyCounts(formId) {
  * Rewrite every email hash entry to update its versionstamp,
  * preventing time-based correlation with answer entries.
  */
+/**
+ * Delete an email record and its associated answers from the database.
+ * Both records must exist for the deletion to succeed.
+ * @param {string} formId
+ * @param {string} email
+ * @param {string} answerId
+ * @returns {Promise<{deleted: boolean, emailExists?: boolean, answerExists?: boolean}>}
+ */
+export async function deleteAnswers(formId, email, answerId) {
+    const kv = await getKv();
+    const hashed = await hashEmail(email);
+    const emailKey = [...EMAILS_PREFIX, formId, hashed];
+    const answerKey = [...ANSWERS_PREFIX, formId, answerId];
+
+    const [emailEntry, answerEntry] = await Promise.all([
+        kv.get(emailKey),
+        kv.get(answerKey),
+    ]);
+
+    const emailExists = emailEntry.value != null;
+    const answerExists = answerEntry.value != null;
+
+    if (!emailExists || !answerExists) {
+        return { deleted: false, emailExists, answerExists };
+    }
+
+    await Promise.all([
+        kv.delete(emailKey),
+        kv.delete(answerKey),
+    ]);
+    return { deleted: true };
+}
+
 export async function refreshEmailVersionstamps() {
     const kv = await getKv();
     const iterator = kv.list({ prefix: EMAILS_PREFIX });

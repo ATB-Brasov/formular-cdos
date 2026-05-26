@@ -17,11 +17,12 @@
 
 <main
     class={[
-        !isIframe && "bg-olive-50/30 dark:bg-olive-900 text-olive-900 dark:text-olive-50",
+        "pt-6",
+        !isIframe && "bg-olive-50/30 dark:bg-olive-900 text-olive-900 dark:text-olive-50 min-h-screen",
     ]}
 >
 
-    <div class="m-auto mt-6 sm:py-10 px-4 w-full sm:w-[60ch]" >
+    <div class="m-auto sm:py-10 px-4 w-full sm:w-[60ch]" >
         {#if !isIframe}
             <header class="px-4 flex justify-center w-full"><a href="https://atbbrasov.ro/"><img class="h-20" src={logo} alt=""></a></header>
         {/if}

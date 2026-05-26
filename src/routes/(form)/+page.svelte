@@ -5,6 +5,7 @@
     import { enhance } from "$app/forms";
     import { page } from "$app/state";
     import { browser, dev } from "$app/environment";
+    import { goto } from "$app/navigation";
 
     import Button from "@components/Button.svelte";
     import Selection from "@components/Selection.svelte";
@@ -27,13 +28,15 @@
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
 
-    let sectionIndex = $state((() => data.session?.email)() ? 0 : -1);
+    const _editData = data.editData;
+    const _session = data.session;
+    let sectionIndex = $state(_editData ? 0 : _session?.email ? 0 : -1);
     $effect(() => {
         sectionIndex;
         notifyParentPageChange()
     })
     /** @type {SDict<FieldError|null>} */ let errors = $state({});
-    /** @type {SDict<string>} */ let answers = $state({});
+    /** @type {SDict<string>} */ let answers = $state(_editData?.answers ?? {});
 
     /**
      * @param {number} sectionIdx
@@ -84,6 +87,7 @@
                 return;
             }
             if (tmp === -1) {
+                if (_editData) return;
                 setSectionIndex(tmp, {whence: "navigateSection::precedent"});
                 return;
             }
@@ -139,6 +143,7 @@
         }
 
         if (isIframe) notifyParentOfHeightChange();
+        if (data.editData) return;
         const savedAnswers = localStorage.getItem("raspunsuri");
         if (savedAnswers) {
             try {
@@ -334,18 +339,20 @@
     <form
         method="POST"
         use:enhance={async ({ formData, cancel }) => {
-            const email = localStorage.getItem("posta");
-            if (email) {
-                formData.set("posta", email);
-                isMining = true;
-                try {
-                    const nonce = await solvePoW(email, 4);
-                    formData.append("nonce", nonce.toString());
-                } catch {
-                    cancel();
-                    return;
-                } finally {
-                    isMining = false;
+            if (!data.editData) {
+                const email = localStorage.getItem("posta");
+                if (email) {
+                    formData.set("posta", email);
+                    isMining = true;
+                    try {
+                        const nonce = await solvePoW(email, 4);
+                        formData.append("nonce", nonce.toString());
+                    } catch {
+                        cancel();
+                        return;
+                    } finally {
+                        isMining = false;
+                    }
                 }
             }
             return async ({ result, update }) => { await update(); };
@@ -358,6 +365,11 @@
 
         {#if test}
             <input type="hidden" name="test" value="true">
+        {/if}
+
+        {#if data.editData}
+            <input type="hidden" name="edit" value="true">
+            <input type="hidden" name="answerId" value={data.editData.answerId}>
         {/if}
 
         {#each sections as section, i}
@@ -421,26 +433,38 @@
             <div
                 class="m-4 rounded-xl border border-surface-border bg-surface p-3"
             >
-                <div class="flex justify-end gap-4">
-                    <Button
-                        class={sectionIndex === -1 ? "invisible" : ""}
-                        onclick={() => navigateSection("precedent")}
-                    >
-                        Anterior
-                    </Button>
-
-                    {@render button()}
-                    {#snippet button()}
-                        {@const ultima = sections[sectionIndex].idx === visibleSections.at(-1)?.idx}
+                <div class="flex justify-between gap-4">
+                    <div>
+                        {#if _editData}
+                            <Button
+                                variant="danger"
+                                onclick={() => goto("/sterge-date?answerId=" + encodeURIComponent(_editData.answerId))}
+                            >
+                                Șterge
+                            </Button>
+                        {/if}
+                    </div>
+                    <div class="flex gap-4">
                         <Button
-                            class="min-w-22"
-                            type="button"
-                            disabled={isMining}
-                            onclick={ultima ? handleSubmit : () => navigateSection("urmator")}
+                            class={sectionIndex === -1 || (_editData && sectionIndex === 0) ? "invisible" : ""}
+                            onclick={() => navigateSection("precedent")}
                         >
-                            {isMining ? "Se verifică..." : ultima ? "Trimite" : "Următor"}
+                            Anterior
                         </Button>
-                    {/snippet}
+
+                        {@render button()}
+                        {#snippet button()}
+                            {@const ultima = sections[sectionIndex].idx === visibleSections.at(-1)?.idx}
+                            <Button
+                                class="min-w-22"
+                                type="button"
+                                disabled={isMining}
+                                onclick={ultima ? handleSubmit : () => navigateSection("urmator")}
+                            >
+                                {isMining ? "Se verifică..." : ultima ? "Trimite" : "Următor"}
+                            </Button>
+                        {/snippet}
+                    </div>
                 </div>
             </div>
         </div>

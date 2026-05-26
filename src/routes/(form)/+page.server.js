@@ -7,10 +7,12 @@ import {
     createSession,
     deleteSession,
     getAnsweredEmail,
+    getPreviousAnswers,
     getSession,
+    overwriteAnswers,
     saveAnswers,
     updateSessionEmail,
-} from "$lib/server/session.js";
+} from "$lib/server/db.js";
 
 /**
  * @param {import('@sveltejs/kit').Cookies} cookies
@@ -30,7 +32,17 @@ async function createSessionCookie(cookies) {
 }
 
 /** @type {import('./$types').PageServerLoad} */
-export async function load({ cookies }) {
+export async function load({ cookies, url }) {
+    const editAnswerId = url.searchParams.get("edit");
+    if (editAnswerId) {
+        const prev = await getPreviousAnswers(survey.id, editAnswerId);
+        return {
+            editData: prev
+                ? { answerId: editAnswerId, answers: Object.fromEntries(prev.answers) }
+                : null,
+        };
+    }
+
     let sessionid = cookies.get("sessionid");
     if (sessionid == null) {
         sessionid = await createSessionCookie(cookies);
@@ -120,50 +132,47 @@ export const actions = {
     },
 
     submit: async ({ request, cookies }) => {
-        const sessionId = cookies.get("sessionid");
-        if (sessionId == null) {
-            return fail(400, {
-                errors: {
-                    _form: {
-                        type: "session-required",
-                        msg: "Nici o sesiune nu a fost setată",
-                        pag: -1,
-                    },
-                },
-            });
-        }
-        let session = await getSession(sessionId);
-        if (session == null) {
-            return fail(400, {
-                errors: {
-                    _form: {
-                        type: "session-invalid",
-                        msg: "Sesiune nevalidă",
-                        pag: -1,
-                    },
-                },
-            });
-        }
-
         const data = await request.formData();
         const dataDict = Object.fromEntries(
             data.entries().map(([name, value]) => [name, value.toString()]),
         );
 
-        if (session.email == null) {
-            if (dataDict.posta == null) {
+        const isEdit = dataDict.edit === "true" && dataDict.answerId != null;
+
+        /** @type {string|undefined} */
+        let answerId;
+        /** @type {string|undefined} */
+        let email;
+
+        if (isEdit) {
+            answerId = dataDict.answerId;
+            const prev = await getPreviousAnswers(survey.id, answerId);
+            if (prev == null) {
                 return fail(400, {
                     errors: {
                         _form: {
-                            type: "email-required",
-                            msg: "Poșta electronică a sesiunii nu a fost setată",
+                            type: "edit-invalid",
+                            msg: "Răspunsul nu a fost găsit.",
                             pag: -1,
                         },
                     },
                 });
             }
-            session = await updateSessionEmail(sessionId, dataDict.posta);
-            if (session == null || session.email == null) {
+        } else {
+            const sessionId = cookies.get("sessionid");
+            if (sessionId == null) {
+                return fail(400, {
+                    errors: {
+                        _form: {
+                            type: "session-required",
+                            msg: "Nici o sesiune nu a fost setată",
+                            pag: -1,
+                        },
+                    },
+                });
+            }
+            let session = await getSession(sessionId);
+            if (session == null) {
                 return fail(400, {
                     errors: {
                         _form: {
@@ -174,29 +183,58 @@ export const actions = {
                     },
                 });
             }
-        }
-        const validationMsg = (survey.validare_posta != null)
-            ? survey.validare_posta(session.email)
-            : null;
-        if (validationMsg != null) {
-            return fail(400, {
-                errors: {
-                    posta: { type: "email-invalid", msg: validationMsg, pag: 0 },
-                },
-            });
-        }
 
-        const nonce = dataDict.nonce;
-        if (nonce == null || !verifyPoW(session.email, nonce, 4)) {
-            return fail(400, {
-                errors: {
-                    _form: {
-                        type: "pow-invalid",
-                        msg: "Verifică adresa poștei electronice și mai încearcă o dată",
-                        pag: -1,
+            if (session.email == null) {
+                if (dataDict.posta == null) {
+                    return fail(400, {
+                        errors: {
+                            _form: {
+                                type: "email-required",
+                                msg: "Poșta electronică a sesiunii nu a fost setată",
+                                pag: -1,
+                            },
+                        },
+                    });
+                }
+                session = await updateSessionEmail(sessionId, dataDict.posta);
+                if (session == null || session.email == null) {
+                    return fail(400, {
+                        errors: {
+                            _form: {
+                                type: "session-invalid",
+                                msg: "Sesiune nevalidă",
+                                pag: -1,
+                            },
+                        },
+                    });
+                }
+            }
+            email = /** @type {string} */ (session.email);
+            answerId = session.answerId;
+
+            const validationMsg = (survey.validare_posta != null)
+                ? survey.validare_posta(session.email)
+                : null;
+            if (validationMsg != null) {
+                return fail(400, {
+                    errors: {
+                        posta: { type: "email-invalid", msg: validationMsg, pag: 0 },
                     },
-                },
-            });
+                });
+            }
+
+            const nonce = dataDict.nonce;
+            if (nonce == null || !verifyPoW(session.email, nonce, 4)) {
+                return fail(400, {
+                    errors: {
+                        _form: {
+                            type: "pow-invalid",
+                            msg: "Verifică adresa poștei electronice și mai încearcă o dată",
+                            pag: -1,
+                        },
+                    },
+                });
+            }
         }
 
         let activeSurvey = survey;
@@ -254,18 +292,18 @@ export const actions = {
             return fail(400, { errors, pag: minErrorSection });
         }
 
-        await saveAnswers(
-            session.email,
-            survey.id,
-            session.answerId,
-            new Map(answers),
-        );
-        await deleteSession(sessionId);
-        cookies.delete("sessionid", { path: "/" });
+        if (isEdit) {
+            await overwriteAnswers(survey.id, answerId, new Map(answers));
+        } else {
+            await saveAnswers(/** @type {string} */ (email), survey.id, answerId, new Map(answers));
+            const sessionId = cookies.get("sessionid");
+            if (sessionId) {
+                await deleteSession(sessionId);
+                cookies.delete("sessionid", { path: "/" });
+            }
+        }
 
-        // TODO: show respondent their answer ID so they can edit it later
-
-        // return { success: true };
-        redirect(303, "/succes");
+        const redirectEmail = email ? `&email=${encodeURIComponent(email)}` : '';
+        redirect(303, `/succes?answerId=${answerId}${redirectEmail}`);
     },
 };

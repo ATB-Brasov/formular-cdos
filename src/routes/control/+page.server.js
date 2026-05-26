@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { getAdminSession, getDailyCounts, getListOfAnswers } from "$lib/server/session.js";
+import { getAdminSession, getDailyCounts, getListOfAnswers } from "$lib/server/db.js";
 import survey from "@content/cestionare/atb-cdos-2026.js";
 
 const ACADEMIC_FIELDS = new Set(["facultatea", "ciclu", "forma", "programul", "anul"]);

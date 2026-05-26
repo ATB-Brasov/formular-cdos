@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { createAdminSession } from "$lib/server/session.js";
+import { createAdminSession } from "$lib/server/db.js";
 import { checkRateLimit } from "$lib/server/rate_limit.js";
 import { dev } from "$app/environment";
 import argon2 from "argon2";

@@ -1,4 +1,4 @@
-import { refreshEmailVersionstamps } from "./session.js";
+import { refreshEmailVersionstamps } from "./db.js";
 
 Deno.cron("Refresh email versionstamps", "0 */6 * * *", async () => {
     try {

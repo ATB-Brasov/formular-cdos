@@ -2,7 +2,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { verifyPoW } from "$lib/server/pow.js";
 
-import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js";
+import survey from "@content/cestionare/atb-cdos-2026.js";
 import {
     createSession,
     deleteSession,
@@ -16,8 +16,8 @@ import {
  * @param {import('@sveltejs/kit').Cookies} cookies
  * @returns {Promise<string>}
  */
-async function newSession(cookies) {
-    const sessionid = await createSession(sondaj_cdos.id);
+async function createSessionCookie(cookies) {
+    const sessionid = await createSession(survey.id);
     cookies.set("sessionid", sessionid, {
         path: "/",
         httpOnly: true,
@@ -33,7 +33,7 @@ async function newSession(cookies) {
 export async function load({ cookies }) {
     let sessionid = cookies.get("sessionid");
     if (sessionid == null) {
-        sessionid = await newSession(cookies);
+        sessionid = await createSessionCookie(cookies);
     }
     let session = await getSession(sessionid);
     return { session };
@@ -47,7 +47,7 @@ export const actions = {
         let email = data.get("posta");
         if (email == null) {
             return fail(400, {
-                erori: {
+                errors: {
                     posta: {
                         type: "email-required",
                         msg: "Câmpul este obligatoriu",
@@ -58,15 +58,15 @@ export const actions = {
         }
         email = email.toString();
 
-        const msg_validare = (sondaj_cdos.validare_posta != null)
-            ? sondaj_cdos.validare_posta(email)
+        const validationMsg = (survey.validare_posta != null)
+            ? survey.validare_posta(email)
             : null;
-        if (msg_validare != null) {
+        if (validationMsg != null) {
             return fail(400, {
-                erori: {
+                errors: {
                     posta: {
                         type: "email-invalid",
-                        msg: msg_validare,
+                        msg: validationMsg,
                         pag: -1,
                     },
                 },
@@ -75,7 +75,7 @@ export const actions = {
 
         if (nonce == null) {
             return fail(400, {
-                erori: {
+                errors: {
                     posta: {
                         type: "pow-required",
                         msg: "Nonce este null!",
@@ -87,7 +87,7 @@ export const actions = {
         nonce = nonce.toString();
         if (!verifyPoW(email, nonce, 3)) {
             return fail(400, {
-                erori: {
+                errors: {
                     posta: {
                         type: "pow-invalid",
                         msg: "Invalid Proof of Work. Nice try, bot!",
@@ -97,10 +97,10 @@ export const actions = {
             });
         }
 
-        const answered_email = await getAnsweredEmail(sondaj_cdos.id, email);
+        const answered_email = await getAnsweredEmail(survey.id, email);
         if (answered_email != null) {
             return fail(400, {
-                erori: {
+                errors: {
                     posta: {
                         type: "email-exists",
                         msg: "Este înregistrat răspuns pe această poștă electronică",
@@ -112,18 +112,18 @@ export const actions = {
 
         const sessionid = cookies.get("sessionid");
         if (sessionid == null) {
-            await newSession(cookies);
+            await createSessionCookie(cookies);
         } else {
             await updateSessionEmail(sessionid, email);
         }
         return { success: true };
     },
 
-    salveaza: async ({ request, cookies }) => {
+    submit: async ({ request, cookies }) => {
         const sessionId = cookies.get("sessionid");
         if (sessionId == null) {
             return fail(400, {
-                erori: {
+                errors: {
                     _form: {
                         type: "session-required",
                         msg: "Nici o sesiune nu a fost setată",
@@ -135,7 +135,7 @@ export const actions = {
         let session = await getSession(sessionId);
         if (session == null) {
             return fail(400, {
-                erori: {
+                errors: {
                     _form: {
                         type: "session-invalid",
                         msg: "Sesiune nevalidă",
@@ -147,13 +147,13 @@ export const actions = {
 
         const data = await request.formData();
         const dataDict = Object.fromEntries(
-            data.entries().map(([nume, valoare]) => [nume, valoare.toString()]),
+            data.entries().map(([name, value]) => [name, value.toString()]),
         );
 
         if (session.email == null) {
             if (dataDict.posta == null) {
                 return fail(400, {
-                    erori: {
+                    errors: {
                         _form: {
                             type: "email-required",
                             msg: "Poșta electronică a sesiunii nu a fost setată",
@@ -165,7 +165,7 @@ export const actions = {
             session = await updateSessionEmail(sessionId, dataDict.posta);
             if (session == null || session.email == null) {
                 return fail(400, {
-                    erori: {
+                    errors: {
                         _form: {
                             type: "session-invalid",
                             msg: "Sesiune nevalidă",
@@ -175,82 +175,82 @@ export const actions = {
                 });
             }
         }
-        const msg_validare = (sondaj_cdos.validare_posta != null)
-            ? sondaj_cdos.validare_posta(session.email)
+        const validationMsg = (survey.validare_posta != null)
+            ? survey.validare_posta(session.email)
             : null;
-        if (msg_validare != null) {
+        if (validationMsg != null) {
             return fail(400, {
-                erori: {
-                    posta: { type: "email-invalid", msg: msg_validare, pag: 0 },
+                errors: {
+                    posta: { type: "email-invalid", msg: validationMsg, pag: 0 },
                 },
             });
         }
 
-        let sondaj = sondaj_cdos;
+        let activeSurvey = survey;
 
         if (dataDict.test === "true") {
-            sondaj = (await import("@content/cestionare/atb-cdos-2026_test.js")).default
+            activeSurvey = (await import("@content/cestionare/atb-cdos-2026_test.js")).default
         }
 
-        /** @type { {[nume: string]: import("$lib/common_types.js").Eroare} } */
-        const erori = {}; // Poate un Map?
+        /** @type { {[name: string]: import("$lib/common_types.js").FieldError} } */
+        const errors = {};
 
         /** @type {[string, string][]} */
-        const raspunsuri = [];
+        const answers = [];
 
-        const pagini = sondaj.pagini;
-        let min_err_pag = pagini.length;
-        for (let pag_nr = 0; pag_nr < pagini.length; ++pag_nr) {
-            const pag = pagini[pag_nr];
-            if (pag.ascunde?.(dataDict)) {
+        const sections = activeSurvey.pagini;
+        let minErrorSection = sections.length;
+        for (let sectionIdx = 0; sectionIdx < sections.length; ++sectionIdx) {
+            const section = sections[sectionIdx];
+            if (section.ascunde?.(dataDict)) {
                 continue;
             }
-            for (let cimp of pag.cimpuri) {
-                const cimp_formular = data.get(cimp.nume);
+            for (let field of section.cimpuri) {
+                const formFieldValue = data.get(field.nume);
 
-                if (!cimp_formular) {
-                    if (!cimp.ascunde?.(dataDict) && cimp.obligatoriu) {
-                        erori[cimp.nume] = {
+                if (!formFieldValue) {
+                    if (!field.ascunde?.(dataDict) && field.obligatoriu) {
+                        errors[field.nume] = {
                             type: "field-required",
                             msg: "Câmpul este obligatoriu",
-                            pag: pag_nr,
+                            pag: sectionIdx,
                         };
-                        min_err_pag = Math.min(min_err_pag, pag_nr);
+                        minErrorSection = Math.min(minErrorSection, sectionIdx);
                     }
                     continue;
                 }
 
-                if (cimp.valideaza !== undefined) {
-                    const err = cimp.valideaza(cimp_formular.toString());
+                if (field.valideaza !== undefined) {
+                    const err = field.valideaza(formFieldValue.toString());
                     if (err != null) {
-                        min_err_pag = Math.min(min_err_pag, pag_nr);
-                        erori[cimp.nume] = {
+                        minErrorSection = Math.min(minErrorSection, sectionIdx);
+                        errors[field.nume] = {
                             type: "field-invalid",
                             msg: err,
-                            pag: pag_nr,
+                            pag: sectionIdx,
                         };
                     }
                 }
 
-                // WARN: Trebuie de văzut cum funcționează cu Selecții Multiple
-                raspunsuri.push([cimp.nume, cimp_formular.toString()]);
+                // WARN: Needs testing with Multi-Select fields
+                answers.push([field.nume, formFieldValue.toString()]);
             }
         }
 
-        if (Object.keys(erori).length > 0) {
-            return fail(400, { erori: erori, pag: min_err_pag });
+        if (Object.keys(errors).length > 0) {
+            return fail(400, { errors, pag: minErrorSection });
         }
 
         await saveAnswers(
             session.email,
-            sondaj_cdos.id,
+            survey.id,
             session.answerId,
-            new Map(raspunsuri),
+            new Map(answers),
         );
         await deleteSession(sessionId);
         cookies.delete("sessionid", { path: "/" });
 
-        // TODO: arată respondentului id-ul la răspuns ca să-l poată edita
+        // TODO: show respondent their answer ID so they can edit it later
 
         // return { success: true };
         redirect(303, "/succes");

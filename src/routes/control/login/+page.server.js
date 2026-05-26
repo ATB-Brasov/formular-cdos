@@ -12,9 +12,9 @@ export async function load({}) {
 export const actions = {
     default: async ({ request, cookies }) => {
         const data = await request.formData();
-        const parola = data.get("parola");
+        const password = data.get("password");
 
-        if (parola == null) {
+        if (password == null) {
             return fail(400, { msg: "Introdu parola!" });
         }
 
@@ -22,7 +22,7 @@ export const actions = {
         if (h == null) {
             throw new Error("HASH_CONTROL environment variable is missing!");
         }
-        if (await argon2.verify(h, parola.toString())) {
+        if (await argon2.verify(h, password.toString())) {
             const sessionid = await createAdminSession();
             cookies.set("adminsession", sessionid, {
                 path: "/",

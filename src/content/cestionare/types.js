@@ -1,87 +1,75 @@
 /** @import { SDict } from "$lib/common_types.js" */
 
 /**
- * O opțiune individuală dintr-o selecție.
- *
- * @typedef {Object} Optiune
- * @property {string} text   Textul afișat pentru această opțiune.
- * @property {boolean} exista Dacă `false`, opțiunea este dezactivată (disabled).
- * @property {string} [msg]  Mesaj tooltip afișat la hover, util când `exista` este `false`.
+ * @typedef {Object} Option
+ * @property {string} text
+ * @property {boolean} exista
+ * @property {string} [msg]
  */
 
 /**
- * Rezultatul întors de funcția de generare a opțiunilor.
- *
- * @typedef {Object} RezultatOptiuni
- * @property {(string | Optiune)[]} optiuni Lista de opțiuni (poate fi goală)
- * @property {string|null} eroare Mesaj descriptiv dacă nu pot fi generate opțiuni, altfel null
+ * @typedef {Object} OptionsResult
+ * @property {(string | Option)[]} optiuni
+ * @property {string|null} eroare
  */
 
- /**
-  * Această funcție este apelată pentru a determina dacă un câmp trebuie afișat în funcție de răspunsurile curente.
-  *
-  * @callback AscundeCimp
-  * @param {SDict<string>} raspunsuri Răspunsurile curente a formularului
-  * @return {boolean}
-  */
+/**
+ * @callback HideField
+ * @param {SDict<string>} answers
+ * @return {boolean}
+ */
 
 /**
- * Funcția trebuiește să întoarcă un obiect cu lista de opțiuni și un mesaj
- * opțional de eroare în cazul în care nu există opțiuni disponibile.
- *
- * @callback DaOptiuniSelectie
- * @param {SDict<string>} raspunsuri Răspunsurile curente a formularului
- * @return {RezultatOptiuni}
+ * @callback GetSelectionOptions
+ * @param {SDict<string>} answers
+ * @return {OptionsResult}
  */
 
 /**
  * @callback Validator
- *
- * Funcție de validare a răspunsului dat.
- *
- * @param {string} valoare Valoarea răspunsului pentru cîmpulu dat
- * @return {string?} Mesaj descriptiv în caz de eroare
+ * @param {string} value
+ * @return {string?}
  */
 
 /**
- * @typedef {'email'|'selecție-nativa'|'selecție-cautare'|'text'|'textarea'|'selecție-radio'} TipCimp
+ * @typedef {'email'|'selecție-nativa'|'selecție-cautare'|'text'|'textarea'|'selecție-radio'} FieldType
  */
 
 /**
- * @typedef {Object} Cimp
- * @property {TipCimp} tip
+ * @typedef {Object} Field
+ * @property {FieldType} tip
  * @property {string} nume
  * @property {string} titlu
  * @property {boolean} [horizontal]
  * @property {string?} [desc]
- * @property {AscundeCimp?} [ascunde]
+ * @property {HideField?} [ascunde]
  * @property {boolean} [obligatoriu]
  * @property {Validator} [valideaza]
- * @property {DaOptiuniSelectie} [optiuni]
+ * @property {GetSelectionOptions} [optiuni]
  */
 
 /**
- * @typedef {Object} Pagina
+ * @typedef {Object} Section
  * @property {string} titlu
  * @property {string} descriere
- * @property {Cimp[]} cimpuri
- * @property {AscundeCimp?} [ascunde]
+ * @property {Field[]} cimpuri
+ * @property {HideField?} [ascunde]
  */
 
 /**
- * @typedef {Object} Cestionar
+ * @typedef {Object} Questionnaire
  * @property {string} id
  * @property {string} titlu
  * @property {string?} [descriere]
  * @property {Validator} [validare_posta]
- * @property {Pagina[]} pagini
+ * @property {Section[]} pagini
  */
 
 /**
- * @param {string | Optiune} opt
- * @returns {Optiune}
+ * @param {string | Option} opt
+ * @returns {Option}
  */
-export function normOptiune(opt) {
+export function normalizeOption(opt) {
     if (typeof opt === "string") {
         return { text: opt, exista: true };
     }
@@ -89,25 +77,22 @@ export function normOptiune(opt) {
 }
 
 /**
- * Verifică dacă răspunsul este gol sau nu.
- *
- * @param {string?} value Numele cîmpului
+ * @param {string?} value
  * @returns {boolean}
  */
-export function raspunsGol(value) {
+export function emptyAnswer(value) {
     return value == null || value?.trim() === "";
 }
 
 /**
- *
  * @param {string} value
  * @param {boolean} obligatoriu
  * @param {Validator} valideaza
  * @returns
  */
-export function aplicaValidare(value, obligatoriu, valideaza) {
+export function applyValidation(value, obligatoriu, valideaza) {
     let err
-    if (raspunsGol(value)) {
+    if (emptyAnswer(value)) {
         err = !obligatoriu ? null :  {
             type: "field-required",
             msg : "Câmpul este obligatoriu",

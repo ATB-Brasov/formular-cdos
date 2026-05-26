@@ -1,7 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { getAdminSession, getDailyCounts, getListOfAnswers } from "$lib/server/session.js";
-import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js";
+import survey from "@content/cestionare/atb-cdos-2026.js";
 
 const ACADEMIC_FIELDS = new Set(["facultatea", "ciclu", "forma", "programul", "anul"]);
 
@@ -9,13 +9,13 @@ const ACADEMIC_FIELDS = new Set(["facultatea", "ciclu", "forma", "programul", "a
 export async function load({ cookies }) {
     if (!dev) {
         const sessionid = cookies.get("adminsession");
-        if (sessionid == null) redirect(303, "/control/conectare");
+        if (sessionid == null) redirect(303, "/control/login");
         const session = await getAdminSession(sessionid);
         if (session == null) {
-            return { eroare: "Sesiunea a expirat!" };
+            return { error: "Sesiunea a expirat!" };
         }
     }
-    let iterator = await getListOfAnswers(sondaj_cdos.id, null);
+    let iterator = await getListOfAnswers(survey.id, null);
     const answers = [];
     for await (const entry of iterator) {
         const val = /** @type {{answerId: string, answers: Map<string,string>}} */ (
@@ -35,6 +35,6 @@ export async function load({ cookies }) {
             versionstamp: entry.versionstamp,
         });
     }
-    const dailyCounts = await getDailyCounts(sondaj_cdos.id);
+    const dailyCounts = await getDailyCounts(survey.id);
     return { answers, dailyCounts };
 }

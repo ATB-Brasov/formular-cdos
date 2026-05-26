@@ -1,25 +1,24 @@
 <script>
-    /** @import { Cimp } from "@content/cestionare/types.js" */
-    /** @import { SDict, Eroare } from "$lib/common_types.js" */
+    /** @import { Field } from "@content/cestionare/types.js" */
+    /** @import { SDict, FieldError } from "$lib/common_types.js" */
 
     import { enhance } from "$app/forms";
     import { page } from "$app/state";
     import { browser, dev } from "$app/environment";
 
-    import Buton from "@components/Buton.svelte";
-    import Selectie from "@components/Selectie.svelte";
-    import CimpText from "@components/CimpText.svelte";
-    import CimpTextArea from "@components/CimpTextArea.svelte";
+    import Button from "@components/Button.svelte";
+    import Selection from "@components/Selection.svelte";
+    import TextField from "@components/TextField.svelte";
+    import TextAreaField from "@components/TextAreaField.svelte";
 
-    import Intrare from "./Intrare.svelte";
+    import Entry from "./Entry.svelte";
     import { onMount } from "svelte";
-    import { raspunsGol } from "@content/cestionare/types.js";
+    import { emptyAnswer } from "@content/cestionare/types.js";
 
     const test = page.url.searchParams.get("test") === "true"
-    let is_iframe = $state(false)
+    let isIframe = $state(false)
 
-
-    const sondaj_cdos =
+    const survey =
         (test
             ? await import("@content/cestionare/atb-cdos-2026_test.js")
             : await import("@content/cestionare/atb-cdos-2026.js")).default;
@@ -27,105 +26,104 @@
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
 
-    let pagina = $state((() => data.session?.email)() ? 0 : -1);
+    let sectionIndex = $state((() => data.session?.email)() ? 0 : -1);
     $effect(() => {
-        pagina;
+        sectionIndex;
         notifyParentPageChange()
     })
-    /** @type {SDict<Eroare|null>} */ let eroare = $state({});
-    /** @type {SDict<string>} */ let raspunsuri = $state({});
+    /** @type {SDict<FieldError|null>} */ let errors = $state({});
+    /** @type {SDict<string>} */ let answers = $state({});
 
     /**
-     * @param {number} pag
+     * @param {number} sectionIdx
      * @param {{whence: string}} [options]
      */
-    function seteaza_pagina(pag, options) {
+    function setSectionIndex(sectionIdx, options) {
         if (dev && options?.whence != null) console.log(options.whence);
-        pagina = pag;
-        localStorage.setItem("pagina", pagina.toString());
+        sectionIndex = sectionIdx;
+        localStorage.setItem("pagina", sectionIndex.toString());
     }
 
     /**
-     * @param {HTMLElement} cimp
+     * @param {HTMLElement} el
     */
-    function scrollToField(cimp) {
-        const top = cimp.offsetTop - window.innerHeight/2 + cimp.offsetHeight/2
+    function scrollToField(el) {
+        const top = el.offsetTop - window.innerHeight/2 + el.offsetHeight/2
         window.scrollTo({top, behavior: "smooth"})
         notifyParentScrollTo(
-            cimp.getBoundingClientRect().top,
-            cimp.getBoundingClientRect().height,
+            el.getBoundingClientRect().top,
+            el.getBoundingClientRect().height,
         )
-        cimp.dataset.animate = "true"
-        setTimeout(() => delete cimp.dataset.animate, 700)
+        el.dataset.animate = "true"
+        setTimeout(() => delete el.dataset.animate, 700)
 
     }
 
-    /** @param {"urmator" | "precedent"} directie */
-    function scimbaPagina(directie) {
-        let tmp = pagina;
+    /** @param {"urmator" | "precedent"} direction */
+    function navigateSection(direction) {
+        let tmp = sectionIndex;
         while (true) {
-            if (directie === "urmator") {
-                for (const k in eroare)
-                    eroare[k] = null
-                for (const c of intrebari[pagina].cimpuri)
-                    aplica_validare(c)
-                for (const k in eroare) {
-                    if (eroare[k] != null) {
-                        scrollToField(cimpuri[k])
+            if (direction === "urmator") {
+                for (const k in errors)
+                    errors[k] = null
+                for (const f of sections[sectionIndex].cimpuri)
+                    applyFieldValidation(f)
+                for (const k in errors) {
+                    if (errors[k] != null) {
+                        scrollToField(fieldRefs[k])
                         return;
                     }
                 }
 
                 tmp++;
-            } else if (directie === "precedent") {
+            } else if (direction === "precedent") {
                 tmp--;
             } else {
-                console.error(`Direcție necunoscută ${directie}`)
+                console.error(`Unknown direction ${direction}`)
                 return;
             }
             if (tmp === -1) {
-                seteaza_pagina(tmp, {whence: "scimbaPagina::precedent"});
+                setSectionIndex(tmp, {whence: "navigateSection::precedent"});
                 return;
             }
-            if (tmp < 0 || tmp > ULTIMA_PAGINA) return;
-            if (!intrebari[tmp].ascunde?.(raspunsuri)) break;
+            if (tmp < 0 || tmp > LAST_SECTION) return;
+            if (!sections[tmp].ascunde?.(answers)) break;
         }
-        seteaza_pagina(tmp, {whence: "scimbaPagina::final"});
-        !is_iframe && setTimeout(() => window.scrollTo({top: 0, behavior: "smooth"}))
+        setSectionIndex(tmp, {whence: "navigateSection::final"});
+        !isIframe && setTimeout(() => window.scrollTo({top: 0, behavior: "smooth"}))
     }
 
-    /**@type{SDict<HTMLElement>}*/ let cimpuri = $state( {})
+    /**@type{SDict<HTMLElement>}*/ let fieldRefs = $state({})
     /**@type{ResizeObserver}*/     let observer
-    /**@type{HTMLElement?}*/       let forIframe
+    /**@type{HTMLElement?}*/       let iframeEl
 
     function notifyParentScrollTo(/**@type{number}*/rectTop, /**@type{number}*/rectHeight) {
-        if (forIframe) {
+        if (iframeEl) {
             window.parent.postMessage(
                 { type: 'scroll-to', rectTop, rectHeight},
-                '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
+                '*'
             );
         }
     }
 
     function notifyParentPageChange() {
-        if (forIframe) {
+        if (iframeEl) {
             window.parent.postMessage(
                 { type: 'page-change' },
-                '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
+                '*'
             );
         }
     }
 
-
     function notifyParentOfHeightChange() {
-        if (forIframe) {
-            const height = forIframe.offsetHeight;
+        if (iframeEl) {
+            const height = iframeEl.offsetHeight;
             window.parent.postMessage(
                 {
                     type: 'iframe-resize',
                     height: height
                 },
-                '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
+                '*'
             );
         }
     }
@@ -135,34 +133,34 @@
     onMount(() => {
         if (browser) {
             try {
-                is_iframe = window?.top !== window?.self;
+                isIframe = window?.top !== window?.self;
             } catch (e) {
-                is_iframe = true; // Likely in a cross-origin iframe
+                isIframe = true; // Likely in a cross-origin iframe
             }
         }
 
-        if (is_iframe) notifyParentOfHeightChange();
-        const raspunsuriSalvate = localStorage.getItem("raspunsuri");
-        if (raspunsuriSalvate) {
+        if (isIframe) notifyParentOfHeightChange();
+        const savedAnswers = localStorage.getItem("raspunsuri");
+        if (savedAnswers) {
             try {
-                const newRaspunsuri = JSON.parse(raspunsuriSalvate);
-                if (typeof newRaspunsuri === "object") {
-                    raspunsuri = newRaspunsuri;
+                const newAnswers = JSON.parse(savedAnswers);
+                if (typeof newAnswers === "object") {
+                    answers = newAnswers;
                 }
-                const paginaSalvata = localStorage.getItem("pagina");
-                if (paginaSalvata) {
-                    pagina = parseInt(paginaSalvata);
+                const savedSectionIndex = localStorage.getItem("pagina");
+                if (savedSectionIndex) {
+                    sectionIndex = parseInt(savedSectionIndex);
                 }
             } catch (e) {
                 console.error(
-                    "Nu am putut incărca răspunsurile din localStorage",
+                    "Could not load answers from localStorage",
                     e,
                 );
             }
         }
         email = localStorage.getItem("posta")
 
-        if (is_iframe) {
+        if (isIframe) {
             observer = new ResizeObserver((entries) => {
                 for (let entry of entries) {
                     if (entry.target.id === "formWrapper") {
@@ -170,27 +168,27 @@
                     }
                 }
             });
-            setTimeout(() => forIframe && observer.observe(forIframe), 0)
+            setTimeout(() => iframeEl && observer.observe(iframeEl), 0)
             return () => { observer?.disconnect() };
         }
     });
 
     $effect(() => {
         if (form == null) return;
-        if (form.pag != null) seteaza_pagina(form.pag, { whence: "$effect" });
+        if (form.pag != null) setSectionIndex(form.pag, { whence: "$effect" });
 
-        /** @type {SDict<string>} */ const newRaspunsuri = {};
-        /** @type {SDict<Eroare>} */ const newEroare = {};
+        /** @type {SDict<string>} */ const newAnswers = {};
+        /** @type {SDict<FieldError>} */ const newErrors = {};
         for (const [k, v] of Object.entries(form)) {
             if (typeof v === "string") {
-                newRaspunsuri[k] = v;
+                newAnswers[k] = v;
             }
         }
-        if (Object.entries(newRaspunsuri).length > 0) {
-            raspunsuri = newRaspunsuri;
+        if (Object.entries(newAnswers).length > 0) {
+            answers = newAnswers;
         }
 
-        const errEntries = Object.entries(form?.erori ?? {})
+        const errEntries = Object.entries(form?.errors ?? {})
             .sort((a, b) => {
                 const erA = a[1];
                 const erB = b[1];
@@ -199,65 +197,65 @@
             })
         if (errEntries.length > 0) {
             for (const [k, v] of errEntries) {
-                newEroare[k] = /** @type {Eroare} */ (v);
+                newErrors[k] = /** @type {FieldError} */ (v);
             }
-            eroare = newEroare;
+            errors = newErrors;
             const e = errEntries[0];
-            seteaza_pagina(e[1].pag, {whence: "$effect::errEntries"})
+            setSectionIndex(e[1].pag, {whence: "$effect::errEntries"})
             if (e[1].pag >= 0)
-                cimpuri[e[0]].scrollIntoView()
+                fieldRefs[e[0]].scrollIntoView()
         }
         form = null
     });
 
     $effect(() => {
-        localStorage.setItem("raspunsuri", JSON.stringify(raspunsuri));
+        localStorage.setItem("raspunsuri", JSON.stringify(answers));
     });
 
-    let intrebari = sondaj_cdos.pagini.map((p, idx) => ({...p, idx}));
+    let sections = survey.pagini.map((p, idx) => ({...p, idx}));
 
-    const ULTIMA_PAGINA = intrebari.length - 1;
-    const pagina_activa = $derived(intrebari[pagina]);
+    const LAST_SECTION = sections.length - 1;
+    const activeSection = $derived(sections[sectionIndex]);
 
     /**
-     * @param {Cimp} cimp
-     * @param {number} [pag=pagina]
+     * @param {Field} field
+     * @param {number} [sectionIdx=sectionIndex]
      */
-    function aplica_validare(cimp, pag=pagina) {
-        eroare[cimp.nume] = null;
+    function applyFieldValidation(field, sectionIdx=sectionIndex) {
+        errors[field.nume] = null;
 
-        const rasp = raspunsuri[cimp.nume] ?? "";
+        const val = answers[field.nume] ?? "";
         let msg = null;
         let type = null;
 
-        if (raspunsGol(rasp)) {
-            const ascunde_pag  = intrebari[pag].ascunde?.(raspunsuri)
-            const ascunde_cimp = cimp.ascunde?.(raspunsuri)
-            if (ascunde_pag || ascunde_cimp || !cimp.obligatoriu) return
+        if (emptyAnswer(val)) {
+            const hideSection  = sections[sectionIdx].ascunde?.(answers)
+            const hideField = field.ascunde?.(answers)
+            if (hideSection || hideField || !field.obligatoriu) return
             type = "field-required";
             msg = "Câmpul este obligatoriu";
         } else {
-            const err = cimp.valideaza?.(rasp);
+            const err = field.valideaza?.(val);
             if (err != null) {
                 type = "field-invalid";
                 msg = err;
             }
         }
 
-        if (msg && type) eroare[cimp.nume] = { type, msg, pag };
+        if (msg && type) errors[field.nume] = { type, msg, pag: sectionIdx };
     }
 
-    const pagini_vizibile = $derived(
-        intrebari.filter((p) => !p.ascunde?.(raspunsuri)),
+    const visibleSections = $derived(
+        sections.filter((p) => !p.ascunde?.(answers)),
     );
 
     let formElement = /** @type {HTMLFormElement?} */ $state();
 
     function handleSubmit() {
-        for (const k in eroare) eroare[k] = null
-        const cimps = intrebari.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1)
-        cimps.forEach(c => aplica_validare(c, c.pag))
-        const err = Object.entries(eroare).filter(([_, v]) => v != null)
+        for (const k in errors) errors[k] = null
+        const allFields = sections.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1)
+        allFields.forEach(c => applyFieldValidation(c, c.pag))
+        const err = Object.entries(errors).filter(([_, v]) => v != null)
         err.sort((a, b) => {
             const erA = a[1];
             const erB = b[1];
@@ -267,9 +265,9 @@
 
         if (err.length > 0) {
             const [k, v] = err[0]
-            if (v == null) return // Pentru a satisface LSP-ul, ca filtrez null-ul mai sus
-            seteaza_pagina(v.pag, {whence: "/::handleSubmit"})
-            setTimeout(() => scrollToField(cimpuri[k]), 0)
+            if (v == null) return
+            setSectionIndex(v.pag, {whence: "/::handleSubmit"})
+            setTimeout(() => scrollToField(fieldRefs[k]), 0)
         } else {
             setTimeout(() => formElement?.requestSubmit(), 0);
         }
@@ -288,35 +286,35 @@
     </div>
 {/if}
 
-<div id="formWrapper" bind:this={forIframe}>
+<div id="formWrapper" bind:this={iframeEl}>
 
-<h1 class="text-4xl font-bold mt-8 mb-4">{sondaj_cdos.titlu}</h1>
+<h1 class="text-4xl font-bold mt-8 mb-4">{survey.titlu}</h1>
 
-{#if pagina === -1}
+{#if sectionIndex === -1}
     <div
         id="descriere"
         class="w-full rounded-xl flex flex-col gap-y-2 border border-surface-border bg-surface mt-4 mb-8 p-3"
     >
-        {@html sondaj_cdos.descriere}
+        {@html survey.descriere}
     </div>
 
-    <Intrare bind:this={formElement} bind:eroare bind:pagina />
+    <Entry bind:this={formElement} bind:errors bind:sectionIndex />
 {:else}
     <div class="flex flex-wrap gap-2 mb-8">
-        {#each intrebari as pag, i}
+        {#each sections as section, i}
             <button
-                aria-label="Pagina {i + 1}"
-                disabled={pag.ascunde?.(raspunsuri)}
+                aria-label="Secțiunea {i + 1}"
+                disabled={section.ascunde?.(answers)}
                 onclick={() => {
-                    pagina = i;
-                    localStorage.setItem("pagina", pagina.toString());
+                    sectionIndex = i;
+                    localStorage.setItem("pagina", sectionIndex.toString());
                 }}
                 class={[
                     "px-1 py-0.5 rounded-full grow disabled:bg-surface-disabled transition-colors duration-200",
-                    i === pagina
+                    i === sectionIndex
                         ? "bg-primary"
                         : "bg-surface-border hover:bg-surface-secondary",
-                    i < pagina && Object.values(eroare).some((e) => e?.pag === i)
+                    i < sectionIndex && Object.values(errors).some((e) => e?.pag === i)
                         ? "border-2 border-danger-strong bg-danger-strong"
                         : "opacity-75",
                 ]}
@@ -325,21 +323,21 @@
         {/each}
     </div>
 
-    <h2 class="text-2xl font-bold">{pagina_activa.titlu}</h2>
-    {#if pagina_activa.descriere}
+    <h2 class="text-2xl font-bold">{activeSection.titlu}</h2>
+    {#if activeSection.descriere}
         <div
             class="w-full rounded-xl border border-surface-border bg-surface mt-4 p-3"
         >
-            {pagina_activa.descriere}
+            {activeSection.descriere}
         </div>
     {/if}
 
     <form
         method="POST"
         use:enhance
-        action="?/salveaza"
+        action="?/submit"
         class="mt-4 w-full"
-        class:mb-26={is_iframe}
+        class:mb-26={isIframe}
         bind:this={formElement}
     >
 
@@ -351,52 +349,52 @@
             <input type="hidden" name="posta" value={email}>
         {/if}
 
-        {#each intrebari as pag, i}
-            {#if !pag.ascunde?.(raspunsuri)}
-                <div class={["flex flex-col gap-6 ", i !== pagina && "hidden"]}>
-                    {#each pag.cimpuri as cimp, nr}
-                        {#if !cimp.ascunde?.(raspunsuri)}
-                            <div id={`cimp-${cimp.nume}`}
+        {#each sections as section, i}
+            {#if !section.ascunde?.(answers)}
+                <div class={["flex flex-col gap-6 ", i !== sectionIndex && "hidden"]}>
+                    {#each section.cimpuri as field, nr}
+                        {#if !field.ascunde?.(answers)}
+                            <div id={`field-${field.nume}`}
                                     class="
                                         p-2 rounded-xl
                                         border border-transparent
                                         data-animate:border-red-200
                                         data-animate:bg-red-100
                                         transition-colors ease-in duration-400"
-                                    bind:this={cimpuri[cimp.nume]}>
+                                    bind:this={fieldRefs[field.nume]}>
                                 {#if dev}
                                     <div class="text-surface-muted text-mono text-xs">
-                                        id: {cimp.nume} ({nr + 1})
+                                        id: {field.nume} ({nr + 1})
                                     </div>
                                 {/if}
 
-                                {#if cimp.tip === "email" || cimp.tip === "text"}
-                                    <CimpText
-                                        {...cimp}
-                                        tip={cimp.tip}
-                                        eroare={eroare[cimp.nume]}
-                                        onblur={() => false && aplica_validare(cimp)}
-                                        bind:value={raspunsuri[cimp.nume]}
+                                {#if field.tip === "email" || field.tip === "text"}
+                                    <TextField
+                                        {...field}
+                                        tip={field.tip}
+                                        errors={errors[field.nume]}
+                                        onblur={() => false && applyFieldValidation(field)}
+                                        bind:value={answers[field.nume]}
                                     />
-                                {:else if cimp.tip === "textarea"}
-                                    <CimpTextArea
-                                        {...cimp}
-                                        tip={cimp.tip}
-                                        eroare={eroare[cimp.nume]}
-                                        onblur={() => false && aplica_validare(cimp)}
-                                        bind:value={raspunsuri[cimp.nume]}
+                                {:else if field.tip === "textarea"}
+                                    <TextAreaField
+                                        {...field}
+                                        tip={field.tip}
+                                        errors={errors[field.nume]}
+                                        onblur={() => false && applyFieldValidation(field)}
+                                        bind:value={answers[field.nume]}
                                     />
-                                {:else if cimp.tip.startsWith("selecție")}
-                                    <Selectie
-                                        {cimp}
-                                        {raspunsuri}
-                                        bind:eroare={eroare[cimp.nume]}
-                                        onblur={() => false && aplica_validare(cimp)}
-                                        bind:value={raspunsuri[cimp.nume]}
+                                {:else if field.tip.startsWith("selecție")}
+                                    <Selection
+                                        field={field}
+                                        allAnswers={answers}
+                                        bind:errors={errors[field.nume]}
+                                        onblur={() => false && applyFieldValidation(field)}
+                                        bind:value={answers[field.nume]}
                                     />
                                 {:else}
                                     <div class="text-italic text-danger-strong">
-                                        Tip câmp `{cimp.tip}` necunoscut
+                                        Unknown field type `{field.tip}`
                                     </div>
                                 {/if}
                             </div>
@@ -413,23 +411,23 @@
                 class="m-4 rounded-xl border border-surface-border bg-surface p-3"
             >
                 <div class="flex justify-end gap-4">
-                    <Buton
-                        class={pagina === -1 ? "invisible" : ""}
-                        onclick={() => scimbaPagina("precedent")}
+                    <Button
+                        class={sectionIndex === -1 ? "invisible" : ""}
+                        onclick={() => navigateSection("precedent")}
                     >
                         Anterior
-                    </Buton>
+                    </Button>
 
                     {@render button()}
                     {#snippet button()}
-                        {@const ultima = intrebari[pagina].idx === pagini_vizibile.at(-1)?.idx}
-                        <Buton
+                        {@const ultima = sections[sectionIndex].idx === visibleSections.at(-1)?.idx}
+                        <Button
                             class="min-w-22"
                             type="button"
-                            onclick={ultima ? handleSubmit : () => scimbaPagina("urmator")}
+                            onclick={ultima ? handleSubmit : () => navigateSection("urmator")}
                         >
                             {ultima ? "Trimite" : "Următor"}
-                        </Buton>
+                        </Button>
                     {/snippet}
                 </div>
             </div>

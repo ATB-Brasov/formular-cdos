@@ -6,16 +6,16 @@
     let { data } = $props();
 
     const test = page.url.searchParams.get("test") === "true"
-    const sondaj_cdos =
+    const survey =
         (test
             ? await import("@content/cestionare/atb-cdos-2026_test.js")
             : await import("@content/cestionare/atb-cdos-2026.js")).default;
 
-    let intrebari = $state(sondaj_cdos.pagini.map((p, idx) => ({...p, idx})));
-    let cimps = $state(intrebari.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1));
+    let sections = $state(survey.pagini.map((p, idx) => ({...p, idx})));
+    let allFields = $state(sections.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1));
 
-    const academicNume = new Set(["facultatea", "ciclu", "forma", "programul", "anul"]);
-    let cimpsAcademic = $state(cimps.filter(c => academicNume.has(c.nume)));
+    const academicFieldNames = new Set(["facultatea", "ciclu", "forma", "programul", "anul"]);
+    let academicFields = $state(allFields.filter(c => academicFieldNames.has(c.nume)));
 
     let totalAnswers = $derived(data.answers?.length ?? 0);
 
@@ -154,8 +154,8 @@
 </script>
 
 
-{#if data.eroare != null}
-    <div class="text-red-500">{data.eroare}</div>
+{#if data.error != null}
+    <div class="text-red-500">{data.error}</div>
 {:else}
     <div class="container mx-auto p-4 md:p-8">
         <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6">Dashboard</h1>
@@ -191,8 +191,8 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                {#each cimpsAcademic as cimp}
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{cimp.nume}</th>
+                                {#each academicFields as field}
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{field.nume}</th>
                                 {/each}
                             </tr>
                         </thead>
@@ -200,8 +200,8 @@
                             {#each data.answers as kdata}
                                 {@const answersMap = kdata.value.answers instanceof Map ? kdata.value.answers : new Map(kdata.value.answers)}
                                 <tr>
-                                    {#each cimpsAcademic as cimp}
-                                        {@const item = answersMap.get(cimp.nume)}
+                                    {#each academicFields as field}
+                                        {@const item = answersMap.get(field.nume)}
                                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{item ?? '-'}</td>
                                     {/each}
                                 </tr>

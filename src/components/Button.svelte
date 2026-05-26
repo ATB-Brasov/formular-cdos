@@ -1,11 +1,11 @@
 <script>
     /**
-     * @typedef {'primary' | 'ghost'} VariantaButon
+     * @typedef {'primary' | 'ghost'} ButtonVariant
      */
 
     /**
      * @typedef {Object} Props
-     * @property {VariantaButon} [varianta='primary']
+     * @property {ButtonVariant} [variant='primary']
      * @property {import('svelte/elements').HTMLButtonAttributes['type']} [type='button']
      * @property {boolean} [disabled=false]
      * @property {string} [class='']
@@ -14,7 +14,7 @@
 
     /** @type {Props & Record<string, unknown>} */
     let {
-        varianta = "primary",
+        variant = "primary",
         type = "button",
         disabled = false,
         class: cls = "",
@@ -22,9 +22,9 @@
         ...rest
     } = $props();
 
-    const baza = "rounded-md px-2 py-1 transition-transform transition-color duration-200 ease-in-out";
+    const base = "rounded-md px-2 py-1 transition-transform transition-color duration-200 ease-in-out";
 
-    const variante = {
+    const variants = {
         primary: `
             border border-primary-strong bg-primary text-white
             shadow-xs shadow-primary-strong/90
@@ -47,7 +47,7 @@
 <button
     {type}
     {disabled}
-    class="{baza} {variante[varianta]} {cls}"
+    class="{base} {variants[variant]} {cls}"
     {...rest}
 >
     {@render children?.()}

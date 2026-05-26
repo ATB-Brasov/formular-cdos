@@ -5,7 +5,7 @@
 </script>
 
 <form method="POST">
-    <input type="password" name="parola" bind:value>
+    <input type="password" name="password" bind:value>
     <button type="submit">Conectează-te</button>
 
     {#if form?.msg != null}

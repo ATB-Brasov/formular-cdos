@@ -1,86 +1,86 @@
 <script>
-    /** @import { SDict, Eroare } from "$lib/common_types.js" */
+    /** @import { SDict, FieldError } from "$lib/common_types.js" */
 
     import { page } from "$app/state";
     import { enhance } from "$app/forms";
     import { solvePoW } from "$lib/miner.js";
-    import Buton from "@components/Buton.svelte";
-    import CimpText from "@components/CimpText.svelte";
+    import Button from "@components/Button.svelte";
+    import TextField from "@components/TextField.svelte";
 
-    import sondaj_cdos from "@content/cestionare/atb-cdos-2026.js"; // TODO: Încărcare dinamică
+    import survey from "@content/cestionare/atb-cdos-2026.js"; // TODO: dynamic loading
     import { onMount } from "svelte";
 
-    const is_iframe = page.url.searchParams.get("iframe") === "true"
+    const isIframe = page.url.searchParams.get("iframe") === "true"
 
     /**
      * @typedef {Object} Props
-     * @property {SDict<Eroare|null>} eroare
-     * @property {number} pagina
+     * @property {SDict<FieldError|null>} errors
+     * @property {number} sectionIndex
      */
 
     /** @type {Props & Record<string, unknown>} */
     let {
-        eroare = $bindable(),
-        pagina = $bindable(),
+        errors = $bindable(),
+        sectionIndex = $bindable(),
     } = $props();
 
     let isMining = $state(false);
     let formElement = /** @type {HTMLFormElement?} */ $state();
 
     let email = $state("");
-    let gdprConsent = $state(false);
+    let consent = $state(false);
 
     onMount(() => {
         email = localStorage.getItem("posta") ?? "";
-        gdprConsent = localStorage.getItem("gdpr-consent") === "true";
+        consent = localStorage.getItem("gdpr-consent") === "true";
     });
 
     $effect(() => {
-        if (!gdprConsent) {
-            eroare["gdpr-consent"] = {
+        if (!consent) {
+            errors["gdpr-consent"] = {
                 type: "required",
                 msg: "Trebuie să acceptați politica de confidențialitate",
                 pag: -1,
             };
             localStorage.setItem("gdpr-consent", "false")
         } else {
-            delete eroare["gdpr-consent"];
+            delete errors["gdpr-consent"];
             localStorage.setItem("gdpr-consent", "true")
         }
     });
 
     $effect(() => {
         if (email === "") {
-            eroare["posta"] = {
+            errors["posta"] = {
                 type: "email-invalid",
                 msg: "Adresa de poștei electronice este obligatorie",
                 pag: -1,
             };
             return;
         }
-        const msg = sondaj_cdos.validare_posta?.(email);
+        const msg = survey.validare_posta?.(email);
         if (msg != null) {
-            eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
+            errors["posta"] = { type: "email-invalid", msg, pag: -1 };
         } else {
-            if (eroare["posta"]?.type !== "email-invalid") return;
-            eroare["posta"] = null;
+            if (errors["posta"]?.type !== "email-invalid") return;
+            errors["posta"] = null;
         }
     });
 
     function handleSubmit() {
         if (email.trim() === "") {
-            eroare["posta"] = { type: "email-invalid", msg: "Adresa de poștei electronice este obligatorie", pag: -1 };
+            errors["posta"] = { type: "email-invalid", msg: "Adresa de poștei electronice este obligatorie", pag: -1 };
             return;
         }
 
-        const msg = sondaj_cdos.validare_posta?.(email);
+        const msg = survey.validare_posta?.(email);
         if (msg != null) {
-            eroare["posta"] = { type: "email-invalid", msg, pag: -1 };
+            errors["posta"] = { type: "email-invalid", msg, pag: -1 };
             return;
         }
 
-        if (!gdprConsent) {
-            eroare["gdpr-consent"] = {
+        if (!consent) {
+            errors["gdpr-consent"] = {
                 type: "required",
                 msg: "Trebuie să acceptați politica de confidențialitate",
                 pag: -1,
@@ -88,8 +88,8 @@
             return;
         }
 
-        eroare["posta"] = null
-        eroare["gdpr-consent"] = null
+        errors["posta"] = null
+        errors["gdpr-consent"] = null
         isMining = true;
         setTimeout(() => { formElement?.requestSubmit(); }, 0);
     }
@@ -98,7 +98,7 @@
 <form
     method="POST"
     bind:this={formElement}
-    class:mb-26={is_iframe}
+    class:mb-26={isIframe}
     use:enhance={async ({ formData, cancel }) => {
         isMining = true;
         await solvePoW(email, 3)
@@ -113,7 +113,7 @@
 
         return async ({ result, update }) => {
             if (result.type === "success") {
-                pagina = 0;
+                sectionIndex = 0;
                 localStorage.setItem("pagina", "0")
                 localStorage.setItem("posta", email)
             }
@@ -124,27 +124,27 @@
     action="?/posta"
     class="flex flex-col gap-6"
 >
-    <CimpText
+    <TextField
         tip={"email"}
         titlu={"Adresa poștei instituționale"}
         disclaimer={`
             Adresa e-mail <strong>nu va fi</strong> asociată cu răspunsurile
             colectate. Colectăm adresa pentru a ne asigura că ești student UNITBV. Pentru mai multe informații, consultați <a href="/politica-confidentialitate">politica de confidențialitate</a>.`}
         nume={"posta"}
-        bind:eroare={eroare["posta"]}
+        bind:errors={errors["posta"]}
         placeholder={"exemplu@student.unitbv.ro"}
         obligatoriu={true}
         bind:value={email}
     />
 
-    {#if eroare["_form"] != null}
-        <span class="text-danger">{eroare["_form"].msg}</span>
+    {#if errors["_form"] != null}
+        <span class="text-danger">{errors["_form"].msg}</span>
     {/if}
 
     <div class="flex flex-col">
         <label for="gdpr-consent" class="sm:leading-0 sm:pb-0.5">
         <input
-            bind:checked={gdprConsent}
+            bind:checked={consent}
             type="checkbox"
             id="gdpr-consent"
             name="gdpr-consent"
@@ -156,8 +156,8 @@
                 class="underline"
             >politica de confidențialitate</a>.
         </label>
-        {#if eroare["gdpr-consent"] != null}
-            <p class="text-danger text-sm mt-1">{eroare["gdpr-consent"].msg}</p>
+        {#if errors["gdpr-consent"] != null}
+            <p class="text-danger text-sm mt-1">{errors["gdpr-consent"].msg}</p>
         {/if}
     </div>
 </form>
@@ -167,13 +167,13 @@
 >
     <div class="m-4 rounded-xl border border-surface-border bg-surface p-3">
         <div class="flex justify-end gap-4">
-            <Buton
+            <Button
                 type="button"
                 onclick={handleSubmit}
                 disabled={isMining}
             >
                 {isMining ? "Se începe..." : "Începe"}
-            </Buton>
+            </Button>
         </div>
     </div>
 </div>

@@ -1,24 +1,24 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
-    /** @import {Eroare} from import('$lib/common_types') */
+    /** @import {FieldError} from import('$lib/common_types') */
     /** @import { Validator } from import('@content/cestionare/types')*/
 
     /**
      * @typedef {Object} Props
-     * @property {string} intrebare
+     * @property {string} question
      * @property {string | null} [desc=null]
      * @property {boolean} [obligatoriu=false]
      * @property {import('svelte').Snippet} children
      * @property {FocusEventHandler} [onFocusOut]
-     * @property {Eroare} eroare
+     * @property {FieldError} errors
      */
 
      /** @type {Props} */
     let {
         desc = null,
         obligatoriu = false,
-        intrebare,
-        eroare,
+        question,
+        errors,
         children,
         onFocusOut
     } = $props();
@@ -28,7 +28,7 @@
 <fieldset onfocusout={onFocusOut} class="flex flex-col">
 
     <legend class="mb-1 text-lg font-bold">
-        {intrebare}{#if obligatoriu}&#8288;<span
+        {question}{#if obligatoriu}&#8288;<span
                 class="px-0.5 leading-none font-bold text-danger"
             >*</span>
         {/if}
@@ -46,8 +46,8 @@
     {@render children?.()}
 
 
-    {#if eroare}
-        <div class="text-red-500 mt-1 text-sm">{eroare.msg}</div>
+    {#if errors}
+        <div class="text-red-500 mt-1 text-sm">{errors.msg}</div>
     {/if}
 
 </fieldset>

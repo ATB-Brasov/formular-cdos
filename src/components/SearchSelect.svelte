@@ -1,7 +1,7 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
-    import Buton from "@components/Buton.svelte";
-    import CadruCimp from "@components/CadruCimp.svelte";
+    import Button from "@components/Button.svelte";
+    import FieldFrame from "@components/FieldFrame.svelte";
 
     /**
      * Uses Unicode NFD decomposition: accented characters split into base letter
@@ -10,7 +10,7 @@
      * @param {string} s
      * @returns {string}
      */
-    function normalizeaza(s) {
+    function normalize(s) {
         return s
             .normalize("NFD")
             .replace(/\p{Diacritic}/gu, "");
@@ -29,8 +29,8 @@
     function fuzzyScore(needle, haystack) {
         if (needle === "") return 0;
 
-        const n = normalizeaza(needle.toLowerCase());
-        const h = normalizeaza(haystack.toLowerCase());
+        const n = normalize(needle.toLowerCase());
+        const h = normalize(haystack.toLowerCase());
 
         let ni = 0; // index into needle
         let score = 0;
@@ -53,18 +53,18 @@
         return ni === n.length ? score : -1;
     }
 
-    /** @import {Eroare} from import('$lib/common_types') */
+    /** @import {FieldError} from import('$lib/common_types') */
     /** @import { Validator } from import('@content/cestionare/types')*/
-    /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
-    import { aplicaValidare, normOptiune } from "@content/cestionare/types.js";
+    /** @import { OptionsResult } from "@content/cestionare/types.js" */
+    import { applyValidation, normalizeOption } from "@content/cestionare/types.js";
 
     /**
      * @typedef {Object} Props
      * @property {string} nume
-     * @property {string} intrebare
+     * @property {string} question
      * @property {string | null} [desc=null]
-     * @property {RezultatOptiuni} optiuni
-     * @property {Eroare} eroare
+     * @property {OptionsResult} optiuni
+     * @property {FieldError} errors
      * @property {Validator} [valideaza]
      * @property {string} value
      * @property {boolean} [obligatoriu=false]
@@ -76,107 +76,107 @@
         nume,
         obligatoriu = false,
         onblur,
-        intrebare,
+        question,
         desc = null,
         optiuni,
         valideaza,
-        eroare = $bindable(),
+        errors = $bindable(),
         value = $bindable(),
     } = $props();
 
     /** @type {string} */
-    let cautare = $state("");
+    let search = $state("");
 
     /** @type {boolean} */
-    let deschis = $state(false);
+    let open = $state(false);
 
     /** @type {number} */
-    let indexActiv = $state(-1);
+    let activeIndex = $state(-1);
 
     /** @type {HTMLInputElement | null} */
     let inputEl = $state(null);
 
     /** @type {HTMLUListElement | null} */
-    let listaEl = $state(null);
+    let listEl = $state(null);
 
-    const optiuniFiltrate = $derived.by(() => {
-        const normalizate = optiuni.optiuni.map(normOptiune);
-        if (cautare === "") {
+    const filteredOptions = $derived.by(() => {
+        const normalizate = optiuni.optiuni.map(normalizeOption);
+        if (search === "") {
             return normalizate.map((opt) => ({ opt, score: 0 }));
         }
         return normalizate
-            .map((opt) => ({ opt, score: fuzzyScore(cautare, opt.text) }))
+            .map((opt) => ({ opt, score: fuzzyScore(search, opt.text) }))
             .filter(({ score }) => score >= 0)
             .sort((a, b) => b.score - a.score);
     });
 
     /** @param {string} opt */
-    function selecteaza(opt) {
-        eroare = aplicaValidare(opt, obligatoriu, valideaza)
+    function select(opt) {
+        errors = applyValidation(opt, obligatoriu, valideaza)
         value = opt;
-        cautare = ""; // search box is always empty after a pick
-        deschis = false;
-        indexActiv = -1;
+        search = ""; // search box is always empty after a pick
+        open = false;
+        activeIndex = -1;
         inputEl?.blur();
     }
 
-    function sterge() {
+    function clear() {
         value = "";
-        cautare = "";
-        deschis = false;
-        indexActiv = -1;
+        search = "";
+        open = false;
+        activeIndex = -1;
         // Give the DOM a tick to re-render before focusing
         setTimeout(() => inputEl?.focus(), 0);
     }
 
     /** @param {KeyboardEvent} e */
-    function peKeyDown(e) {
-        if (!deschis) {
+    function onKeyDown(e) {
+        if (!open) {
             if (e.key === "ArrowDown" || e.key === "Enter") {
-                deschis = true;
-                indexActiv = 0;
+                open = true;
+                activeIndex = 0;
                 e.preventDefault();
             }
             return;
         }
 
-        const total = optiuniFiltrate.length;
+        const total = filteredOptions.length;
 
         if (e.key === "ArrowDown") {
-            indexActiv = (indexActiv + 1) % total;
+            activeIndex = (activeIndex + 1) % total;
             e.preventDefault();
-            scrollLaActiv();
+            scrollToActive();
         } else if (e.key === "ArrowUp") {
-            indexActiv = (indexActiv - 1 + total) % total;
+            activeIndex = (activeIndex - 1 + total) % total;
             e.preventDefault();
-            scrollLaActiv();
+            scrollToActive();
         } else if (e.key === "Enter") {
-            if (indexActiv >= 0 && indexActiv < total) {
-                selecteaza(optiuniFiltrate[indexActiv].opt.text);
+            if (activeIndex >= 0 && activeIndex < total) {
+                select(filteredOptions[activeIndex].opt.text);
             }
             e.preventDefault();
         } else if (e.key === "Escape") {
-            deschis = false;
-            indexActiv = -1;
+            open = false;
+            activeIndex = -1;
         }
     }
 
-    function scrollLaActiv() {
+    function scrollToActive() {
         // Give Svelte a tick to render before scrolling
         setTimeout(() => {
-            const item = listaEl?.children[indexActiv];
+            const item = listEl?.children[activeIndex];
             item?.scrollIntoView({ block: "nearest" });
         }, 0);
     }
 
     /** @param {Event} e */
-    function peInput(e) {
+    function onInput(e) {
         // Keep the internal search text, clear the committed value until user
         // actually picks something from the list.
-        cautare = /** @type {HTMLInputElement} */ (e.target).value;
+        search = /** @type {HTMLInputElement} */ (e.target).value;
         value = "";
-        deschis = true;
-        indexActiv = cautare === "" ? -1 : 0;
+        open = true;
+        activeIndex = search === "" ? -1 : 0;
     }
 
     /**
@@ -187,11 +187,11 @@
         // relatedTarget is the element receiving focus; if it's still inside our
         // container we leave the dropdown open.
         const related = /** @type {Node | null} */ (e.relatedTarget);
-        if (listaEl && listaEl.contains(related)) return;
+        if (listEl && listEl.contains(related)) return;
 
-        deschis = false;
-        indexActiv = -1;
-        cautare = "";
+        open = false;
+        activeIndex = -1;
+        search = "";
 
         if (onblur) onblur(/** @type {any} */ (e));
     }
@@ -203,12 +203,12 @@
      * @param {string} haystack
      * @returns {{ text: string, matched: boolean }[]}
      */
-    function evidentiaza(needle, haystack) {
+    function highlight(needle, haystack) {
         if (needle === "") return [{ text: haystack, matched: false }];
 
         // Normalise for matching only — keep originals for display.
-        const n = normalizeaza(needle.toLowerCase());
-        const h = normalizeaza(haystack.toLowerCase());
+        const n = normalize(needle.toLowerCase());
+        const h = normalize(haystack.toLowerCase());
 
         /** @type {{ text: string, matched: boolean }[]} */
         const parts = [];
@@ -254,7 +254,7 @@
 -->
 <input type="hidden" name={nume} {value} />
 
-<CadruCimp {eroare} {onFocusOut} {intrebare} {desc} {obligatoriu}>
+<FieldFrame errors={errors} {onFocusOut} {question} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}
@@ -274,18 +274,18 @@
                     bg-surface dark:bg-surface-dark
                     shadow-xs placeholder:text-surface-placeholder
                 "
-                value={cautare}
-                oninput={peInput}
+                value={search}
+                oninput={onInput}
                 onfocus={() => {
-                    deschis = true;
+                    open = true;
                 }}
-                onkeydown={peKeyDown}
+                onkeydown={onKeyDown}
             />
 
             <!-- Dropdown list -->
-            {#if deschis && optiuniFiltrate.length > 0}
+            {#if open && filteredOptions.length > 0}
                 <ul
-                    bind:this={listaEl}
+                    bind:this={listEl}
                     class="
                         absolute z-50 mt-1 w-full
                         max-h-60 overflow-y-auto
@@ -294,7 +294,7 @@
                         shadow-md
                     "
                 >
-                    {#each optiuniFiltrate as { opt }, i}
+                    {#each filteredOptions as { opt }, i}
                         <li>
                             <button
                                 type="button"
@@ -304,16 +304,16 @@
                                     w-full px-3 py-1.5 text-left text-sm
                                     hover:bg-primary-subtle dark:hover:bg-surface-dark
                                     disabled:opacity-50 disabled:cursor-not-allowed
-                                    {i === indexActiv
+                                    {i === activeIndex
                                     ? 'bg-primary-muted dark:bg-surface-dim'
                                     : ''}
                                 "
                                 onmousedown={(e) => {
                                     e.preventDefault();
-                                    selecteaza(opt.text);
+                                    select(opt.text);
                                 }}
                             >
-                                {#each evidentiaza(cautare, opt.text) as seg}
+                                {#each highlight(search, opt.text) as seg}
                                     {#if seg.matched}
                                         <span
                                             class="font-bold text-primary-strong dark:text-primary-dim"
@@ -326,7 +326,7 @@
                         </li>
                     {/each}
                 </ul>
-            {:else if deschis && cautare !== "" && optiuniFiltrate.length === 0}
+            {:else if open && search !== "" && filteredOptions.length === 0}
                 <div
                     class="
                         absolute z-50 mt-1 w-full
@@ -366,11 +366,11 @@
                 <span
                     class="flex-1 text-sm font-medium text-primary-text dark:text-primary-dim"
                 >{value}</span>
-                <Buton
-                    varianta="ghost"
+                <Button
+                    variant="ghost"
                     aria-label="Șterge selecția"
                     class="ml-auto"
-                    onclick={sterge}
+                    onclick={clear}
                 >
                     <svg
                         class="h-4 w-4"
@@ -382,8 +382,8 @@
                             d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
                         />
                     </svg>
-                </Buton>
+                </Button>
             </div>
         {/if}
     {/if}
-</CadruCimp>
+</FieldFrame>

@@ -1,4 +1,4 @@
-/** @import { AscundeCimp, Cimp } from "@content/cestionare/types.js" */
+/** @import { HideField, Field } from "@content/cestionare/types.js" */
 import { uniq } from "$lib/ds_helpers.js";
 import lista from "./lista_facultati_unitbv_2026.js";
 
@@ -6,11 +6,11 @@ import lista from "./lista_facultati_unitbv_2026.js";
  * @typedef {object} OptiuniDanu
  * @property {string | null} [desc=null]
  * @property {boolean} [obligatoriu=true]
- * @property {AscundeCimp | null} [ascunde=null]
+ * @property {HideField | null} [ascunde=null]
  * @property {() => ({ optiuni: string[]; eroare: string? })} [optiuni=() => ({ optiuni: ["da", "nu", "nu știu"], eroare: null })]
  */
 
- /** @typedef {(nume:string, titlu:string, optiuni_obj?: OptiuniDanu) => Cimp} RadioConstructor */
+ /** @typedef {(nume:string, titlu:string, optiuni_obj?: OptiuniDanu) => Field} RadioConstructor */
 
 /**
  * Base function for creating radio selection fields.
@@ -18,7 +18,7 @@ import lista from "./lista_facultati_unitbv_2026.js";
  * @param {string} titlu
  * @param {string[]} valori_implicite
  * @param {OptiuniDanu} [optiuni_obj={}]
- * @returns {Cimp}
+ * @returns {Field}
  */
 function _radio(nume, titlu, valori_implicite, optiuni_obj = {}) {
     const {
@@ -85,7 +85,7 @@ function grad_p(nume, titlu, optiuni_obj = {}) {
 
 /**
  * @param {string} nume
- * @returns {Cimp}
+ * @returns {Field}
  */
 function detalii(nume) {
     return {
@@ -94,7 +94,7 @@ function detalii(nume) {
     }
 }
 
-/**@type{import("@content/cestionare/types.js").Cestionar}*/
+/**@type{import("@content/cestionare/types.js").Questionnaire}*/
 export default {
     id: "atb-cdos-2026",
     titlu: "Chestionar CDOS 2026",

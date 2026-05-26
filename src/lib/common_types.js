@@ -4,7 +4,7 @@
  */
 
  /**
-  * @typedef {Object} Eroare
+  * @typedef {Object} FieldError
   * @property {string} type
   * @property {string} msg
   * @property {number} pag

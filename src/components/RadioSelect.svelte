@@ -1,22 +1,22 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
-    /** @import {Eroare} from import('$lib/common_types') */
+    /** @import {FieldError} from import('$lib/common_types') */
     /** @import { Validator } from import('@content/cestionare/types')*/
 
-    /** @import { RezultatOptiuni } from "@content/cestionare/types.js" */
-    import { aplicaValidare, normOptiune } from "@content/cestionare/types.js";
-    import CadruCimp from "./CadruCimp.svelte";
+    /** @import { OptionsResult } from "@content/cestionare/types.js" */
+    import { applyValidation, normalizeOption } from "@content/cestionare/types.js";
+    import FieldFrame from "./FieldFrame.svelte";
 
     /**
      * @typedef {Object} Props
      * @property {string} nume
-     * @property {string} intrebare
+     * @property {string} question
      * @property {boolean} [horizontal = false]
      * @property {string?} [desc = null]
-     * @property {RezultatOptiuni} optiuni
+     * @property {OptionsResult} optiuni
      * @property {string} value
      * @property {boolean} [obligatoriu=false]
-     * @property {Eroare} eroare
+     * @property {FieldError} errors
      * @property {Validator} [valideaza]
      * @property {FocusEventHandler<HTMLElement>} [onblur]
      */
@@ -26,12 +26,12 @@
         nume,
         obligatoriu = false,
         onblur,
-        intrebare,
+        question,
         desc = null,
         horizontal = false,
         optiuni,
         valideaza,
-        eroare = $bindable(),
+        errors = $bindable(),
         value = $bindable(),
     } = $props();
 
@@ -40,20 +40,20 @@
             return value;
         },
         set value(v) {
-            eroare = aplicaValidare(v, obligatoriu, valideaza);
+            errors = applyValidation(v, obligatoriu, valideaza);
             value = v;
         },
     };
 </script>
 
-<CadruCimp {eroare} {intrebare} {desc} {obligatoriu}>
+    <FieldFrame errors={errors} {question} {desc} {obligatoriu}>
     {#if optiuni.eroare != null}
         <p class="mt-1 text-sm text-warning dark:text-warning-dark">
             {optiuni.eroare}
         </p>
     {:else}
         <div class={["flex", horizontal ? "flex-row gap-4" : "flex-col gap-0.5"]} {onblur}>
-            {#each optiuni.optiuni.map(normOptiune) as opt}
+            {#each optiuni.optiuni.map(normalizeOption) as opt}
                 <div
                     class={[
                         "border transition-colors duration-300 rounded-lg",
@@ -79,4 +79,4 @@
             {/each}
         </div>
     {/if}
-</CadruCimp>
+    </FieldFrame>

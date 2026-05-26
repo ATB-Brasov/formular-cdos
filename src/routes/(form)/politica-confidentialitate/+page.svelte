@@ -5,19 +5,19 @@
     /**@type{HTMLElement?}*/ let element = $state(null)
 
     onMount(() => {
-        let is_iframe = false;
+        let isIframe = false;
         if (browser) {
             try {
-                is_iframe = window?.top !== window?.self;
+                isIframe = window?.top !== window?.self;
             } catch (e) {
-                is_iframe = true; // Likely in a cross-origin iframe
+                isIframe = true; // Likely in a cross-origin iframe
             }
         }
-        if (is_iframe && element != null) {
+        if (isIframe && element != null) {
             const height = element.offsetHeight;
             window.parent.postMessage(
                 { type: 'iframe-resize', height: height },
-                '*' // INFO: Folosește url-ul de producție, printr-o variabilă de mediu poate
+                '*' // TODO: use production URL from env variable
             );
         }
     });

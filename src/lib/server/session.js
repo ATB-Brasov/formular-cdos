@@ -186,7 +186,7 @@ export async function deleteSession(sessionId) {
 }
 
 /**
- * Extrge adresa poștei electronice din lista adreselor salvate
+ * Get answered email from the saved email list
  * @param {string} formId
  * @param {string} email
  * @returns {Promise<EmailData|null>}
@@ -215,7 +215,7 @@ export async function getListOfAnswers(formId, limit = 10) {
 }
 
 /**
- * Extrage răspunsuri pe baza identificatorului de raspuns
+ * Get previous answers by answer ID
  * @param {string} formId
  * @param {string} answerId
  * @returns {Promise<Map<string,string>|null>}
@@ -227,7 +227,7 @@ export async function getPreviousAnswers(formId, answerId) {
 }
 
 /**
- * Salvează răspunsurile la cestionar
+ * Save answers to questionnaire
  * @param {string} email
  * @param {string} formId
  * @param {string} answerId

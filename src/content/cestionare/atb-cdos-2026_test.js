@@ -6,7 +6,7 @@ import lista from "./lista_facultati_unitbv_2026.js";
  * @typedef {object} OptiuniDanu
  * @property {string | null} [desc=null]
  * @property {boolean} [obligatoriu=true]
- * @property {import("@content/cestionare/types.js").AscundeCimp | null} [ascunde=null]
+ * @property {import("@content/cestionare/types.js").HideField | null} [ascunde=null]
  * @property {() => ({ optiuni: string[]; eroare: string? })} [optiuni=() => ({ optiuni: ["da", "nu", "nu știu"], eroare: null })]
  */
 
@@ -14,7 +14,7 @@ import lista from "./lista_facultati_unitbv_2026.js";
  * @param {string} nume
  * @param {string} titlu
  * @param {OptiuniDanu} [optiuni_obj={}]
- * @returns {import("@content/cestionare/types.js").Cimp}
+ * @returns {import("@content/cestionare/types.js").Field}
  */
 function danu(nume, titlu, optiuni_obj = {}) {
     const {
@@ -35,7 +35,7 @@ function danu(nume, titlu, optiuni_obj = {}) {
     };
 }
 
-/** @type {import("@content/cestionare/types.js").Pagina} */
+/** @type {import("@content/cestionare/types.js").Section} */
 const paginia_dezabilitati =
     {
         titlu: "Dizabilități",
@@ -80,7 +80,7 @@ const paginia_dezabilitati =
         ],
     }
 
-/**@type{import("@content/cestionare/types.js").Cestionar}*/
+/**@type{import("@content/cestionare/types.js").Questionnaire}*/
 export default {
     id: "atb-cdos-2026",
     titlu: "Chestionar CDOS 2026",

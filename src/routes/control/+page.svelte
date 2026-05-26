@@ -14,6 +14,9 @@
     let intrebari = $state(sondaj_cdos.pagini.map((p, idx) => ({...p, idx})));
     let cimps = $state(intrebari.map((p) => p.cimpuri.map(c=>({...c, pag: p.idx}))).flat(1));
 
+    const academicNume = new Set(["facultatea", "ciclu", "forma", "programul", "anul"]);
+    let cimpsAcademic = $state(cimps.filter(c => academicNume.has(c.nume)));
+
     let totalAnswers = $derived(data.answers?.length ?? 0);
 
     let answersPerDay = $derived.by(() => {
@@ -188,7 +191,7 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                {#each cimps as cimp}
+                                {#each cimpsAcademic as cimp}
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{cimp.nume}</th>
                                 {/each}
                             </tr>
@@ -197,7 +200,7 @@
                             {#each data.answers as kdata}
                                 {@const answersMap = kdata.value.answers instanceof Map ? kdata.value.answers : new Map(kdata.value.answers)}
                                 <tr>
-                                    {#each cimps as cimp}
+                                    {#each cimpsAcademic as cimp}
                                         {@const item = answersMap.get(cimp.nume)}
                                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{item ?? '-'}</td>
                                     {/each}

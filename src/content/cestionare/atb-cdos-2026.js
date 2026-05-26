@@ -528,7 +528,7 @@ export default {
                 ),
                 da_nu_caz(
                     "prac_cost_deplas_s",
-                    "În cazul practicii desfășurate în afara Brașovului, ți-au fost acoperite costurile de masă, cazare și transport? [art. 9 (1) b)]",
+                    "În cazul practicii desfășurate în afara Centrului Universitar, ți-au fost acoperite costurile de masă, cazare și transport? [art. 9 (1) b)]",
                     {
                         desc:
                             "Studenții au dreptul de a beneficia de acoperirea costurilor necesare pentru efectuarea practicii comasate, pentru perioada prevăzută în planurile de învătământ, inclusiv cheltuieli de masă, cazare și transport, in situațiile in care practica se desfășoara in afara centrului universitar respectiv (institutului), conform prevederilor art. 128 alin. (25) din Legea nr. 199/2023, cu modificările și completarile ulterioare;",

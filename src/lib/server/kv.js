@@ -1,4 +1,3 @@
-// Assisted-By: Gemini 3 Flash
 import { runMigrations } from "./migration.js";
 import { refreshEmailVersionstamps } from "./db.js";
 

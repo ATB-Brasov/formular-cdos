@@ -1,6 +1,9 @@
 <script>
     import { onMount } from "svelte";
 	import { browser } from "$app/environment";
+    import { PUBLIC_ORIGIN } from "$env/static/public";
+
+    const POST_ORIGIN = PUBLIC_ORIGIN || "*";
 
     /**@type{HTMLElement?}*/ let element = $state(null)
 
@@ -17,7 +20,7 @@
             const height = element.offsetHeight;
             window.parent.postMessage(
                 { type: 'iframe-resize', height: height },
-                '*' // TODO: use production URL from env variable
+                POST_ORIGIN,
             );
         }
     });

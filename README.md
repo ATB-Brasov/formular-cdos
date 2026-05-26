@@ -21,11 +21,13 @@ deno task dev
 ## Producție
 
 ```sh
+# Copiază și completează variabilele de mediu
+cp .env.example .env
 deno task build
 deno task preview
 ```
 
-Sunt necesare următoarele variabile de mediu:
+Variabilele de mediu sunt definite într-un fișier `.env` (vezi [`.env.example`](./.env.example)):
 
 | Variabilă | Descriere |
 |---|---|
@@ -33,6 +35,8 @@ Sunt necesare următoarele variabile de mediu:
 | `HASH_SALT` | Salt pentru hashingul adreselor de e-mail |
 | `HASH_CONTROL` | Hash Argon2 al parolei pentru panoul de administrare |
 | `EXPORT_API_TOKEN` | Token pentru exportul programatic al răspunsurilor |
+| `ADMIN_AUTH_ENABLED` | Activează/dezactivează autentificarea pe panoul de administrare (opțional, implicit `true`) |
+| `PUBLIC_ORIGIN` | Originea URL-ului părinte pentru iframe postMessage (opțional, implicit `*`) |
 
 ## Licență
 

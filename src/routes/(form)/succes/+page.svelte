@@ -1,6 +1,9 @@
 <script>
     import { browser } from "$app/environment";
     import { onMount } from "svelte";
+    import { PUBLIC_ORIGIN } from "$env/static/public";
+
+    const POST_ORIGIN = PUBLIC_ORIGIN || "*";
 
     /** @type {import('./$types').PageProps} */
     let { data } = $props();
@@ -18,11 +21,16 @@
             }
         }
 
+        if (isIframe) {
+            window.scrollTo(0, 0);
+            window.parent.postMessage({ type: 'page-change' }, POST_ORIGIN);
+        }
+
         if (isIframe && element != null) {
             const height = element.offsetHeight;
             window.parent.postMessage(
                 { type: 'iframe-resize', height: height },
-                '*'
+                POST_ORIGIN,
             );
         }
     });

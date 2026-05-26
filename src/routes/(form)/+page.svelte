@@ -6,6 +6,7 @@
     import { page } from "$app/state";
     import { browser, dev } from "$app/environment";
     import { goto } from "$app/navigation";
+    import { PUBLIC_ORIGIN } from "$env/static/public";
 
     import Button from "@components/Button.svelte";
     import Selection from "@components/Selection.svelte";
@@ -17,6 +18,7 @@
     import { emptyAnswer } from "@content/cestionare/types.js";
     import { solvePoW } from "$lib/miner.js";
 
+    const POST_ORIGIN = PUBLIC_ORIGIN || "*";
     const test = page.url.searchParams.get("test") === "true"
     let isIframe = $state(false)
 
@@ -106,7 +108,7 @@
         if (iframeEl) {
             window.parent.postMessage(
                 { type: 'scroll-to', rectTop, rectHeight},
-                '*'
+                POST_ORIGIN,
             );
         }
     }
@@ -115,7 +117,7 @@
         if (iframeEl) {
             window.parent.postMessage(
                 { type: 'page-change' },
-                '*'
+                POST_ORIGIN,
             );
         }
     }
@@ -128,7 +130,7 @@
                     type: 'iframe-resize',
                     height: height
                 },
-                '*'
+                POST_ORIGIN,
             );
         }
     }

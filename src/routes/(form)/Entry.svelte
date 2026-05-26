@@ -101,7 +101,7 @@
     class:mb-26={isIframe}
     use:enhance={async ({ formData, cancel }) => {
         isMining = true;
-        await solvePoW(email, 3)
+        await solvePoW(email, 4)
             .then((nonce) => {
                 formData.append("nonce", nonce.toString());
                 console.log("Solved PoW with nonce:", nonce);
@@ -172,7 +172,7 @@
                 onclick={handleSubmit}
                 disabled={isMining}
             >
-                {isMining ? "Se începe..." : "Începe"}
+                {isMining ? "Se verifică..." : "Începe"}
             </Button>
         </div>
     </div>

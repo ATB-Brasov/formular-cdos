@@ -14,6 +14,7 @@
     import Entry from "./Entry.svelte";
     import { onMount } from "svelte";
     import { emptyAnswer } from "@content/cestionare/types.js";
+    import { solvePoW } from "$lib/miner.js";
 
     const test = page.url.searchParams.get("test") === "true"
     let isIframe = $state(false)
@@ -128,8 +129,6 @@
         }
     }
 
-    /**@type{string?}*/ let email = $state(null)
-
     onMount(() => {
         if (browser) {
             try {
@@ -158,7 +157,6 @@
                 );
             }
         }
-        email = localStorage.getItem("posta")
 
         if (isIframe) {
             observer = new ResizeObserver((entries) => {
@@ -250,6 +248,7 @@
     );
 
     let formElement = /** @type {HTMLFormElement?} */ $state();
+    let isMining = $state(false);
 
     function handleSubmit() {
         for (const k in errors) errors[k] = null
@@ -269,7 +268,7 @@
             setSectionIndex(v.pag, {whence: "/::handleSubmit"})
             setTimeout(() => scrollToField(fieldRefs[k]), 0)
         } else {
-            setTimeout(() => formElement?.requestSubmit(), 0);
+            formElement?.requestSubmit();
         }
     }
 </script>
@@ -334,7 +333,23 @@
 
     <form
         method="POST"
-        use:enhance
+        use:enhance={async ({ formData, cancel }) => {
+            const email = localStorage.getItem("posta");
+            if (email) {
+                formData.set("posta", email);
+                isMining = true;
+                try {
+                    const nonce = await solvePoW(email, 4);
+                    formData.append("nonce", nonce.toString());
+                } catch {
+                    cancel();
+                    return;
+                } finally {
+                    isMining = false;
+                }
+            }
+            return async ({ result, update }) => { await update(); };
+        }}
         action="?/submit"
         class="mt-4 w-full"
         class:mb-26={isIframe}
@@ -343,10 +358,6 @@
 
         {#if test}
             <input type="hidden" name="test" value="true">
-        {/if}
-
-        {#if email != null}
-            <input type="hidden" name="posta" value={email}>
         {/if}
 
         {#each sections as section, i}
@@ -424,9 +435,10 @@
                         <Button
                             class="min-w-22"
                             type="button"
+                            disabled={isMining}
                             onclick={ultima ? handleSubmit : () => navigateSection("urmator")}
                         >
-                            {ultima ? "Trimite" : "Următor"}
+                            {isMining ? "Se verifică..." : ultima ? "Trimite" : "Următor"}
                         </Button>
                     {/snippet}
                 </div>

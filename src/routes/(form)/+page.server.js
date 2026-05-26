@@ -85,12 +85,12 @@ export const actions = {
             });
         }
         nonce = nonce.toString();
-        if (!verifyPoW(email, nonce, 3)) {
+        if (!verifyPoW(email, nonce, 4)) {
             return fail(400, {
                 errors: {
                     posta: {
                         type: "pow-invalid",
-                        msg: "Invalid Proof of Work. Nice try, bot!",
+                        msg: "Verifică adresa poștei electronice și mai încearcă o dată",
                         pag: -1,
                     },
                 },
@@ -182,6 +182,19 @@ export const actions = {
             return fail(400, {
                 errors: {
                     posta: { type: "email-invalid", msg: validationMsg, pag: 0 },
+                },
+            });
+        }
+
+        const nonce = dataDict.nonce;
+        if (nonce == null || !verifyPoW(session.email, nonce, 4)) {
+            return fail(400, {
+                errors: {
+                    _form: {
+                        type: "pow-invalid",
+                        msg: "Verifică adresa poștei electronice și mai încearcă o dată",
+                        pag: -1,
+                    },
                 },
             });
         }

@@ -1,8 +1,6 @@
-// Assisted-By: Gemini 3 Flash
 /**
  * @param {string} email
- * @param {number} difficulty
- * @returns
+ * @param {number} [difficulty=4]
  */
 export async function solvePoW(email, difficulty = 4) {
     let nonce = 0;

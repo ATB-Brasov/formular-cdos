@@ -1,5 +1,4 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { dev } from "$app/environment";
 import { getAdminSession, getDailyCounts, getListOfAnswers } from "$lib/server/session.js";
 import survey from "@content/cestionare/atb-cdos-2026.js";
 
@@ -7,7 +6,8 @@ const ACADEMIC_FIELDS = new Set(["facultatea", "ciclu", "forma", "programul", "a
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ cookies }) {
-    if (!dev) {
+    const adminAuthEnabled = Deno.env.get("ADMIN_AUTH_ENABLED") !== "false";
+    if (adminAuthEnabled) {
         const sessionid = cookies.get("adminsession");
         if (sessionid == null) redirect(303, "/control/login");
         const session = await getAdminSession(sessionid);

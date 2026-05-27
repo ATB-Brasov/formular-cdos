@@ -30,6 +30,12 @@
     );
 
     let totalAnswers = $derived(data.answers?.length ?? 0);
+    let validatedAnswers = $derived(data.validationStats?.validated ?? 0);
+    let validationPct = $derived(
+        totalAnswers > 0
+            ? Math.round((validatedAnswers / totalAnswers) * 100)
+            : 0,
+    );
 
     let answersPerDay = $derived.by(() => {
         /**@type{Map<string, number>}*/
@@ -203,6 +209,22 @@
                     {totalAnswers}
                 </p>
             </div>
+            <!-- Validated Answers Card -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-700 transition-shadow duration-300 hover:shadow-lg"
+            >
+                <h2
+                    class="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2"
+                >
+                    Validated Answers
+                </h2>
+                <p class="text-5xl font-bold text-green-600 dark:text-green-400">
+                    {validatedAnswers}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {validationPct}% of total
+                </p>
+            </div>
         </div>
 
         <!-- Answers Per Day Chart -->
@@ -256,6 +278,12 @@
                                         {field.nume}
                                     </th>
                                 {/each}
+                                <th
+                                    scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                >
+                                    Validat
+                                </th>
                             </tr>
                         </thead>
                         <tbody
@@ -274,6 +302,13 @@
                                             {item ?? "-"}
                                         </td>
                                     {/each}
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                        {#if kdata.validated}
+                                            <span class="text-green-600 font-medium">Da</span>
+                                        {:else}
+                                            <span class="text-gray-400">Nu</span>
+                                        {/if}
+                                    </td>
                                 </tr>
                             {/each}
                         </tbody>

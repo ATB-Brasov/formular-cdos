@@ -1,7 +1,7 @@
 import { getKv } from "./kv.js";
 
 const MIGRATION_KEY = ["_migration", "schema_version"];
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
 
 /**
  * v1: strip submittedAt from answers, backfill daily counts, refresh email stamps
@@ -58,9 +58,41 @@ async function v1(kv) {
     );
 }
 
+/**
+ * v2: backfill validated: false on existing answer & email records
+ * @param {Deno.Kv} kv
+ */
+async function v2(kv) {
+    const ANSWERS_PREFIX = ["answers"];
+    const EMAILS_PREFIX = ["emails"];
+    let answersUpdated = 0;
+    let emailsUpdated = 0;
+
+    const answerIter = kv.list({ prefix: ANSWERS_PREFIX });
+    for await (const entry of answerIter) {
+        if (entry.value?.validated === undefined) {
+            await kv.set(entry.key, { ...entry.value, validated: false });
+            answersUpdated++;
+        }
+    }
+
+    const emailIter = kv.list({ prefix: EMAILS_PREFIX });
+    for await (const entry of emailIter) {
+        if (entry.value?.validated === undefined) {
+            await kv.set(entry.key, { ...entry.value, validated: false });
+            emailsUpdated++;
+        }
+    }
+
+    console.log(
+        `Migration v2: marked ${answersUpdated} answers and ${emailsUpdated} email records as unvalidated`,
+    );
+}
+
 /** Ordered list of migration functions (index 0 = v1, 1 = v2, ...). */
 const migrations = [
     v1,
+    v2,
 ];
 
 /**

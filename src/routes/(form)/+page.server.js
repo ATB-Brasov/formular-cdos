@@ -2,6 +2,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { verifyPoW } from "$lib/server/pow.js";
 
+
 import survey from "@content/cestionare/atb-cdos-2026.js";
 import {
     createSession,
@@ -13,6 +14,7 @@ import {
     saveAnswers,
     updateSessionEmail,
 } from "$lib/server/db.js";
+import { sendVerificationEmail } from "$lib/server/email.js";
 
 /**
  * @param {import('@sveltejs/kit').Cookies} cookies
@@ -315,6 +317,8 @@ export const actions = {
                 await deleteSession(sessionId);
                 cookies.delete("sessionid", { path: "/" });
             }
+            const origin = dev ? "http://localhost:5173" : Deno.env.get("PUBLIC_ORIGIN") ?? "https://atbbrasov.ro";
+            sendVerificationEmail(email, answerId, email, origin);
         }
 
         const redirectEmail = email

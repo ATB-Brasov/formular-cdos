@@ -26,12 +26,14 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
 /**
  * @typedef {Object} EmailData
  * @property {boolean} answered
+ * @property {boolean} [validated]
  */
 
 /**
  * @typedef {Object} AnswersData
  * @property {string} answerId
  * @property {Map<string,string>} answers
+ * @property {boolean} [validated]
  */
 
 /**
@@ -238,10 +240,14 @@ export async function saveAnswers(email, formId, answerId, answers) {
     const kv = await getKv();
 
     const hashed_email = await hashEmail(email);
-    await kv.set([...EMAILS_PREFIX, formId, hashed_email], { answered: true });
+    await kv.set([...EMAILS_PREFIX, formId, hashed_email], {
+        answered: true,
+        validated: false,
+    });
     await kv.set([...ANSWERS_PREFIX, formId, answerId], {
         answerId,
         answers,
+        validated: false,
     });
     await saveDailyCount(kv, formId);
 }
@@ -255,7 +261,98 @@ export async function saveAnswers(email, formId, answerId, answers) {
  */
 export async function overwriteAnswers(formId, answerId, answers) {
     const kv = await getKv();
-    await kv.set([...ANSWERS_PREFIX, formId, answerId], { answerId, answers });
+    const existing = await kv.get([...ANSWERS_PREFIX, formId, answerId]);
+    const validated = existing.value?.validated ?? false;
+    await kv.set([...ANSWERS_PREFIX, formId, answerId], {
+        answerId,
+        answers,
+        validated,
+    });
+}
+
+/**
+ * Generate an HMAC-SHA256 verification token linking an answer to an email.
+ * @param {string} answerId
+ * @param {string} email
+ * @returns {Promise<string>}
+ */
+export async function generateVerificationToken(answerId, email) {
+    const secret = Deno.env.get("HASH_SECRET");
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(secret),
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["sign"],
+    );
+    const sig = await crypto.subtle.sign(
+        "HMAC",
+        key,
+        encoder.encode(`${answerId}::${email}`),
+    );
+    return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/**
+ * Verify that a token matches the answerId-email pair.
+ * @param {string} answerId
+ * @param {string} email
+ * @param {string} token
+ * @returns {Promise<boolean>}
+ */
+export async function verifyVerificationToken(answerId, email, token) {
+    const expected = await generateVerificationToken(answerId, email);
+    if (token.length !== expected.length) return false;
+    return crypto.subtle.timingSafeEqual(
+        new TextEncoder().encode(token),
+        new TextEncoder().encode(expected),
+    );
+}
+
+/**
+ * Mark an answer and its associated email as validated.
+ * @param {string} formId
+ * @param {string} answerId
+ * @param {string} email
+ * @returns {Promise<boolean>} true if both records were found and updated
+ */
+export async function validateAnswer(formId, answerId, email) {
+    const kv = await getKv();
+    const hashed = await hashEmail(email);
+    const emailKey = [...EMAILS_PREFIX, formId, hashed];
+    const answerKey = [...ANSWERS_PREFIX, formId, answerId];
+
+    const [emailEntry, answerEntry] = await Promise.all([
+        kv.get(emailKey),
+        kv.get(answerKey),
+    ]);
+
+    if (emailEntry.value == null || answerEntry.value == null) return false;
+
+    await Promise.all([
+        kv.set(emailKey, { ...emailEntry.value, validated: true }),
+        kv.set(answerKey, { ...answerEntry.value, validated: true }),
+    ]);
+
+    return true;
+}
+
+/**
+ * Get total and validated answer counts for a form.
+ * @param {string} formId
+ * @returns {Promise<{total: number, validated: number}>}
+ */
+export async function getValidationStats(formId) {
+    const kv = await getKv();
+    const iter = kv.list({ prefix: [...ANSWERS_PREFIX, formId] });
+    let total = 0;
+    let validated = 0;
+    for await (const entry of iter) {
+        total++;
+        if (entry.value?.validated) validated++;
+    }
+    return { total, validated };
 }
 
 /**

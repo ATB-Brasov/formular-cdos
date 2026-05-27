@@ -318,7 +318,9 @@ export const actions = {
                 cookies.delete("sessionid", { path: "/" });
             }
             const origin = dev ? "http://localhost:5173" : Deno.env.get("PUBLIC_ORIGIN") ?? "https://atbbrasov.ro";
-            sendVerificationEmail(email, answerId, email, origin);
+            sendVerificationEmail(email, answerId, email, origin).catch((err) =>
+                console.error("Failed to send verification email:", err),
+            );
         }
 
         const redirectEmail = email

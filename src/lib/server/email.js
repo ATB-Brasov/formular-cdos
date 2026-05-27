@@ -26,7 +26,8 @@ async function getAccessToken() {
     const data = await resp.json();
     if (!resp.ok) {
         throw new Error(
-            `Gmail OAuth error: ${data.error_description || data.error}`,
+            `Gmail OAuth error: ${data.error_description || data.error} (status ${resp.status})`,
+            { cause: data },
         );
     }
     return data.access_token;
@@ -129,18 +130,7 @@ export async function sendVerificationEmail(to, answerId, email, origin) {
 </body>
 </html>`;
 
-    let accessToken;
-    try {
-        accessToken = await getAccessToken();
-    } catch (err) {
-        console.error("Failed to get Gmail access token:", err);
-        return;
-    }
-
-    try {
-        await sendGmail(accessToken, { from, to, subject, htmlBody });
-        console.log(`Verification email sent to ${to} for answer ${answerId}`);
-    } catch (err) {
-        console.error(`Failed to send verification email to ${to}:`, err);
-    }
+    const accessToken = await getAccessToken();
+    await sendGmail(accessToken, { from, to, subject, htmlBody });
+    console.log(`Verification email sent to ${to} for answer ${answerId}`);
 }

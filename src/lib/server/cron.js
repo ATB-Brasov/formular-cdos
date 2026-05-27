@@ -1,9 +1,9 @@
-import { refreshEmailVersionstamps } from "./db.js";
+import { shuffleVersionstamps } from "./db.js";
 
-Deno.cron("Refresh email versionstamps", "0 */6 * * *", async () => {
+Deno.cron("Shuffle email and answer versionstamps", "0 */6 * * *", async () => {
     try {
-        await refreshEmailVersionstamps();
+        await shuffleVersionstamps();
     } catch (err) {
-        console.error("Cron refresh failed:", err);
+        console.error("Cron shuffle failed:", err);
     }
 });

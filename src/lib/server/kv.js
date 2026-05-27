@@ -1,5 +1,5 @@
 import { runMigrations } from "./migration.js";
-import { refreshEmailVersionstamps } from "./db.js";
+import { shuffleVersionstamps } from "./db.js";
 
 /** @typedef {Deno.Kv} Kv */
 
@@ -46,7 +46,7 @@ async function initKv() {
         // Run DB-level startup tasks after connection is established
         try {
             await runMigrations();
-            await refreshEmailVersionstamps();
+            await shuffleVersionstamps();
         } catch (err) {
             console.error("KV startup tasks failed:", err);
         }

@@ -329,15 +329,25 @@ export async function deleteAnswers(formId, email, answerId) {
     return { deleted: true };
 }
 
-export async function refreshEmailVersionstamps() {
+export async function shuffleVersionstamps() {
     const kv = await getKv();
-    const iterator = kv.list({ prefix: EMAILS_PREFIX });
-    let count = 0;
-    for await (const entry of iterator) {
-        await kv.set(entry.key, entry.value);
-        count++;
+
+    const emailEntries = [];
+    const emailIter = kv.list({ prefix: EMAILS_PREFIX });
+    for await (const entry of emailIter) {
+        emailEntries.push({ key: entry.key, value: entry.value });
     }
-    console.log(`Refreshed versionstamps for ${count} email entries`);
+
+    for (let i = emailEntries.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [emailEntries[i], emailEntries[j]] = [emailEntries[j], emailEntries[i]];
+    }
+
+    for (const entry of emailEntries) {
+        await kv.set(entry.key, entry.value);
+    }
+
+    console.log(`Shuffled versionstamps for ${emailEntries.length} email entries`);
 }
 
 export async function hashEmail(/**@type{string}*/ email) {

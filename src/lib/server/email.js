@@ -86,7 +86,19 @@ async function sendGmail(accessToken, { from, to, subject, htmlBody }) {
         throw new Error(`Gmail API error: ${err}`);
     }
 
-    return await resp.json();
+    const msg = await resp.json();
+
+    // Permanently delete from Sent folder so the recipient address is not
+    // visible in the sender's account.
+    await fetch(
+        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`,
+        {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${accessToken}` },
+        },
+    );
+
+    return msg;
 }
 
 /**

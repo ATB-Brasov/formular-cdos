@@ -390,10 +390,6 @@ export async function getDailyCounts(formId) {
 }
 
 /**
- * Rewrite every email hash entry to update its versionstamp,
- * preventing time-based correlation with answer entries.
- */
-/**
  * Delete an email record and its associated answers from the database.
  * Both records must exist for the deletion to succeed.
  * @param {string} formId
@@ -412,10 +408,7 @@ export async function deleteAnswers(formId, email, answerId) {
         kv.get(answerKey),
     ]);
 
-    const emailExists = emailEntry.value != null;
-    const answerExists = answerEntry.value != null;
-
-    if (!emailExists || !answerExists) {
+    if (emailEntry.value == null || answerEntry.value == null) {
         return { deleted: false, emailExists, answerExists };
     }
 
@@ -426,6 +419,10 @@ export async function deleteAnswers(formId, email, answerId) {
     return { deleted: true };
 }
 
+/**
+ * Rewrite every email hash entry to update its versionstamp,
+ * preventing time-based correlation with answer entries.
+ */
 export async function shuffleVersionstamps() {
     const kv = await getKv();
 

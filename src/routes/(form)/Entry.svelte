@@ -3,6 +3,7 @@
 
     import { page } from "$app/state";
     import { enhance } from "$app/forms";
+    import { dev } from "$app/environment";
     import { solvePoW } from "$lib/miner.js";
     import Button from "@components/Button.svelte";
     import TextField from "@components/TextField.svelte";
@@ -160,14 +161,31 @@
     class="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[60ch]"
 >
     <div class="m-4 rounded-xl border border-surface-border bg-surface p-3">
-        <div class="flex justify-end gap-4">
-            <Button
-                type="button"
-                onclick={handleSubmit}
-                disabled={isMining}
-            >
-                {isMining ? "Se verifică..." : "Începe"}
-            </Button>
+        <div class="flex justify-between gap-4">
+            <div>
+                {#if dev}
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        onclick={() => {
+                            email = "test@student.unitbv.ro";
+                            consent = true;
+                            handleSubmit();
+                        }}
+                    >
+                        Pre-fill
+                    </Button>
+                {/if}
+            </div>
+            <div class="flex gap-4">
+                <Button
+                    type="button"
+                    onclick={handleSubmit}
+                    disabled={isMining}
+                >
+                    {isMining ? "Se verifică..." : "Începe"}
+                </Button>
+            </div>
         </div>
     </div>
 </div>

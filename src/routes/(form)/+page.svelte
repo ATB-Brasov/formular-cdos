@@ -297,13 +297,91 @@
 
 {#if dev}
     <div
-        class="fixed bottom-6 left-6 rounded bg-primary-subtle border border-primary-border z-200 px-4 py-2 font-mono"
+        class="fixed bottom-6 left-6 z-200 flex flex-col gap-2"
     >
-        <span class="inline sm:hidden">xs</span>
-        <span class="hidden sm:inline md:hidden">sm</span>
-        <span class="hidden md:inline lg:hidden">md</span>
-        <span class="hidden lg:inline xl:hidden">lg</span>
-        <span class="hidden xl:inline">xl</span>
+        <div
+            class="rounded bg-primary-subtle border border-primary-border px-4 py-2 font-mono"
+        >
+            <span class="inline sm:hidden">xs</span>
+            <span class="hidden sm:inline md:hidden">sm</span>
+            <span class="hidden md:inline lg:hidden">md</span>
+            <span class="hidden lg:inline xl:hidden">lg</span>
+            <span class="hidden xl:inline">xl</span>
+        </div>
+        <button
+            type="button"
+            onclick={() => {
+                answers = {
+                    facultatea: "01 Inginerie Mecanică",
+                    ciclu: "Licență",
+                    forma: "Învățământ cu Frecvență",
+                    programul: "Autovehicule rutiere",
+                    anul: "1",
+                    "participare-tabere": "da",
+                    "student-cu-dizabilități": "nu",
+                    "practica-de-specialitate": "da",
+                    "gen_nediscrim_did": "rar",
+                    "gen_acces_org_std": "da",
+                    "soc_termen_concurs": "da",
+                    "gen_mod_contract_s": "nu",
+                    "soc_raspuns_scris": "da",
+                    "detalii-generale": "",
+                    "acad_limit_ore_zi_8": "da",
+                    "acad_tutore_indrum": "da",
+                    "acad_info_fisa_dis": "mereu",
+                    "acad_suport_curs_g": "mereu",
+                    "acad_acces_sit_sco": "da",
+                    "acad_mobil_erasmu_s": "da",
+                    "acad_eval_prof_ano": "da",
+                    "acad_feedback_prof": "des",
+                    "detalii-calitate_eduational": "",
+                    "acad_consult_progr": "des",
+                    "acad_modific_evalu": "rar",
+                    "acad_eval_obiectiv": "des",
+                    "acad_rezult_exam_t": "des",
+                    "acad_contesta_note": "nu",
+                    "detalii-examinare": "",
+                    "taxe_inform_stabi": "da",
+                    "taxe_detalii_clar": "da",
+                    "taxe_publ_termen_3": "da",
+                    "gen_gratuit_acte_s": "da",
+                    "taxe_suplim_nejust": "nu",
+                    "detalii-taxe": "",
+                    "repr_info_hotariri": "nu știu",
+                    "repr_alegeri_liber": "nu știu",
+                    "repr_eval_anuala_s": "nu",
+                    "repr_disem_statis": "nu",
+                    "detalii-representare": "",
+                    "soc_asist_med_psi": "da",
+                    "acad_consiliere_gr": "da",
+                    "soc_acces_spatii_u": "da",
+                    "soc_baze_sport_gr": "nu e cazul",
+                    "soc_gratuit_cazare": "nu e cazul",
+                    "gen_transp_faci_st": "da",
+                    "soc_mediu_sigur_st": "des",
+                    "detalii-drepturi_sociale": "",
+                    "prac_parteneri_li": "da",
+                    "prac_cost_deplas_s": "da",
+                    "prac_cazare_camin": "da",
+                    "prac_tutore_indru": "da",
+                    "prac_eval_calitat": "da",
+                    "prac_recuno_indiv": "da",
+                    "detalii-practica": "",
+                    "tab_acces_restrict": "nu",
+                    "tab_credite_sesiun": "nu e cazul",
+                    "tab_formare_ec_ect": "nu e cazul",
+                    "detalii-tabere": "",
+                    "dizab_info_comun_s": "nu",
+                    "dizab_conditii_ade": "rar",
+                    "dizab_practic_spri": "da",
+                    "detalii-dizabilitati": "",
+                };
+                setSectionIndex(0, { whence: "dev-prefill" });
+            }}
+            class="rounded bg-yellow-200 border border-yellow-500 px-4 py-2 text-sm font-mono text-yellow-900 hover:bg-yellow-300 cursor-pointer"
+        >
+            Pre-fill answers
+        </button>
     </div>
 {/if}
 

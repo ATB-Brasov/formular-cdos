@@ -64,7 +64,5 @@
             errors = applyValidation(v, obligatoriu, valideaza);
             value = v;
         }}
-    >
-        {placeholder}
-</textarea>
+    ></textarea>
 </FieldFrame>

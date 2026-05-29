@@ -1,25 +1,89 @@
 import { generateVerificationToken } from "./db.js";
 
+function base64UrlEncode(data) {
+    return btoa(data).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function base64UrlEncodeBuffer(buf) {
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return base64UrlEncode(binary);
+}
+
 /**
- * Get an OAuth2 access token using the Gmail API refresh token flow.
+ * Parse a PEM-encoded RSA private key into PKCS#8 bytes.
+ * Handles both actual newlines and literal "\n" escape sequences.
+ */
+function parsePem(pem) {
+    const cleaned = pem.replace(/\\n/g, "\n");
+    const lines = cleaned.split("\n");
+    const b64 = lines
+        .filter((l) => !l.includes("-----BEGIN") && !l.includes("-----END"))
+        .join("");
+    const binStr = atob(b64);
+    const bytes = new Uint8Array(binStr.length);
+    for (let i = 0; i < binStr.length; i++) {
+        bytes[i] = binStr.charCodeAt(i);
+    }
+    return bytes;
+}
+
+/**
+ * Get an OAuth2 access token using a Google service account JWT assertion.
  * @returns {Promise<string>}
  */
 async function getAccessToken() {
-    const clientId = Deno.env.get("GMAIL_CLIENT_ID");
-    const clientSecret = Deno.env.get("GMAIL_CLIENT_SECRET");
-    const refreshToken = Deno.env.get("GMAIL_REFRESH_TOKEN");
-    if (!clientId || !clientSecret || !refreshToken) {
-        throw new Error("GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, and GMAIL_REFRESH_TOKEN must be set");
+    const saEmail = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_EMAIL");
+    const privateKeyPem = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY");
+    const impersonateUser = Deno.env.get("GMAIL_USER");
+
+    if (!saEmail || !privateKeyPem || !impersonateUser) {
+        throw new Error(
+            "GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, and GMAIL_USER must be set",
+        );
     }
+
+    const now = Math.floor(Date.now() / 1000);
+    const header = { alg: "RS256", typ: "JWT" };
+    const claim = {
+        iss: saEmail,
+        sub: impersonateUser,
+        scope: "https://www.googleapis.com/auth/gmail.send",
+        aud: "https://oauth2.googleapis.com/token",
+        exp: now + 3600,
+        iat: now,
+    };
+
+    const headerEncoded = base64UrlEncode(JSON.stringify(header));
+    const claimEncoded = base64UrlEncode(JSON.stringify(claim));
+    const signingInput = `${headerEncoded}.${claimEncoded}`;
+
+    const keyData = parsePem(privateKeyPem);
+    const key = await crypto.subtle.importKey(
+        "pkcs8",
+        keyData,
+        { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+        false,
+        ["sign"],
+    );
+
+    const sig = await crypto.subtle.sign(
+        { name: "RSASSA-PKCS1-v1_5" },
+        key,
+        new TextEncoder().encode(signingInput),
+    );
+
+    const jwt = `${signingInput}.${base64UrlEncodeBuffer(sig)}`;
 
     const resp = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            refresh_token: refreshToken,
-            grant_type: "refresh_token",
+            grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            assertion: jwt,
         }),
     });
 
@@ -31,10 +95,6 @@ async function getAccessToken() {
         );
     }
     return data.access_token;
-}
-
-function base64UrlSafe(str) {
-    return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 /**
@@ -60,7 +120,7 @@ function buildRawMessage(from, to, subject, htmlBody) {
         bodyEncoded,
     ].join("\r\n");
 
-    return base64UrlSafe(message);
+    return base64UrlEncode(message);
 }
 
 /**
@@ -86,19 +146,7 @@ async function sendGmail(accessToken, { from, to, subject, htmlBody }) {
         throw new Error(`Gmail API error: ${err}`);
     }
 
-    const msg = await resp.json();
-
-    // Permanently delete from Sent folder so the recipient address is not
-    // visible in the sender's account.
-    await fetch(
-        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`,
-        {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${accessToken}` },
-        },
-    );
-
-    return msg;
+    return await resp.json();
 }
 
 /**

@@ -161,7 +161,7 @@ export async function sendVerificationEmail(to, answerId, email, origin) {
 
     const verifyLink = `${origin}/verificare?answerId=${encodeURIComponent(answerId)}&email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
     const editLink = `${origin}/edit?answerId=${encodeURIComponent(answerId)}`;
-    const deleteLink = `${origin}/sterge-date?answerId=${encodeURIComponent(answerId)}&email=${encodeURIComponent(email)}`;
+    const deleteLink = `${origin}/sterge-date?answerId=${encodeURIComponent(answerId)}`;
 
     const from = Deno.env.get("GMAIL_USER") || "noreply@atbbrasov.ro";
     const subject = "Verifică-ți răspunsul — Formular ATB CDOS";

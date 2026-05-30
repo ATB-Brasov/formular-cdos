@@ -8,7 +8,6 @@ const FORM_ID = survey.id;
 export async function load({ url }) {
     return {
         answerId: url.searchParams.get("answerId"),
-        email: url.searchParams.get("email"),
     };
 }
 

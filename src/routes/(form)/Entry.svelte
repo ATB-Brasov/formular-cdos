@@ -122,7 +122,9 @@
         titlu={"Adresa poștei instituționale"}
         disclaimer={`
             Adresa e-mail <strong>nu va fi</strong> asociată cu răspunsurile
-            colectate. Colectăm adresa pentru a ne asigura că ești student UNITBV. Pentru mai multe informații, consultați <a href="/politica-confidentialitate">politica de confidențialitate</a>.`}
+            colectate. Colectăm adresa pentru a ne asigura că ești student UNITBV.
+${false && 'Totuși, dacă ai dubii, urmărește postările noastre pe Instagram ca să fii la curent când vom colecta răspunsuri în campusul universitar, unde îți vei putea împărtăși experiența cu toată încredera ca datele nu vor fi asociate cu identiatea ta.'}
+            Pentru mai multe informații, consultați <a href="/politica-confidentialitate">politica de confidențialitate</a>.`}
         nume={"posta"}
         bind:errors={errors["posta"]}
         placeholder={"exemplu@student.unitbv.ro"}

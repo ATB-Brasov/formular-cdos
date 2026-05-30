@@ -30,7 +30,6 @@
         <input
             type="email"
             name="email"
-            value={data.email ?? ""}
             placeholder="exemplu@student.unitbv.ro"
             required
             class="w-full px-3 py-2 rounded border border-surface-border bg-white text-sm"

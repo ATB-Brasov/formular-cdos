@@ -11,6 +11,5 @@ export async function load({ cookies, url }) {
     });
     return {
         answerId: url.searchParams.get("answerId"),
-        email: url.searchParams.get("email"),
     };
 }

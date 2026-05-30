@@ -323,9 +323,6 @@ export const actions = {
             );
         }
 
-        const redirectEmail = email
-            ? `&email=${encodeURIComponent(email)}`
-            : "";
-        redirect(303, `/succes?answerId=${answerId}${redirectEmail}`);
+        redirect(303, `/succes?answerId=${answerId}`);
     },
 };

@@ -118,7 +118,7 @@ export default {
 
 <p>Dacă ai întâlnit situații care consideri că ar trebui semnalate sau aspecte care pot fi îmbunătățite, formularul acesta este spațiul în care îți poți exprima opinia. Răspunsurile contribuie la identificarea problemelor reale din mediul universitar și la evidențierea nevoilor studenților.</p>
 
-<p>Completarea este anonimă, iar adresa instituțională nu va fi asociată răspunsurilor oferite.</p>
+<p>Completarea este anonimă, în sens că adresa instituțională nu va fi asociată răspunsurilor oferite.</p>
 
 <p>Mai multe informații despre raportarea <a target="_blank" href="https://unitbv.ro/documente/despre-unitbv/regulamente-hotarari/regulamentele-universitatii/studenti/Codul_studentului_26.06.2024.pdf">CDOS</a> pot fi găsite în <a target="_blank" href="https://atbbrasov.ro/rapoarte/raport-conformare-cdos-2025/">Raport CDOS 2025</a>.</p>`,
     pagini: [

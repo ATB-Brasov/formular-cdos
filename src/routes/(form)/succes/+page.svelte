@@ -38,7 +38,7 @@
 
 <div
     bind:this={element}
-    class="py-18 w-full flex flex-col gap-y-12 text-center"
+    class="py-18 w-full flex flex-col gap-y-6 text-center"
 >
     <h1 class="text-4xl font-bold">Mulțumim pentru participare</h1>
 
@@ -46,6 +46,23 @@
         Opinia ta este importantă pentru a îmbunătăți mediul universitar și
         experiența de student la Universitatea Transilvania din Brașov.
     </p>
+
+    <div
+        class="mx-auto max-w-md rounded-xl border border-primary/20 bg-primary/5 p-4 text-left"
+    >
+        <p class="font-semibold text-primary mb-1">
+            Confirmă-ți adresa de e-mail
+        </p>
+        <p class="text-sm text-surface-dim">
+            Ți-am trimis un e-mail de confirmare. Accesează linkul din e-mail
+            pentru a-ți valida răspunsul și a contribui la validitatea
+            statistică a rezultatelor.
+        </p>
+        <p class="text-xs text-surface-dim mt-2">
+            Dacă nu găsești e-mailul, verifică folderul Spam. Confirmarea este
+            opțională, dar ajută la asigurarea calității datelor colectate.
+        </p>
+    </div>
 
     {#if data.answerId}
         <div
@@ -67,8 +84,7 @@
                     Modifică răspunsurile
                 </a>
                 <a
-                    href={"/sterge-date?answerId=" + encodeURIComponent(data.answerId) +
-                    (data.email ? "&email=" + encodeURIComponent(data.email) : "")}
+                    href={"/sterge-date?answerId=" + encodeURIComponent(data.answerId)}
                     class="text-danger-strong hover:text-danger-hover"
                 >
                     Șterge răspunsurile

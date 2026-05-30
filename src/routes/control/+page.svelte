@@ -30,12 +30,9 @@
     );
 
     let totalAnswers = $derived(data.answers?.length ?? 0);
-    let validatedAnswers = $derived(data.validationStats?.validated ?? 0);
-    let validationPct = $derived(
-        totalAnswers > 0
-            ? Math.round((validatedAnswers / totalAnswers) * 100)
-            : 0,
-    );
+    let noEmail = $derived(data.verificationStats?.noEmail ?? 0);
+    let emailNotVerified = $derived(data.verificationStats?.emailNotVerified ?? 0);
+    let emailVerified = $derived(data.verificationStats?.emailVerified ?? 0);
 
     let answersPerDay = $derived.by(() => {
         /**@type{Map<string, number>}*/
@@ -195,7 +192,7 @@
         </h1>
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Total Answers Card -->
             <div
                 class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-700 transition-shadow duration-300 hover:shadow-lg"
@@ -203,27 +200,48 @@
                 <h2
                     class="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2"
                 >
-                    Total Answers Submitted
+                    Total Answers
                 </h2>
                 <p class="text-5xl font-bold text-blue-600 dark:text-blue-400">
                     {totalAnswers}
                 </p>
             </div>
-            <!-- Validated Answers Card -->
+            <!-- Email Verified Card -->
             <div
                 class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-700 transition-shadow duration-300 hover:shadow-lg"
             >
                 <h2
                     class="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2"
                 >
-                    Validated Answers
+                    Email Verified
                 </h2>
                 <p class="text-5xl font-bold text-green-600 dark:text-green-400">
-                    {validatedAnswers}
+                    {emailVerified}
                 </p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {validationPct}% of total
-                </p>
+            </div>
+            <!-- Email Not Verified Card -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-700 transition-shadow duration-300 hover:shadow-lg"
+            >
+                <h2
+                    class="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2"
+                >
+                    No Email / Unverified
+                </h2>
+                <div class="flex gap-4 items-baseline">
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-amber-500">
+                            {noEmail}
+                        </p>
+                        <p class="text-xs text-gray-500">no email</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-gray-400">
+                            {emailNotVerified}
+                        </p>
+                        <p class="text-xs text-gray-500">unverified</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -282,7 +300,7 @@
                                     scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
                                 >
-                                    Validat
+                                    Verification
                                 </th>
                             </tr>
                         </thead>
@@ -303,10 +321,12 @@
                                         </td>
                                     {/each}
                                     <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                        {#if kdata.validated}
-                                            <span class="text-green-600 font-medium">Da</span>
+                                        {#if kdata.verificationType === "email-verified"}
+                                            <span class="text-green-600 font-medium">Verified</span>
+                                        {:else if kdata.verificationType === "email-not-verified"}
+                                            <span class="text-amber-500">Unverified</span>
                                         {:else}
-                                            <span class="text-gray-400">Nu</span>
+                                            <span class="text-gray-400">No email</span>
                                         {/if}
                                     </td>
                                 </tr>

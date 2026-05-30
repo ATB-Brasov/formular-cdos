@@ -43,7 +43,6 @@ async function initKv() {
             kvInstance = await Deno.openKv();
         }
 
-        // Run DB-level startup tasks after connection is established
         try {
             await runMigrations();
             await shuffleVersionstamps();

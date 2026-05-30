@@ -24,14 +24,14 @@ export async function POST({ request }) {
     for await (const entry of iterator) {
         const formId = /** @type {string} */ (entry.key[1]);
         const answerId = /** @type {string} */ (entry.key[2]);
-        const val = /** @type {{answers: Map<string,string>, validated?: boolean}} */ (entry.value);
+        const val = /** @type {{answers: Map<string,string>, verificationType: string}} */ (entry.value);
         const answersMap = val.answers instanceof Map
             ? val.answers
             : new Map(val.answers);
         answers.push({
             formId,
             answerId,
-            validated: val.validated ?? false,
+            verificationType: val.verificationType ?? "no-email",
             ...Object.fromEntries(answersMap),
         });
     }

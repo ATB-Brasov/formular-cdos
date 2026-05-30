@@ -8,6 +8,39 @@
 <div class="py-18 w-full flex flex-col gap-y-12 text-center">
     <h1 class="text-4xl font-bold">Ștergere răspunsuri</h1>
 
+{#if data.verificationType === "no-email"}
+    <p class="text-lg">
+        Ești pe cale să ștergi răspunsurile tale. Deoarece nu ai furnizat o
+        adresă de e-mail, confirmă introducând ID-ul răspunsului.
+    </p>
+
+    <form
+        method="POST"
+        action="?/delete"
+        use:enhance
+        class="mx-auto max-w-md flex flex-col gap-3"
+    >
+        <input
+            type="text"
+            name="answerId"
+            value={data.answerId ?? ""}
+            placeholder="ID-ul răspunsului"
+            required
+            class="w-full px-3 py-2 rounded border border-surface-border bg-white text-sm font-mono"
+        >
+        <button
+            type="submit"
+            class="self-end rounded-md px-4 py-1.5 bg-danger text-white text-sm hover:bg-danger-hover"
+        >
+            Șterge răspunsurile
+        </button>
+        {#if form?.deleteSuccess}
+            <p class="text-green-600 text-sm">Răspunsurile au fost șterse.</p>
+        {:else if form?.deleteMsg}
+            <p class="text-danger text-sm">{form.deleteMsg}</p>
+        {/if}
+    </form>
+{:else}
     <p class="text-lg">
         Pentru a-ți șterge răspunsurile, introdu adresa de e-mail și ID-ul
         răspunsului primit după completare.
@@ -46,6 +79,7 @@
             <p class="text-danger text-sm">{form.deleteMsg}</p>
         {/if}
     </form>
+{/if}
 
     <p><a href="/">Înapoi la formular</a></p>
 </div>

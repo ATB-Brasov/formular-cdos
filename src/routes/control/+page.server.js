@@ -3,7 +3,7 @@ import {
     getAdminSession,
     getDailyCounts,
     getListOfAnswers,
-    getValidationStats,
+    getVerificationStats,
 } from "$lib/server/db.js";
 import survey from "@content/cestionare/atb-cdos-2026.js";
 
@@ -30,7 +30,7 @@ export async function load({ cookies }) {
     const answers = [];
     for await (const entry of iterator) {
         const val =
-            /** @type {{answerId: string, answers: Map<string,string>, validated?: boolean}} */ (
+            /** @type {{answerId: string, answers: Map<string,string>, verificationType: string}} */ (
                 entry.value
             );
         const academicAnswers = new Map();
@@ -45,10 +45,10 @@ export async function load({ cookies }) {
             key: entry.key,
             value: { answerId: val.answerId, answers: academicAnswers },
             versionstamp: entry.versionstamp,
-            validated: val.validated ?? false,
+            verificationType: val.verificationType ?? "no-email",
         });
     }
     const dailyCounts = await getDailyCounts(survey.id);
-    const validationStats = await getValidationStats(survey.id);
-    return { answers, dailyCounts, validationStats };
+    const verificationStats = await getVerificationStats(survey.id);
+    return { answers, dailyCounts, verificationStats };
 }

@@ -18,7 +18,7 @@ export async function load({ url }) {
         return { status: "error", message: "Link de verificare invalid sau expirat." };
     }
 
-    const success = await validateAnswer(FORM_ID, answerId, email);
+    const success = await validateAnswer(FORM_ID, answerId);
     if (!success) {
         return {
             status: "error",

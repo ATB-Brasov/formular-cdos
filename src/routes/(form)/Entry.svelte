@@ -30,14 +30,26 @@
 
     let email = $state("");
     let consent = $state(false);
+    let optOut = $state(false);
 
     onMount(() => {
         email = localStorage.getItem("posta") ?? "";
         consent = localStorage.getItem("gdpr-consent") === "true";
+        optOut = localStorage.getItem("opt-out") === "true";
     });
 
     $effect(() => {
         localStorage.setItem("gdpr-consent", consent ? "true" : "false");
+    });
+
+    $effect(() => {
+        localStorage.setItem("opt-out", optOut ? "true" : "false");
+    });
+
+    $effect(() => {
+        if (optOut) {
+            email = "";
+        }
     });
 
     $effect(() => {
@@ -52,6 +64,22 @@
     }
 
     function handleSubmit() {
+        if (!consent) {
+            errors["gdpr-consent"] = {
+                type: "required",
+                msg: "Trebuie să acceptați politica de confidențialitate",
+                pag: -1,
+            };
+            focusField("gdpr-consent");
+            return;
+        }
+
+        if (optOut) {
+            sectionIndex = 0;
+            localStorage.setItem("pagina", "0");
+            return;
+        }
+
         if (email.trim() === "") {
             errors["posta"] = {
                 type: "email-invalid",
@@ -66,16 +94,6 @@
         if (msg != null) {
             errors["posta"] = { type: "email-invalid", msg, pag: -1 };
             focusField("posta");
-            return;
-        }
-
-        if (!consent) {
-            errors["gdpr-consent"] = {
-                type: "required",
-                msg: "Trebuie să acceptați politica de confidențialitate",
-                pag: -1,
-            };
-            focusField("gdpr-consent");
             return;
         }
 
@@ -135,6 +153,22 @@ ${false && 'Totuși, dacă ai dubii, urmărește postările noastre pe Instagram
     {#if errors["_form"] != null}
         <span class="text-danger">{errors["_form"].msg}</span>
     {/if}
+
+    <div
+        class="flex flex-col rounded-xl border p-3 transition-colors {errors['gdpr-consent'] != null ? 'border-danger bg-red-50' : 'border-transparent'}"
+    >
+        <label for="opt-out" class="sm:pb-0.5">
+            <input
+                bind:checked={optOut}
+                type="checkbox"
+                id="opt-out"
+                class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
+            />
+            Nu doresc să furnizez o adresă de e-mail. Înțeleg că răspunsul meu
+            va fi marcat ca neverificat și nu voi putea modifica sau șterge
+            răspunsurile ulterior.
+        </label>
+    </div>
 
     <div
         class="flex flex-col rounded-xl border p-3 transition-colors {errors['gdpr-consent'] != null ? 'border-danger bg-red-50' : 'border-transparent'}"

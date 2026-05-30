@@ -442,11 +442,12 @@
             use:enhance={async ({ formData, cancel }) => {
                 if (!data.editData) {
                     const email = localStorage.getItem("posta");
-                    if (email) {
-                        formData.set("posta", email);
+                    const powInput = email || _session?.answerId;
+                    if (powInput) {
+                        if (email) formData.set("posta", email);
                         isMining = true;
                         try {
-                            const nonce = await solvePoW(email, 4);
+                            const nonce = await solvePoW(powInput, 4);
                             formData.append("nonce", nonce.toString());
                         } catch {
                             cancel();

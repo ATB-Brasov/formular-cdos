@@ -11,5 +11,6 @@ export async function load({ cookies, url }) {
     });
     return {
         answerId: url.searchParams.get("answerId"),
+        verificationType: url.searchParams.get("type"),
     };
 }

@@ -15,7 +15,8 @@
         "preview": "deno run -A --env-file npm:vite preview",
         "prepare": "deno run -A npm:@sveltejs/kit sync || echo ''",
         "check": "deno run -A npm:@sveltejs/kit sync && deno run -A npm:svelte-check --tsconfig ./jsconfig.json",
-        "check:watch": "deno run -A npm:@sveltejs/kit sync && deno run -A npm:svelte-check --tsconfig ./jsconfig.json --watch"
+        "check:watch": "deno run -A npm:@sveltejs/kit sync && deno run -A npm:svelte-check --tsconfig ./jsconfig.json --watch",
+        "test": "deno test -A --unstable-kv --no-check tests/"
     },
     "imports": {
         "$lib": "./src/lib",

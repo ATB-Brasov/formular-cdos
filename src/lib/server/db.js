@@ -26,14 +26,13 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day
 /**
  * @typedef {Object} EmailData
  * @property {boolean} answered
- * @property {boolean} [validated]
  */
 
 /**
  * @typedef {Object} AnswersData
  * @property {string} answerId
  * @property {Map<string,string>} answers
- * @property {boolean} [validated]
+ * @property {string} verificationType
  */
 
 /**
@@ -230,26 +229,34 @@ export async function getPreviousAnswers(formId, answerId) {
 
 /**
  * Save answers to questionnaire
- * @param {string} email
+ * @param {string|null} email
  * @param {string} formId
  * @param {string} answerId
  * @param {Map<string,string>} answers
- * @returns {Promise<void>}
+ * @returns {Promise<{verificationType: string}>}
  */
 export async function saveAnswers(email, formId, answerId, answers) {
     const kv = await getKv();
 
-    const hashed_email = await hashEmail(email);
-    await kv.set([...EMAILS_PREFIX, formId, hashed_email], {
-        answered: true,
-        validated: false,
-    });
+    const verificationType = email
+        ? "email-not-verified"
+        : "no-email";
+
+    if (email) {
+        const hashed_email = await hashEmail(email);
+        await kv.set([...EMAILS_PREFIX, formId, hashed_email], {
+            answered: true,
+        });
+    }
+
     await kv.set([...ANSWERS_PREFIX, formId, answerId], {
         answerId,
         answers,
-        validated: false,
+        verificationType,
     });
     await saveDailyCount(kv, formId);
+
+    return { verificationType };
 }
 
 /**
@@ -262,11 +269,11 @@ export async function saveAnswers(email, formId, answerId, answers) {
 export async function overwriteAnswers(formId, answerId, answers) {
     const kv = await getKv();
     const existing = await kv.get([...ANSWERS_PREFIX, formId, answerId]);
-    const validated = existing.value?.validated ?? false;
+    const verificationType = existing.value?.verificationType ?? "no-email";
     await kv.set([...ANSWERS_PREFIX, formId, answerId], {
         answerId,
         answers,
-        validated,
+        verificationType,
     });
 }
 
@@ -304,55 +311,52 @@ export async function generateVerificationToken(answerId, email) {
 export async function verifyVerificationToken(answerId, email, token) {
     const expected = await generateVerificationToken(answerId, email);
     if (token.length !== expected.length) return false;
-    return crypto.subtle.timingSafeEqual(
-        new TextEncoder().encode(token),
-        new TextEncoder().encode(expected),
-    );
+    const tBuf = new TextEncoder().encode(token);
+    const eBuf = new TextEncoder().encode(expected);
+    let result = 0;
+    for (let i = 0; i < tBuf.length; i++) {
+        result |= tBuf[i] ^ eBuf[i];
+    }
+    return result === 0;
 }
 
 /**
- * Mark an answer and its associated email as validated.
+ * Mark an answer as email-verified.
  * @param {string} formId
  * @param {string} answerId
- * @param {string} email
- * @returns {Promise<boolean>} true if both records were found and updated
+ * @returns {Promise<boolean>} true if the answer record was found and updated
  */
-export async function validateAnswer(formId, answerId, email) {
+export async function validateAnswer(formId, answerId) {
     const kv = await getKv();
-    const hashed = await hashEmail(email);
-    const emailKey = [...EMAILS_PREFIX, formId, hashed];
     const answerKey = [...ANSWERS_PREFIX, formId, answerId];
 
-    const [emailEntry, answerEntry] = await Promise.all([
-        kv.get(emailKey),
-        kv.get(answerKey),
-    ]);
+    const answerEntry = await kv.get(answerKey);
+    if (answerEntry.value == null) return false;
 
-    if (emailEntry.value == null || answerEntry.value == null) return false;
-
-    await Promise.all([
-        kv.set(emailKey, { ...emailEntry.value, validated: true }),
-        kv.set(answerKey, { ...answerEntry.value, validated: true }),
-    ]);
-
+    await kv.set(answerKey, { ...answerEntry.value, verificationType: "email-verified" });
     return true;
 }
 
 /**
- * Get total and validated answer counts for a form.
+ * Get answer counts by verification type for a form.
  * @param {string} formId
- * @returns {Promise<{total: number, validated: number}>}
+ * @returns {Promise<{total: number, noEmail: number, emailNotVerified: number, emailVerified: number}>}
  */
-export async function getValidationStats(formId) {
+export async function getVerificationStats(formId) {
     const kv = await getKv();
     const iter = kv.list({ prefix: [...ANSWERS_PREFIX, formId] });
     let total = 0;
-    let validated = 0;
+    let noEmail = 0;
+    let emailNotVerified = 0;
+    let emailVerified = 0;
     for await (const entry of iter) {
         total++;
-        if (entry.value?.validated) validated++;
+        const type = entry.value?.verificationType;
+        if (type === "no-email") noEmail++;
+        else if (type === "email-verified") emailVerified++;
+        else emailNotVerified++;
     }
-    return { total, validated };
+    return { total, noEmail, emailNotVerified, emailVerified };
 }
 
 /**
@@ -390,33 +394,46 @@ export async function getDailyCounts(formId) {
 }
 
 /**
- * Delete an email record and its associated answers from the database.
- * Both records must exist for the deletion to succeed.
+ * Delete an answer and optionally its associated email record.
+ * For no-email answers, only the answer record is needed.
  * @param {string} formId
- * @param {string} email
+ * @param {string|null} email
  * @param {string} answerId
  * @returns {Promise<{deleted: boolean, emailExists?: boolean, answerExists?: boolean}>}
  */
 export async function deleteAnswers(formId, email, answerId) {
     const kv = await getKv();
-    const hashed = await hashEmail(email);
-    const emailKey = [...EMAILS_PREFIX, formId, hashed];
     const answerKey = [...ANSWERS_PREFIX, formId, answerId];
 
-    const [emailEntry, answerEntry] = await Promise.all([
-        kv.get(emailKey),
-        kv.get(answerKey),
-    ]);
+    const answerEntry = await kv.get(answerKey);
+    if (answerEntry.value == null) {
+        return { deleted: false, answerExists: false };
+    }
 
-    if (emailEntry.value == null || answerEntry.value == null) {
-        return { deleted: false, emailExists, answerExists };
+    const verificationType = answerEntry.value.verificationType;
+
+    if (verificationType === "no-email") {
+        await kv.delete(answerKey);
+        return { deleted: true, answerExists: true };
+    }
+
+    if (!email) {
+        return { deleted: false, answerExists: true, emailExists: false };
+    }
+
+    const hashed = await hashEmail(email);
+    const emailKey = [...EMAILS_PREFIX, formId, hashed];
+    const emailEntry = await kv.get(emailKey);
+
+    if (emailEntry.value == null) {
+        return { deleted: false, emailExists: false, answerExists: true };
     }
 
     await Promise.all([
         kv.delete(emailKey),
         kv.delete(answerKey),
     ]);
-    return { deleted: true };
+    return { deleted: true, emailExists: true, answerExists: true };
 }
 
 /**

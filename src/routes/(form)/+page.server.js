@@ -189,56 +189,17 @@ export const actions = {
                 });
             }
 
-            if (session.email == null) {
-                if (dataDict.posta == null) {
-                    return fail(400, {
-                        errors: {
-                            _form: {
-                                type: "email-required",
-                                msg: "Poșta electronică a sesiunii nu a fost setată",
-                                pag: -1,
-                            },
-                        },
-                    });
-                }
-                session = await updateSessionEmail(sessionId, dataDict.posta);
-                if (session == null || session.email == null) {
-                    return fail(400, {
-                        errors: {
-                            _form: {
-                                type: "session-invalid",
-                                msg: "Sesiune nevalidă",
-                                pag: -1,
-                            },
-                        },
-                    });
-                }
-            }
-            email = /** @type {string} */ (session.email);
+            email = session.email;
             answerId = session.answerId;
 
-            const validationMsg = (survey.validare_posta != null)
-                ? survey.validare_posta(session.email)
-                : null;
-            if (validationMsg != null) {
-                return fail(400, {
-                    errors: {
-                        posta: {
-                            type: "email-invalid",
-                            msg: validationMsg,
-                            pag: 0,
-                        },
-                    },
-                });
-            }
-
-            const nonce = dataDict.nonce;
-            if (nonce == null || !verifyPoW(session.email, nonce, 4)) {
+            const powInput = email || answerId;
+            const nonce = data.get("nonce");
+            if (nonce == null || !verifyPoW(powInput, nonce.toString(), 4)) {
                 return fail(400, {
                     errors: {
                         _form: {
                             type: "pow-invalid",
-                            msg: "Verifică adresa poștei electronice și mai încearcă o dată",
+                            msg: "Verificarea anti-spam a eșuat. Încercați din nou.",
                             pag: -1,
                         },
                     },
@@ -305,24 +266,29 @@ export const actions = {
 
         if (isEdit) {
             await overwriteAnswers(survey.id, answerId, new Map(answers));
-        } else {
-            await saveAnswers(
-                /** @type {string} */ (email),
-                survey.id,
-                answerId,
-                new Map(answers),
-            );
-            const sessionId = cookies.get("sessionid");
-            if (sessionId) {
-                await deleteSession(sessionId);
-                cookies.delete("sessionid", { path: "/" });
-            }
+            redirect(303, `/succes?answerId=${answerId}`);
+        }
+
+        const { verificationType } = await saveAnswers(
+            email ?? null,
+            survey.id,
+            answerId,
+            new Map(answers),
+        );
+
+        const sessionId = cookies.get("sessionid");
+        if (sessionId) {
+            await deleteSession(sessionId);
+            cookies.delete("sessionid", { path: "/" });
+        }
+
+        if (email) {
             const origin = dev ? "http://localhost:5173" : Deno.env.get("PUBLIC_ORIGIN") ?? "https://atbbrasov.ro";
             sendVerificationEmail(email, answerId, email, origin).catch((err) =>
                 console.error("Failed to send verification email:", err),
             );
         }
 
-        redirect(303, `/succes?answerId=${answerId}`);
+        redirect(303, `/succes?answerId=${answerId}&type=${verificationType}`);
     },
 };

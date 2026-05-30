@@ -1,5 +1,6 @@
 import { fail } from "@sveltejs/kit";
-import { deleteAnswers, getPreviousAnswers } from "$lib/server/db.js";
+import { dev } from "$app/environment";
+import { deleteAnswers, deleteSession, getPreviousAnswers } from "$lib/server/db.js";
 import survey from "@content/cestionare/atb-cdos-2026.js";
 
 const FORM_ID = survey.id;
@@ -19,7 +20,7 @@ export async function load({ url }) {
 
 /** @satisfies {import('./$types').Actions} */
 export const actions = {
-    delete: async ({ request }) => {
+    delete: async ({ request, cookies }) => {
         const data = await request.formData();
         const email = data.get("email")?.toString();
         const answerId = data.get("answerId")?.toString();
@@ -53,6 +54,7 @@ export const actions = {
 
         if (prev.verificationType === "no-email") {
             await deleteAnswers(FORM_ID, null, answerId);
+            await cleanupSession(cookies);
             return { deleteSuccess: true };
         }
 
@@ -90,6 +92,21 @@ export const actions = {
                 },
             });
         }
+        await cleanupSession(cookies);
         return { deleteSuccess: true };
     },
 };
+
+async function cleanupSession(cookies) {
+    const sessionId = cookies.get("sessionid");
+    if (sessionId) {
+        await deleteSession(sessionId);
+        cookies.delete("sessionid", {
+            path: "/",
+            httpOnly: true,
+            partitioned: !dev,
+            secure: !dev,
+            sameSite: dev ? "lax" : "none",
+        });
+    }
+}

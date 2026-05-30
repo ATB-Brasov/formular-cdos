@@ -13,6 +13,10 @@
             return;
         }
         answerIdErrors = undefined;
+        localStorage.removeItem("posta");
+        localStorage.removeItem("gdpr-consent");
+        localStorage.removeItem("opt-out");
+        localStorage.removeItem("pagina");
         goto("/?edit=" + encodeURIComponent(val), { replaceState: true });
     }
 </script>

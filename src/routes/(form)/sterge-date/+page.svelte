@@ -19,6 +19,15 @@
             answerIdErrors = err.answerId;
         }
     });
+
+    $effect(() => {
+        if (form?.deleteSuccess) {
+            localStorage.removeItem("posta");
+            localStorage.removeItem("gdpr-consent");
+            localStorage.removeItem("opt-out");
+            localStorage.removeItem("pagina");
+        }
+    });
 </script>
 
 <div class="py-18 w-full flex flex-col gap-y-12 text-center">

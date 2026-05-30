@@ -1,21 +1,26 @@
 <script>
     import { page } from "$app/state";
     import { goto } from "$app/navigation";
+    import TextField from "@components/TextField.svelte";
 
     let answerId = $state(page.url.searchParams.get("answerId") ?? "");
+    let answerIdErrors = $state(/** @type {import('$lib/common_types').FieldError | undefined} */ (undefined));
 
     function handleSubmit() {
         const val = answerId.trim();
-        if (val) {
-            goto("/?edit=" + encodeURIComponent(val), { replaceState: true });
+        if (!val) {
+            answerIdErrors = { type: "field-required", msg: "Introdu ID-ul răspunsului.", pag: -1 };
+            return;
         }
+        answerIdErrors = undefined;
+        goto("/?edit=" + encodeURIComponent(val), { replaceState: true });
     }
 </script>
 
 <div class="py-18 w-full flex flex-col gap-y-12 text-center">
     <h1 class="text-4xl font-bold">Modifică răspunsuri</h1>
 
-    <p class="text-lg">
+    <p class="text-md">
         Introdu ID-ul răspunsului primit după completarea formularului pentru
         a-ți modifica răspunsurile.
     </p>
@@ -27,17 +32,18 @@
         }}
         class="mx-auto max-w-md flex flex-col gap-3"
     >
-        <input
-            type="text"
-            name="answerId"
+        <TextField
+            tip="text"
+            titlu="ID-ul răspunsului"
+            nume="answerId"
             bind:value={answerId}
-            placeholder="ID-ul răspunsului"
-            required
-            class="w-full px-3 py-2 rounded border border-surface-border bg-white text-sm font-mono text-center"
-        >
+            obligatoriu={true}
+            bind:errors={answerIdErrors}
+            compact
+        />
         <button
             type="submit"
-            class="rounded-md px-4 py-1.5 bg-primary text-white text-sm hover:bg-primary-hover"
+            class="self-end rounded-md w-full px-4 py-1.5 bg-primary text-white text-sm hover:bg-primary-hover"
         >
             Modifică răspunsurile
         </button>

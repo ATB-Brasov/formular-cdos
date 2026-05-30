@@ -14,6 +14,7 @@
      * @property {string | null} [disclaimer=null]
      * @property {string} titlu
      * @property {boolean} [obligatoriu=false]
+     * @property {boolean} [compact=false]
      * @property {string | null} [placeholder=null]
      * @property {string} value
      * @property {FieldError} errors
@@ -27,6 +28,7 @@
         titlu: question,
         desc = null,
         obligatoriu = false,
+        compact = false,
         disclaimer = null,
         tip,
         placeholder = null,
@@ -40,14 +42,17 @@
 <FieldFrame
     {question}
     {obligatoriu}
+    {compact}
     {desc}
     {errors}
 >
+    {#if disclaimer != null}
     <p
         class="border-l-3 border-surface-dark pl-2.5 mt-1 text-surface-dark text-sm mb-3"
     >
         {@html disclaimer}
     </p>
+    {/if}
     <input
         id={nume}
         {placeholder}

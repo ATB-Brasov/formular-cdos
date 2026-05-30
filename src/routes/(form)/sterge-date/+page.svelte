@@ -1,49 +1,35 @@
 <script>
     import { enhance } from "$app/forms";
+    import TextField from "@components/TextField.svelte";
 
     /** @type {import('./$types').PageProps} */
     let { data, form } = $props();
+
+    let emailErrors = $state(/** @type {import('$lib/common_types').FieldError | undefined} */ (undefined));
+    let answerIdErrors = $state(/** @type {import('$lib/common_types').FieldError | undefined} */ (undefined));
+    let emailValue = $state("");
+    let answerIdValue = $state(data.answerId ?? "");
+
+    $effect(() => {
+        const err = /** @type {any} */ (form)?.errors;
+        if (err?.email != null) {
+            emailErrors = err.email;
+        }
+        if (err?.answerId != null) {
+            answerIdErrors = err.answerId;
+        }
+    });
 </script>
 
 <div class="py-18 w-full flex flex-col gap-y-12 text-center">
     <h1 class="text-4xl font-bold">Ștergere răspunsuri</h1>
 
-{#if data.verificationType === "no-email"}
-    <p class="text-lg">
-        Ești pe cale să ștergi răspunsurile tale. Deoarece nu ai furnizat o
-        adresă de e-mail, confirmă introducând ID-ul răspunsului.
-    </p>
-
-    <form
-        method="POST"
-        action="?/delete"
-        use:enhance
-        class="mx-auto max-w-md flex flex-col gap-3"
-    >
-        <input
-            type="text"
-            name="answerId"
-            value={data.answerId ?? ""}
-            placeholder="ID-ul răspunsului"
-            required
-            class="w-full px-3 py-2 rounded border border-surface-border bg-white text-sm font-mono"
-        >
-        <button
-            type="submit"
-            class="self-end rounded-md px-4 py-1.5 bg-danger text-white text-sm hover:bg-danger-hover"
-        >
-            Șterge răspunsurile
-        </button>
-        {#if form?.deleteSuccess}
-            <p class="text-green-600 text-sm">Răspunsurile au fost șterse.</p>
-        {:else if form?.deleteMsg}
-            <p class="text-danger text-sm">{form.deleteMsg}</p>
-        {/if}
-    </form>
-{:else}
     <p class="text-md">
-        Pentru a-ți șterge adresa poștei și/sau răspunsurile din baza noastră de date, introdu și ID-ul
-        răspunsului primit după completare și, în caz că a fost introdusă, adresa poșei electronice.
+        Pentru a-ți șterge răspunsurile din baza noastră de date, introdu ID-ul
+        răspunsului primit după completare.
+        {#if data.verificationType !== "no-email"}
+            Dacă ai furnizat o adresă de e-mail, introdu și aceasta pentru confirmare.
+        {/if}
     </p>
 
     <form
@@ -52,21 +38,26 @@
         use:enhance
         class="mx-auto max-w-md flex flex-col gap-3"
     >
-        <input
-            type="text"
-            name="answerId"
-            value={data.answerId ?? ""}
-            placeholder="ID-ul răspunsului"
-            required
-            class="w-full px-3 py-2 rounded border border-surface-border bg-white text-sm font-mono"
-        >
-        <input
-            type="email"
-            name="email"
+        <TextField
+            tip="text"
+            titlu="ID-ul răspunsului"
+            nume="answerId"
+            bind:value={answerIdValue}
+            obligatoriu={true}
+            bind:errors={answerIdErrors}
+            compact
+        />
+
+        <TextField
+            tip="email"
+            titlu="Adresă de e-mail"
+            nume="email"
             placeholder="exemplu@student.unitbv.ro"
-            required
-            class="w-full px-3 py-2 rounded border border-surface-border bg-white text-sm"
-        >
+            bind:errors={emailErrors}
+            bind:value={emailValue}
+            compact
+        />
+
         <button
             type="submit"
             class="self-end rounded-md w-full px-4 py-1.5 bg-danger text-white text-sm hover:cursor-pointer hover:bg-danger-hover"
@@ -79,7 +70,6 @@
             <p class="text-danger text-sm">{form.deleteMsg}</p>
         {/if}
     </form>
-{/if}
 
     <p><a href="/">Înapoi la formular</a></p>
 </div>

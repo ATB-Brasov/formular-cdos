@@ -1,13 +1,13 @@
 <script>
     /** @import {FocusEventHandler} from import('svelte/elements') */
     /** @import {FieldError} from import('$lib/common_types') */
-    /** @import { Validator } from import('@content/cestionare/types')*/
 
     /**
      * @typedef {Object} Props
      * @property {string} question
      * @property {string | null} [desc=null]
      * @property {boolean} [obligatoriu=false]
+     * @property {boolean} [compact=false]
      * @property {import('svelte').Snippet} children
      * @property {FocusEventHandler} [onFocusOut]
      * @property {FieldError} errors
@@ -17,6 +17,7 @@
     let {
         desc = null,
         obligatoriu = false,
+        compact = false,
         question,
         errors,
         children,
@@ -25,7 +26,7 @@
 </script>
 
 <fieldset onfocusout={onFocusOut} class="flex flex-col">
-    <legend class="mb-1 text-lg font-bold">
+    <legend class="{compact ? 'mb-0 text-sm' : 'mb-1 text-lg font-bold'}">
         {question}{#if obligatoriu}&#8288;<span
                 class="px-0.5 leading-none font-bold text-danger"
             >*</span>

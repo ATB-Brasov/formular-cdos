@@ -27,6 +27,13 @@ export const actions = {
         if (answerId == null) {
             return fail(400, {
                 deleteMsg: "Introdu ID-ul răspunsului.",
+                errors: {
+                    answerId: {
+                        type: "field-required",
+                        msg: "ID-ul răspunsului este necesar.",
+                        pag: -1,
+                    },
+                },
             });
         }
 
@@ -34,6 +41,13 @@ export const actions = {
         if (prev == null) {
             return fail(404, {
                 deleteMsg: "Nu s-au găsit date pentru acest ID.",
+                errors: {
+                    answerId: {
+                        type: "not-found",
+                        msg: "Nu s-au găsit date pentru acest ID.",
+                        pag: -1,
+                    },
+                },
             });
         }
 
@@ -45,6 +59,13 @@ export const actions = {
         if (email == null) {
             return fail(400, {
                 deleteMsg: "Introdu adresa de e-mail asociată răspunsului pentru confirmare.",
+                errors: {
+                    email: {
+                        type: "field-required",
+                        msg: "Adresa de e-mail este necesară pentru confirmare.",
+                        pag: -1,
+                    },
+                },
             });
         }
 
@@ -59,7 +80,14 @@ export const actions = {
             }
             return fail(400, {
                 deleteMsg:
-                    "Adresa de e-mail nu corespunde. Verifică datele introduse.",
+                    "Adresa poștei electronice nu a fost înregistrată. Verifică datele introduse.",
+                errors: {
+                    email: {
+                        type: "email-invalid",
+                        msg: "Adresa poștei electronice nu a fost înregistrată.",
+                        pag: -1,
+                    },
+                },
             });
         }
         return { deleteSuccess: true };

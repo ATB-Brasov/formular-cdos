@@ -205,6 +205,36 @@ export const actions = {
                     },
                 });
             }
+
+            if (email) {
+                const validationMsg = (survey.validare_posta != null)
+                    ? survey.validare_posta(email)
+                    : null;
+                if (validationMsg != null) {
+                    return fail(400, {
+                        errors: {
+                            _form: {
+                                type: "email-invalid",
+                                msg: validationMsg,
+                                pag: -1,
+                            },
+                        },
+                    });
+                }
+
+                const answered_email = await getAnsweredEmail(survey.id, email);
+                if (answered_email != null) {
+                    return fail(400, {
+                        errors: {
+                            _form: {
+                                type: "email-exists",
+                                msg: "Este înregistrat răspuns pe această poștă electronică",
+                                pag: -1,
+                            },
+                        },
+                    });
+                }
+            }
         }
 
         let activeSurvey = survey;

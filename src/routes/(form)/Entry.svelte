@@ -141,7 +141,7 @@
         disclaimer={`
             Adresa e-mail <strong>nu va fi</strong> asociată cu răspunsurile
             colectate. Colectăm adresa pentru a ne asigura că ești student UNITBV.
-${false && 'Totuși, dacă ai dubii, urmărește postările noastre pe Instagram ca să fii la curent când vom colecta răspunsuri în campusul universitar, unde îți vei putea împărtăși experiența cu toată încredera ca datele nu vor fi asociate cu identiatea ta.'}
+${false ? 'Totuși, dacă ai dubii, urmărește postările noastre pe Instagram ca să fii la curent când vom colecta răspunsuri în campusul universitar, unde îți vei putea împărtăși experiența cu toată încredera ca datele nu vor fi asociate cu identiatea ta.' : ''}
             Pentru mai multe informații, consultați <a href="/politica-confidentialitate">politica de confidențialitate</a>.`}
         nume={"posta"}
         bind:errors={errors["posta"]}
@@ -155,7 +155,7 @@ ${false && 'Totuși, dacă ai dubii, urmărește postările noastre pe Instagram
     {/if}
 
     <div
-        class="flex flex-col rounded-xl border p-3 transition-colors {errors['gdpr-consent'] != null ? 'border-danger bg-red-50' : 'border-transparent'}"
+        class="flex flex-col rounded-xl border transition-colors {errors['gdpr-consent'] != null ? 'border-danger bg-red-50' : 'border-transparent'}"
     >
         <label for="opt-out" class="sm:pb-0.5">
             <input
@@ -165,13 +165,12 @@ ${false && 'Totuși, dacă ai dubii, urmărește postările noastre pe Instagram
                 class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
             />
             Nu doresc să furnizez o adresă de e-mail. Înțeleg că răspunsul meu
-            va fi marcat ca neverificat și nu voi putea modifica sau șterge
-            răspunsurile ulterior.
+            va fi marcat ca neverificat.
         </label>
     </div>
 
     <div
-        class="flex flex-col rounded-xl border p-3 transition-colors {errors['gdpr-consent'] != null ? 'border-danger bg-red-50' : 'border-transparent'}"
+        class="flex flex-col rounded-xl border transition-colors {errors['gdpr-consent'] != null ? 'border-danger bg-red-50' : 'border-transparent'}"
     >
         <label for="gdpr-consent" class="sm:leading-0 sm:pb-0.5">
             <input

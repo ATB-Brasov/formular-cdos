@@ -510,7 +510,7 @@
                                             {...field}
                                             tip={field.tip}
                                             errors={errors[field.nume]}
-                                            onblur={() => false && applyFieldValidation(field)}
+                                            onblur={() => applyFieldValidation(field)}
                                             bind:value={answers[field.nume]}
                                         />
                                     {:else if field.tip === "textarea"}
@@ -518,7 +518,7 @@
                                             {...field}
                                             tip={field.tip}
                                             errors={errors[field.nume]}
-                                            onblur={() => false && applyFieldValidation(field)}
+                                            onblur={() => applyFieldValidation(field)}
                                             bind:value={answers[field.nume]}
                                         />
                                     {:else if field.tip.startsWith("selecție")}
@@ -526,7 +526,7 @@
                                             {field}
                                             allAnswers={answers}
                                             bind:errors={errors[field.nume]}
-                                            onblur={() => false && applyFieldValidation(field)}
+                                            onblur={() => applyFieldValidation(field)}
                                             bind:value={answers[field.nume]}
                                         />
                                     {:else}

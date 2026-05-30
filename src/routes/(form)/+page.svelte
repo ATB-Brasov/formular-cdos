@@ -457,7 +457,7 @@
                         }
                     }
                 }
-                return async ({ result, update }) => {
+                return async ({ update }) => {
                     await update();
                 };
             }}

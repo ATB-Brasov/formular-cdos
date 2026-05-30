@@ -41,9 +41,9 @@
         {/if}
     </form>
 {:else}
-    <p class="text-lg">
-        Pentru a-ți șterge răspunsurile, introdu adresa de e-mail și ID-ul
-        răspunsului primit după completare.
+    <p class="text-md">
+        Pentru a-ți șterge adresa poștei și/sau răspunsurile din baza noastră de date, introdu și ID-ul
+        răspunsului primit după completare și, în caz că a fost introdusă, adresa poșei electronice.
     </p>
 
     <form
@@ -69,7 +69,7 @@
         >
         <button
             type="submit"
-            class="self-end rounded-md px-4 py-1.5 bg-danger text-white text-sm hover:bg-danger-hover"
+            class="self-end rounded-md w-full px-4 py-1.5 bg-danger text-white text-sm hover:cursor-pointer hover:bg-danger-hover"
         >
             Șterge răspunsurile
         </button>

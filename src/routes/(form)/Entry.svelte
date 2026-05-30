@@ -146,7 +146,7 @@ ${false ? 'Totuși, dacă ai dubii, urmărește postările noastre pe Instagram 
         nume={"posta"}
         bind:errors={errors["posta"]}
         placeholder={"exemplu@student.unitbv.ro"}
-        obligatoriu={true}
+        obligatoriu={!optOut}
         bind:value={email}
     />
 

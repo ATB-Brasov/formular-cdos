@@ -136,7 +136,7 @@ export const actions = {
         return { success: true };
     },
 
-    submit: async ({ request, cookies }) => {
+    submit: async ({ request, cookies, url }) => {
         const data = await request.formData();
         const dataDict = Object.fromEntries(
             data.entries().map(([name, value]) => [name, value.toString()]),
@@ -313,7 +313,7 @@ export const actions = {
         }
 
         if (email) {
-            const origin = dev ? "http://localhost:5173" : Deno.env.get("PUBLIC_ORIGIN") ?? "https://atbbrasov.ro";
+            const origin = dev ? "http://localhost:5173" : (Deno.env.get("ORIGIN") ?? url.origin);
             sendVerificationEmail(email, answerId, email, origin).catch((err) =>
                 console.error("Failed to send verification email:", err),
             );

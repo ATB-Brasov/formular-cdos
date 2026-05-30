@@ -103,7 +103,7 @@ async function v3(kv) {
     for await (const entry of answerIter) {
         const val = entry.value;
         if (val && val.verificationType === undefined) {
-            const type = val.validated ? "email-verified" : "email-not-verified";
+            const type = "email-verified";
             const { validated, ...rest } = val;
             await kv.set(entry.key, { ...rest, verificationType: type });
             answersUpdated++;

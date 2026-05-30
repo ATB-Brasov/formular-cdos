@@ -47,38 +47,40 @@
         experiența de student la Universitatea Transilvania din Brașov.
     </p>
 
-    {#if data.verificationType === "no-email"}
-        <div
-            class="mx-auto max-w-md rounded-xl border border-amber-200 bg-amber-50 p-4 text-left"
-        >
-            <p class="font-semibold text-amber-800 mb-1">
-                Răspuns neverificat
-            </p>
-            <p class="text-sm text-amber-700">
-                Răspunsul tău a fost înregistrat fără o adresă de e-mail.
-                Fiindcă nu putem garanta că ești student UnitBv vom marca
-                răspunsul ca neverificat. El va fi luat în considerare la
-                prelucrarea răspunsurilor, însă va fi considerat în categorie
-                separată.
-            </p>
-        </div>
-    {:else}
-        <div
-            class="mx-auto max-w-md rounded-xl border border-primary/20 bg-primary/5 p-4 text-left"
-        >
-            <p class="font-semibold text-primary mb-1">
-                Confirmă-ți adresa de e-mail
-            </p>
-            <p class="text-sm text-surface-dim">
-                Ți-am trimis un e-mail de confirmare. Accesează linkul din e-mail
-                pentru a-ți valida răspunsul și a contribui la validitatea
-                statistică a rezultatelor.
-            </p>
-            <p class="text-xs text-surface-dim mt-2">
-                Dacă nu găsești e-mailul, verifică folderul Spam. Confirmarea este
-                opțională, dar ajută la asigurarea calității datelor colectate.
-            </p>
-        </div>
+    {#if data.verificationType != null}
+        {#if data.verificationType === "no-email"}
+            <div
+                class="mx-auto max-w-md rounded-xl border border-amber-200 bg-amber-50 p-4 text-left"
+            >
+                <p class="font-semibold text-amber-800 mb-1">
+                    Răspuns neverificat
+                </p>
+                <p class="text-sm text-amber-700">
+                    Răspunsul tău a fost înregistrat fără o adresă de e-mail.
+                    Fiindcă nu putem garanta că ești student UnitBv vom marca
+                    răspunsul ca neverificat. El va fi luat în considerare la
+                    prelucrarea răspunsurilor, însă va fi considerat în categorie
+                    separată.
+                </p>
+            </div>
+        {:else}
+            <div
+                class="mx-auto max-w-md rounded-xl border border-primary/20 bg-primary/5 p-4 text-left"
+            >
+                <p class="font-semibold text-primary mb-1">
+                    Confirmă-ți adresa de e-mail
+                </p>
+                <p class="text-sm text-surface-dim">
+                    Ți-am trimis un e-mail de confirmare. Accesează linkul din e-mail
+                    pentru a-ți valida răspunsul și a contribui la validitatea
+                    statistică a rezultatelor.
+                </p>
+                <p class="text-xs text-surface-dim mt-2">
+                    Dacă nu găsești e-mailul, verifică folderul Spam. Confirmarea este
+                    opțională, dar ajută la asigurarea calității datelor colectate.
+                </p>
+            </div>
+        {/if}
     {/if}
 
     {#if data.answerId}
@@ -110,5 +112,5 @@
         </div>
     {/if}
 
-    <p><a href="/">Completează din nou</a></p>
+    <p><a href="/">Înăpoi la formular</a></p>
 </div>

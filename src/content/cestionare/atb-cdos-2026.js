@@ -294,7 +294,7 @@ export default {
                     {
                         optiuni: () => {
                             return {
-                                optiuni: ["da", "nu"],
+                                optiuni: ["da", "în proces", "nu"],
                                 eroare: null,
                             };
                         },
@@ -532,11 +532,20 @@ export default {
                     {
                         desc:
                             "Studenții au dreptul de a beneficia de acoperirea costurilor necesare pentru efectuarea practicii comasate, pentru perioada prevăzută în planurile de învătământ, inclusiv cheltuieli de masă, cazare și transport, in situațiile in care practica se desfășoara in afara centrului universitar respectiv (institutului), conform prevederilor art. 128 alin. (25) din Legea nr. 199/2023, cu modificările și completarile ulterioare;",
+
+                        ascunde: (rspi) =>
+                            rspi["practica-de-specialitate"] !== "în proces",
                     },
                 ),
                 da_nu_caz(
                     "prac_cazare_camin",
                     "Ai beneficiat de cazare în căminele universității pe perioada practicii obligatorii? [art. 9 (1) d)]",
+                    {
+                        desc:
+                            "Studenții pot beneficia de cazare în căminele universitare pe perioada practicii desfășurate în cadrul universității",
+                        ascunde: (rspi) =>
+                            rspi["practica-de-specialitate"] !== "în proces",
+                    },
                 ),
                 da_nustiu(
                     "prac_tutore_indru",
@@ -545,10 +554,18 @@ export default {
                 da_nustiu(
                     "prac_eval_calitat",
                     "Ai avut posibilitatea de a evalua calitatea stagiului de practică și de a sesiza eventuale deficiențe? [art. 9 (1) f)]",
+                    {
+                        ascunde: (rspi) =>
+                            rspi["practica-de-specialitate"] !== "în proces",
+                    },
                 ),
                 da_nu_caz(
                     "prac_recuno_indiv",
                     "Ti-a fost recunoscută practica efectuată individual după evaluarea îndeplinirii obiectivelor? [art. 9 (1) g)]",
+                    {
+                        ascunde: (rspi) =>
+                            rspi["practica-de-specialitate"] !== "în proces",
+                    },
                 ),
                 detalii("detalii-practica"),
             ],

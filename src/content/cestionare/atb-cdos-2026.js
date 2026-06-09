@@ -518,7 +518,7 @@ export default {
         {
             // afișăm numai dacă studentul răspunde că a făcut practica de specialitate în prima secțiune
             titlu: "Practica de Specialitate",
-            ascunde: (rspi) => rspi["practica-de-specialitate"] !== "da" || rspi["practica-de-specialitate"] !== "în proces" ,
+            ascunde: (rspi) => rspi["practica-de-specialitate"] == "nu",
             descriere:
                 "Această secțiune analizează calitatea stagiilor de practică",
             cimpuri: [
